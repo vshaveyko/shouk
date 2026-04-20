@@ -6,9 +6,11 @@ nixPkgs = ["nodejs_20", "openssl"]
 # Nixpacks auto-runs `npm ci` in its install phase for Node projects and
 # executes the `postinstall` script (which runs `prisma generate`). No need
 # to repeat either here — doing so triggers EBUSY on node_modules/.cache.
+#
+# Migrations run at startup (see `start` script in package.json), not at
+# build time — Railway's build network can't reach postgres.railway.internal.
 [phases.build]
 cmds = [
-  "npx prisma migrate deploy",
   "npm run build",
 ]
 
