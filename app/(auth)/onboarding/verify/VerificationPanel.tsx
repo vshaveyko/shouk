@@ -236,8 +236,8 @@ function generateMockHandle(providerId: string) {
   const base = Math.random().toString(36).slice(2, 7);
   if (providerId === "INSTAGRAM") return `@jane_${base}`;
   if (providerId === "TWITTER") return `@jane_${base}`;
-  if (providerId === "FACEBOOK") return `Jane Merchant`;
+  if (providerId === "FACEBOOK") return `Jane Merchant ${base}`;
   if (providerId === "LINKEDIN") return `jane-merchant-${base}`;
-  if (providerId === "GOOGLE") return `jane@example.com`;
+  if (providerId === "GOOGLE") return `jane+${base}@example.com`;
   return base;
 }

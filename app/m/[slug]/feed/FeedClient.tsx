@@ -364,7 +364,10 @@ function ListingCard({ listing, onToggleSave }: { listing: Listing; onToggleSave
         </div>
 
         <div className="p-4 space-y-1.5">
-          <h3 className="text-[15px] font-semibold leading-snug line-clamp-2 group-hover:text-blue-ink transition-colors">
+          <h3
+            className="text-[15px] font-semibold leading-snug line-clamp-2 group-hover:text-blue-ink transition-colors"
+            data-testid="listing-title"
+          >
             {listing.title}
           </h3>
           <div className="flex items-center justify-between gap-2">

@@ -773,19 +773,22 @@ function SchemaStep({
 
   function addField() {
     if (fields.length >= 25) return;
-    setState((s) => ({
-      ...s,
-      schemaFields: [
-        ...s.schemaFields,
-        {
-          uid: uid(),
-          label: "",
-          name: "field",
-          type: "SHORT_TEXT",
-          required: false,
-        },
-      ],
-    }));
+    setState((s) => {
+      const n = s.schemaFields.length + 1;
+      return {
+        ...s,
+        schemaFields: [
+          ...s.schemaFields,
+          {
+            uid: uid(),
+            label: `Field ${n}`,
+            name: `field_${n}`,
+            type: "SHORT_TEXT",
+            required: false,
+          },
+        ],
+      };
+    });
   }
 
   return (
@@ -1187,7 +1190,7 @@ function MembershipStep({
                   <input
                     type="checkbox"
                     checked={checked}
-                    data-testid={`verify-option-${p.id}`}
+                    data-testid={`verify-option-${p.id.toLowerCase()}`}
                     onChange={() => toggleVerify(p.id)}
                     className="h-4 w-4 rounded border-line text-blue focus:ring-blue"
                   />

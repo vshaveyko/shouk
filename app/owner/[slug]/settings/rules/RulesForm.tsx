@@ -242,6 +242,9 @@ export function RulesForm({
 
   return (
     <form onSubmit={save} data-testid="rules-form" className="space-y-5">
+      <h2 className="text-[18px] font-semibold tracking-[-0.01em]">
+        Membership rules
+      </h2>
       <Card>
         <CardHeader>
           <CardTitle>How do people join?</CardTitle>

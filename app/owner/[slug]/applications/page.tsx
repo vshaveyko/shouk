@@ -1,7 +1,7 @@
+import { redirect } from "next/navigation";
 import { requireOwnerOf } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { ApplicationsList } from "./ApplicationsList";
-import { ApplicationDetail } from "./[appId]/ApplicationDetail";
 
 export const dynamic = "force-dynamic";
 
@@ -12,65 +12,32 @@ export default async function ApplicationsQueuePage({
 }) {
   const { marketplace } = await requireOwnerOf(params.slug);
 
-  const apps = await prisma.application.findMany({
+  // If there's a pending application, redirect to the detail route so the
+  // URL matches the rendered structure. Keeps the component tree stable when
+  // a user later navigates between queue rows (which would otherwise swap
+  // wrappers and remount any open action dialog).
+  const first = await prisma.application.findFirst({
     where: { marketplaceId: marketplace.id, status: "PENDING" },
     orderBy: { createdAt: "asc" },
-    include: {
-      user: {
-        select: {
-          id: true,
-          displayName: true,
-          name: true,
-          email: true,
-          image: true,
-          verifiedAccounts: { select: { provider: true } },
-        },
-      },
-    },
+    select: { id: true },
   });
-
-  const rows = apps.map((a) => {
-    const answers = a.answers as Record<string, unknown> | null;
-    let excerpt: string | null = null;
-    if (answers) {
-      for (const v of Object.values(answers)) {
-        if (typeof v === "string" && v.length > 20) {
-          excerpt = v.length > 160 ? `${v.slice(0, 160).trim()}…` : v;
-          break;
-        }
-      }
-    }
-    return {
-      id: a.id,
-      createdAt: a.createdAt.toISOString(),
-      userName: a.user.displayName ?? a.user.name ?? a.user.email ?? "Applicant",
-      userImage: a.user.image,
-      verifiedProviders: a.user.verifiedAccounts.map((v) => v.provider),
-      excerpt,
-      subtitle: null,
-    };
-  });
-
-  const firstId = rows[0]?.id;
-  const totalRequiredVerifications = marketplace.requiredVerifications.length;
+  if (first) {
+    redirect(`/owner/${params.slug}/applications/${first.id}`);
+  }
 
   return (
     <>
       <ApplicationsList
         slug={params.slug}
-        rows={rows}
-        selectedId={firstId}
-        totalRequiredVerifications={totalRequiredVerifications}
+        rows={[]}
+        selectedId={undefined}
+        totalRequiredVerifications={marketplace.requiredVerifications.length}
       />
-      <div className="q-detail">
-        {firstId ? (
-          <ApplicationDetail slug={params.slug} appId={firstId} />
-        ) : (
-          <div className="empty-state">
-            Queue is clear — new applications will appear here.
-          </div>
-        )}
-      </div>
+      <section className="flex-1 min-w-0 bg-bg-soft">
+        <div className="empty-state">
+          Queue is clear — new applications will appear here.
+        </div>
+      </section>
     </>
   );
 }

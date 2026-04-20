@@ -64,7 +64,7 @@ export function ApplyForm({ slug, marketplaceName, questions, prefill }: Props) 
     },
   );
 
-  const [agree, setAgree] = React.useState(false);
+  const [agree, setAgree] = React.useState(true);
   const [submitting, setSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [missingProviders, setMissingProviders] = React.useState<string[]>([]);

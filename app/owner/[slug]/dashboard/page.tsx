@@ -325,6 +325,9 @@ export default async function OwnerDashboardPage({
       <main className="dash-body">
         <div className="page-head">
           <div>
+            <h2 className="text-[11px] tracking-[0.14em] uppercase text-blue-ink font-semibold mb-2">
+              {marketplace.name}
+            </h2>
             <h1>
               Welcome back, <em>{displayOwner}</em>.
             </h1>

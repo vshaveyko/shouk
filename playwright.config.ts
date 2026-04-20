@@ -31,13 +31,14 @@ export default defineConfig({
         timeout: 120_000,
         reuseExistingServer: !process.env.CI,
         env: {
-          DATABASE_URL: process.env.DATABASE_URL ?? "",
+          // DATABASE_URL is intentionally not hard-coded here — Next.js will
+          // pick it up from `.env` (or a pre-exported shell env var) so the
+          // dev server talks to the same Postgres the developer is using.
           NEXTAUTH_URL: BASE_URL,
           NEXTAUTH_SECRET: "e2e-secret-key",
           AUTH_SECRET: "e2e-secret-key",
           AUTH_GOOGLE_ID: "",
           AUTH_GOOGLE_SECRET: "",
-          NODE_ENV: "test",
         },
       },
 });

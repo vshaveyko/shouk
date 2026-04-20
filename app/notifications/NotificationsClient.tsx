@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   AtSign,
   Bell,
@@ -127,6 +128,7 @@ export function NotificationsClient({
   initialUnread: number;
 }) {
   const [items, setItems] = React.useState(initialItems);
+  const router = useRouter();
   const [tab, setTab] = React.useState<TabKey>("all");
   const [marking, setMarking] = React.useState(false);
 
@@ -161,6 +163,7 @@ export function NotificationsClient({
       if (res.ok) {
         const now = new Date().toISOString();
         setItems((prev) => prev.map((n) => (n.readAt ? n : { ...n, readAt: now })));
+        router.refresh();
       }
     } finally {
       setMarking(false);

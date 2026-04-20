@@ -222,17 +222,20 @@ export function SchemaEditor({
 
   function addField() {
     if (fields.length >= 25) return;
-    setFields((prev) => [
-      ...prev,
-      {
-        uid: uid(),
-        order: prev.length,
-        name: "field",
-        label: "",
-        type: "SHORT_TEXT",
-        required: false,
-      },
-    ]);
+    setFields((prev) => {
+      const n = prev.length + 1;
+      return [
+        ...prev,
+        {
+          uid: uid(),
+          order: prev.length,
+          name: `field_${n}`,
+          label: `Field ${n}`,
+          type: "SHORT_TEXT",
+          required: false,
+        },
+      ];
+    });
   }
 
   function validate(): string | null {
@@ -260,7 +263,13 @@ export function SchemaEditor({
       toast.error(err);
       return;
     }
-    setConfirmOpen(true);
+    // Only ask to confirm when a change could affect existing listings —
+    // adding brand-new fields is purely additive and saves directly.
+    if (removedFromActive.length > 0) {
+      setConfirmOpen(true);
+      return;
+    }
+    void confirmSave();
   }
 
   async function confirmSave() {

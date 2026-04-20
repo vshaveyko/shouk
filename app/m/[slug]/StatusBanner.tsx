@@ -26,10 +26,10 @@ export function StatusBanner({ slug, status, reviewerNote, rejectionReason }: Pr
           <div className="space-y-1.5">
             <h2 className="text-[22px] tracking-[-0.02em]">
               Your application is{" "}
-              <em className="serif italic text-blue-ink">in review</em>.
+              <em className="serif italic text-blue-ink">pending review</em>.
             </h2>
             <p className="text-[14px] text-ink-soft max-w-[360px] mx-auto">
-              We'll let you know shortly. Typical review takes ~48 hours.
+              Typical review takes ~48 hours — you'll hear back by email.
             </p>
           </div>
         </div>

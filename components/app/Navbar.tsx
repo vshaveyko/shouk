@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Avatar } from "@/components/ui/Avatar";
 import { ShouksMark } from "@/components/brand/Logo";
@@ -303,11 +304,14 @@ function UserMenu({
           </DropdownMenu.Item>
           <DropdownMenu.Separator className="h-px bg-line-soft my-1" />
           <DropdownMenu.Item asChild>
-            <form action="/api/auth/signout" method="post" className="block">
-              <button type="submit" className="w-full text-left px-2.5 py-2 rounded-[6px] hover:bg-hover text-[14px] text-danger" data-testid="sign-out">
-                Sign out
-              </button>
-            </form>
+            <button
+              type="button"
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="w-full text-left px-2.5 py-2 rounded-[6px] hover:bg-hover text-[14px] text-danger"
+              data-testid="sign-out"
+            >
+              Sign out
+            </button>
           </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu.Portal>

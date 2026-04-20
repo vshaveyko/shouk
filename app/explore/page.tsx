@@ -140,9 +140,9 @@ export default async function ExplorePage({
                       {entryLabels[m.entryMethod] ?? m.entryMethod}
                     </span>
                   </div>
-                  <div className="absolute bottom-3 left-3.5 right-3.5 text-white font-semibold text-[17px] tracking-[-0.015em] truncate">
+                  <h3 className="absolute bottom-3 left-3.5 right-3.5 text-white font-semibold text-[17px] tracking-[-0.015em] truncate">
                     {m.name}
-                  </div>
+                  </h3>
                 </div>
                 <div className="p-4 space-y-2">
                   {m.tagline && (

@@ -14,6 +14,12 @@ export default async function HomeDashboard() {
   if (!ctx) redirect("/signin?callbackUrl=/home");
   const { user, memberships, owned } = ctx;
 
+  // Owners whose primary identity is "owner" and who already run at least one
+  // marketplace should land in their admin shell, not the member home feed.
+  if (user.defaultRole === "OWNER" && owned.length > 0) {
+    redirect(`/owner/${owned[0].slug}/dashboard`);
+  }
+
   const active = memberships[0] ?? owned[0] ?? null;
 
   const unread = await prisma.notification.count({

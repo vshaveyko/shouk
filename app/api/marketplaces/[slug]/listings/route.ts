@@ -54,13 +54,21 @@ export async function POST(req: Request, { params }: { params: { slug: string } 
     return NextResponse.json({ error: "Fixed-price listings require a price." }, { status: 400 });
   }
 
-  // Validate required schema fields
+  // Validate required schema fields. Title/description/price are captured
+  // via the hard-coded top-level body props (d.title / d.description /
+  // d.priceCents) rather than schemaValues, so skip them here. Image fields
+  // live on d.images (also top-level) — their count is validated separately.
+  const reservedSchemaNames = new Set(["title", "description", "price"]);
   for (const field of mp.schemaFields) {
+    if (reservedSchemaNames.has(field.name)) continue;
+    if (field.type === "IMAGE") {
+      if (field.required && (!d.images || d.images.length < (field.minImages ?? 1))) {
+        return NextResponse.json({ error: `Upload at least ${field.minImages ?? 1} image(s).` }, { status: 400 });
+      }
+      continue;
+    }
     if (field.required && d.schemaValues[field.name] == null) {
       return NextResponse.json({ error: `Field "${field.label}" is required.` }, { status: 400 });
-    }
-    if (field.type === "IMAGE" && field.required && (!d.images || d.images.length < (field.minImages ?? 1))) {
-      return NextResponse.json({ error: `Upload at least ${field.minImages ?? 1} image(s).` }, { status: 400 });
     }
   }
 

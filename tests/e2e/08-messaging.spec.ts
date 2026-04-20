@@ -2,6 +2,13 @@ import { expect, test } from "@playwright/test";
 import { signIn } from "../fixtures/helpers";
 
 test.describe("Flow 6E · Marketplace messaging", () => {
+  // Earlier tests in this suite (Flow 5 · owner moderation) may have
+  // suspended the seeded "member" account. Reset seed memberships to ACTIVE
+  // before running messaging tests so they can rely on seeded state.
+  test.beforeAll(async ({ request }) => {
+    await request.post("/api/e2e-reset");
+  });
+
   test("global /messages redirects into the user's first marketplace", async ({ page }) => {
     await signIn(page, "member@shouks.test", "Test123!@#");
     await page.goto("/messages");
@@ -59,7 +66,7 @@ test.describe("Flow 6E · Marketplace messaging", () => {
 
     // --- Seller: Marcus Owner signs in, sees the thread, replies ---
     await page.context().clearCookies();
-    await signIn(page, "owner@shouks.test", "Test123!@#", /\/home/);
+    await signIn(page, "owner@shouks.test", "Test123!@#", /\/owner\//);
     await page.goto("/m/ferrari-frenzy/messages");
 
     const threadRow = page.getByTestId("thread-row").filter({ hasText: /Sasha/i }).first();

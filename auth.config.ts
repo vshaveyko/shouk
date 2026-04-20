@@ -49,6 +49,7 @@ export const authConfig = {
         "/help",
         "/api/auth",
         "/api/health",
+        "/api/e2e-reset",
         "/_next",
         "/favicon.ico",
         "/icons",

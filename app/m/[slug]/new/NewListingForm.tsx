@@ -74,7 +74,14 @@ export function NewListingForm({ slug, auctionsEnabled, currency, schemaFields }
   const [error, setError] = React.useState<string | null>(null);
 
   const imageField = schemaFields.find((f) => f.type === "IMAGE");
-  const nonImageFields = schemaFields.filter((f) => f.type !== "IMAGE");
+  // Title, description, and price are rendered by the hard-coded "Basics" /
+  // "Pricing" sections above. Any schema field with one of those reserved
+  // names would render a duplicate input (with a duplicate testid) — filter
+  // them out of the schema-driven section.
+  const reservedNames = new Set(["title", "description", "price"]);
+  const nonImageFields = schemaFields.filter(
+    (f) => f.type !== "IMAGE" && !reservedNames.has(f.name),
+  );
   const maxImages = imageField?.maxImages ?? 8;
 
   function addImage() {

@@ -42,6 +42,12 @@ export function NotificationBell({ initialCount = 0 }: { initialCount?: number }
   const [count, setCount] = React.useState(initialCount);
   const hasLoadedRef = React.useRef(false);
 
+  // Keep count in sync when the server sends a fresh initialCount (e.g. after
+  // a router.refresh() from the full-page notifications view).
+  React.useEffect(() => {
+    setCount(initialCount);
+  }, [initialCount]);
+
   async function loadItems() {
     setLoading(true);
     try {
