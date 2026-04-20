@@ -3,10 +3,11 @@ providers = ["node"]
 [phases.setup]
 nixPkgs = ["nodejs_20", "openssl"]
 
+# Nixpacks auto-runs `npm ci` in its install phase for Node projects and
+# executes the `postinstall` script (which runs `prisma generate`). No need
+# to repeat either here — doing so triggers EBUSY on node_modules/.cache.
 [phases.build]
 cmds = [
-  "npm ci",
-  "npx prisma generate",
   "npx prisma migrate deploy",
   "npm run build",
 ]
