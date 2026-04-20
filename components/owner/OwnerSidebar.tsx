@@ -10,6 +10,7 @@ import {
   Settings,
   LineChart,
   Wallet,
+  type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -104,7 +105,7 @@ function SideLink({
 }: {
   href: string;
   label: string;
-  Icon: React.ComponentType<{ size?: number; className?: string }>;
+  Icon: LucideIcon;
   count?: number;
   urgent?: boolean;
   active?: boolean;

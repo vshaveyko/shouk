@@ -131,7 +131,6 @@ export function Navbar({
                 key={l.href}
                 href={l.href}
                 className={l.active ? "active" : ""}
-                {...(l.optional ? { "data-optional": "true" } : {})}
               >
                 {l.label}
                 {l.label === "Messages" && notificationCount > 0 ? (

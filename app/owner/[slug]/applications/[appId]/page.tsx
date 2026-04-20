@@ -37,12 +37,15 @@ export default async function ApplicationDetailPage({
     verifiedProviders: a.user.verifiedAccounts.map((v) => v.provider),
   }));
 
+  const totalRequiredVerifications = marketplace.requiredVerifications.length;
+
   return (
     <>
       <ApplicationsList
         slug={params.slug}
         rows={rows}
         selectedId={params.appId}
+        totalRequiredVerifications={totalRequiredVerifications}
       />
       <section className="flex-1 min-w-0 bg-bg-soft">
         <ApplicationDetail slug={params.slug} appId={params.appId} />
