@@ -419,12 +419,51 @@ export function ListingClient(props: Props) {
                 </Button>
               )}
               {isFixed && !isLocked && !props.isSeller && (
-                <Button size="lg" className="w-full" data-testid="contact-seller">
-                  Contact seller
+                <Button
+                  size="lg"
+                  className="w-full"
+                  data-testid="message-seller"
+                  onClick={() =>
+                    props.isAuthed
+                      ? router.push(
+                          `/m/${props.marketplace.slug}/messages?seller=${props.seller.id}&listing=${listing.id}`,
+                        )
+                      : router.push(`/signin?callbackUrl=/l/${listing.id}`)
+                  }
+                >
+                  Message seller
+                </Button>
+              )}
+              {isAuction && !isLocked && !props.isSeller && (
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  className="w-full"
+                  data-testid="message-seller"
+                  onClick={() =>
+                    props.isAuthed
+                      ? router.push(
+                          `/m/${props.marketplace.slug}/messages?seller=${props.seller.id}&listing=${listing.id}`,
+                        )
+                      : router.push(`/signin?callbackUrl=/l/${listing.id}`)
+                  }
+                >
+                  Message seller
                 </Button>
               )}
               {isISO && !isLocked && !props.isSeller && (
-                <Button size="lg" className="w-full" data-testid="offer-match">
+                <Button
+                  size="lg"
+                  className="w-full"
+                  data-testid="message-seller"
+                  onClick={() =>
+                    props.isAuthed
+                      ? router.push(
+                          `/m/${props.marketplace.slug}/messages?seller=${props.seller.id}&listing=${listing.id}`,
+                        )
+                      : router.push(`/signin?callbackUrl=/l/${listing.id}`)
+                  }
+                >
                   Offer a match
                 </Button>
               )}

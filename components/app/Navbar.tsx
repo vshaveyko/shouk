@@ -70,10 +70,14 @@ export function Navbar({
   const isOwnerMode = mode === "owner";
   const slug = activeMarketplace?.slug ?? "";
 
-  // Design:
-  //   Owner (Flow 5): Dashboard / Browse / Messages (marketplace-scoped)
-  //   Member in marketplace (Flow 6B): Explore / Messages
-  //   Member global (Flow 6A): Explore / Messages
+  // Messages are marketplace-scoped. Link to the active marketplace when
+  // we're already inside one; otherwise fall back to the first marketplace
+  // the user belongs to, or the global redirector at /messages.
+  const messagesSlug = slug || marketplaces[0]?.slug || "";
+  const messagesHref = messagesSlug ? `/m/${messagesSlug}/messages` : "/messages";
+  const messagesActive =
+    pathname.startsWith("/messages") || /^\/m\/[^/]+\/messages/.test(pathname);
+
   const links = isOwnerMode && inMarketplace
     ? [
         {
@@ -84,12 +88,14 @@ export function Navbar({
         {
           href: `/m/${slug}/feed`,
           label: "Browse",
-          active: pathname.startsWith(`/m/${slug}`),
+          active:
+            pathname.startsWith(`/m/${slug}`) &&
+            !pathname.startsWith(`/m/${slug}/messages`),
         },
         {
-          href: "/messages",
+          href: messagesHref,
           label: "Messages",
-          active: pathname.startsWith("/messages"),
+          active: messagesActive,
         },
       ]
     : [
@@ -99,9 +105,9 @@ export function Navbar({
           active: pathname.startsWith("/explore"),
         },
         {
-          href: "/messages",
+          href: messagesHref,
           label: "Messages",
-          active: pathname.startsWith("/messages"),
+          active: messagesActive,
         },
       ];
 

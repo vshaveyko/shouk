@@ -43,6 +43,8 @@ model User {
   issuedInvites     Invite[]           @relation("InviteIssuer")
   moderationActions ModerationAction[] @relation("ModeratorActions")
   pushSubscriptions PushSubscription[]
+  threadParticipations ThreadParticipant[]
+  sentMessages         Message[]          @relation("MessageSender")
 }
 
 model PushSubscription {
@@ -160,6 +162,7 @@ model Marketplace {
   notifications        Notification[]
   savedSearches        SavedSearch[]
   listingSaves         ListingSave[]
+  messageThreads       MessageThread[]
 
   @@index([ownerId])
   @@index([status])
@@ -331,6 +334,7 @@ model Listing {
   reports           Report[]
   saves             ListingSave[]
   moderationActions ModerationAction[]
+  messageThreads    MessageThread[]
 
   @@index([marketplaceId, status])
   @@index([sellerId])
@@ -494,4 +498,50 @@ enum NotificationKind {
   NEW_LISTING_MATCH
   MENTION
   SYSTEM
+}
+
+// ─────────────────────────────────────────────────────────────
+// DIRECT MESSAGING (marketplace-scoped)
+// ─────────────────────────────────────────────────────────────
+
+model MessageThread {
+  id            String   @id @default(cuid())
+  marketplaceId String
+  listingId     String?
+  createdAt     DateTime @default(now())
+  lastMessageAt DateTime @default(now())
+
+  marketplace  Marketplace         @relation(fields: [marketplaceId], references: [id], onDelete: Cascade)
+  listing      Listing?            @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  participants ThreadParticipant[]
+  messages     Message[]
+
+  @@index([marketplaceId, lastMessageAt])
+  @@index([listingId])
+}
+
+model ThreadParticipant {
+  id         String    @id @default(cuid())
+  threadId   String
+  userId     String
+  lastReadAt DateTime?
+
+  thread MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([threadId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  threadId  String
+  senderId  String
+  body      String   @db.Text
+  createdAt DateTime @default(now())
+
+  thread MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  sender User          @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([threadId, createdAt])
 }
