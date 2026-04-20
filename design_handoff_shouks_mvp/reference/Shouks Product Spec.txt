@@ -1,0 +1,91 @@
+
+Product Specification
+Shouk
+Empowering communities to build, manage, and grow
+their own curated marketplaces.
+High-Level Spec — v1.0
+March 2026
+DRAFT — For Internal Use
+
+1. Executive Summary
+Niche communities—luxury watch dealers, trading card collectors, vintage denim enthusiasts, classic car buyers—are transacting billions of dollars worth of goods every year through tools that were never designed for commerce. WhatsApp group chats, Facebook Groups, and Facebook Marketplace have become the default infrastructure for these markets, but they impose severe limitations: no structured listings, no search, no membership controls, and no monetization path for the people who build and moderate these communities.
+Shouk enables anyone to create a purpose-built marketplace for their niche. Think of it as what Wix did for websites, applied to vertical marketplaces. Creators define the rules—who can join, what listings look like, and how the marketplace is monetized—and Shouk handles the rest.
+The initial product focuses on three core capabilities: marketplace creation and configuration, membership management with identity verification, and structured listings with high-quality search. The MVP ships as a mobile-first responsive web app with a lightweight native shell (PWA or Capacitor) for push notifications and home-screen presence. In-app messaging is a natural post-MVP addition. Payment processing and listing authentication are not currently in scope for Shouk—transactions and item verification remain the responsibility of the community and its members, as they are today.
+2. Problem Statement
+2.1 Current State
+Communities running niche marketplaces on general-purpose social platforms face a consistent set of problems:
+Poor discoverability. Listings are buried in chat histories and feeds. WhatsApp group chats become unnavigable within hours. Facebook Groups lack structured search beyond keyword matching on free-text posts.
+No listing standards. Without enforced schemas, post quality varies wildly. Key details—condition, price, provenance—are often missing, incomplete, or formatted inconsistently, making comparison and search nearly impossible.
+Membership chaos. Admins vet members manually, often using spreadsheets or memory. Identity spoofing is common. There is no reliable way to verify that a member is who they claim to be.
+No monetization. Community builders who invest significant time curating and moderating have no native way to charge membership fees or capture value. Payments happen off-platform and are tracked manually.
+Terms of Service risk. Many of these commercial activities violate the platforms’ ToS, putting communities at risk of being shut down without warning.
+2.2 Opportunity
+A platform that gives community leaders the tools to launch their own marketplace—with structured data, access controls, and subscription management—removes the need for workarounds and unlocks value for creators, admins, and members alike.
+3. User Personas
+Persona
+Description
+Core Needs
+Marketplace Creator
+The individual or organization that launches a new marketplace. Defines the category, rules, and business model.
+Easy setup, listing schema builder, membership criteria, subscription/monetization configuration.
+Marketplace Admin
+Trusted moderators appointed by the creator. Responsible for day-to-day operations: approving members, reviewing listings, resolving disputes.
+Moderation tools, member management dashboard, flagged content queue, activity analytics.
+Marketplace Member
+End users who join a marketplace to buy, sell, or browse. They expect a clean experience that makes it easy to find and list items.
+Intuitive listing creation, powerful search and filtering, alerts/notifications, listing engagement visibility.
+
+4. Product Scope — MVP
+The MVP is intentionally constrained. It focuses on the three pillars that differentiate Shouk from the status quo: marketplace configuration, access management, and structured listings. The application will ship as a mobile-first responsive web app with a lightweight native shell (PWA or Capacitor) to provide push notifications and a home-screen presence on iOS and Android. Fully native apps are deferred until adoption warrants deeper OS integration. The following sections detail what is in scope, what is explicitly deferred, and why.
+4.1 Marketplace Creation & Configuration
+Creators should be able to stand up a new marketplace in minutes. The setup flow covers four areas:
+Marketplace identity. Name, description, category, branding (logo, color scheme), and a unique URL or handle.
+Listing schema. A builder that lets creators define the fields each listing must include (e.g., brand, model, year, condition, price, photos). Field types include text, number, dropdown, multi-select, date, and image upload. Required vs. optional designation per field.
+Membership rules. Public (anyone can join), approval-required (applications reviewed by admins), or invite-only. Creators set the criteria applicants must meet and the information they must provide.
+Monetization. Optional subscription tiers that creators define (e.g., free browse-only tier, paid listing tier, premium tier with alerts). Shouk handles recurring billing and access gating.
+4.2 Membership & Identity
+Trust is the currency of niche markets. Shouk provides several mechanisms to establish and maintain it:
+Verified identity. Members link verified social accounts (Facebook, Instagram, LinkedIn) or other identity providers as part of their profile. This does not replace a traditional login—it supplements it. Marketplace creators choose which verification methods they require.
+Member profiles. Each member has a marketplace-specific profile displaying their verified accounts, listing history, and community reputation. Contact information (linked social handles, optionally phone number) is visible to other members per the marketplace’s rules.
+Approval workflows. For gated marketplaces, admins see a queue of pending applications with the applicant’s verified identity, submitted information, and any existing cross-marketplace activity on the platform.
+4.3 Listings & Discovery
+Structured data is the foundation of a good marketplace experience. Every listing follows the schema defined by the marketplace creator, which enables:
+Guided listing creation. Members fill in a structured form rather than composing a free-text post. Required fields are enforced. Image uploads follow size and count guidelines set by the creator.
+Search & filtering. Every schema field is indexable and filterable. Members can combine filters (e.g., brand = Rolex, condition = excellent, price < $10,000) and sort results by date, price, or relevance.
+Saved searches & alerts. Members save filter combinations and receive notifications when new listings match their criteria.
+Listing engagement. Sellers see views, saves, and inquiries on their listings. This gives them signal on demand and pricing.
+Auction listings. Creators can enable auctions as a listing type alongside fixed-price listings. Sellers set a starting price, custom duration, optional reserve price, and minimum bid increment. Bidding is manual with full transparency—all bids and bidder identities are visible to marketplace members. Creators configure whether anti-snipe clock extensions are enabled. Saved search alerts trigger on new auction listings just as they do for fixed-price listings.
+4.4 Admin & Moderation Tools
+Admins are the backbone of healthy marketplaces. Shouk gives them:
+Content moderation queue. Flagged listings and reported members surface in a dedicated dashboard. Admins can approve, edit, or remove listings and suspend or ban members.
+Activity overview. High-level metrics on new members, listings posted, engagement trends, and subscription revenue.
+Role management. Creators assign admin privileges to trusted members. Permissions are granular (e.g., can moderate listings but cannot change marketplace settings).
+5. Scope Boundaries
+Not everything belongs in Shouk. This section distinguishes between capabilities that are planned for future releases and those that fall outside the product’s intended scope entirely.
+5.1 Post-MVP
+In-app messaging. Members already have established communication channels via linked social accounts and phone numbers, so the MVP does not include a standalone messaging system. However, as marketplace activity grows, keeping conversations in-platform will improve the experience and give admins better visibility into community health. In-app messaging is the most natural next feature after the MVP ships.
+Cross-marketplace broadcasting. As the Shouk ecosystem grows, members will often belong to multiple marketplaces with overlapping audiences. A seller listing a vintage Rolex might want it visible in both a luxury watch marketplace and a general high-end goods marketplace. Cross-marketplace broadcasting allows a member to create a single listing and publish it to multiple marketplaces simultaneously, rather than duplicating the effort across each one. The listing respects each marketplace’s schema—shared fields map automatically, and marketplace-specific fields are filled in per destination. Engagement (views, saves, bids) is tracked per marketplace, giving the seller visibility into where demand is strongest. This is a strong candidate for a premium, monetized feature—either as a per-broadcast fee, an add-on for higher subscription tiers, or part of Shouk’s own à la carte feature set for power sellers. It also reinforces the network effect: the more marketplaces that exist on Shouk, the more valuable broadcasting becomes.
+5.2 Not in Scope
+The following capabilities are not on Shouk’s roadmap. They may be revisited if the market demands it, but they are excluded by design—not deferred for timing.
+Payment processing. Transactions between buyers and sellers happen off-platform, as they do today on WhatsApp and Facebook. Shouk facilitates discovery and connection; it is up to the community and the parties involved to manage the exchange of goods and payment. Integrating payments would introduce regulatory, escrow, and dispute resolution complexity that is not core to Shouk’s value proposition.
+Listing authentication. Verifying the authenticity of physical goods (e.g., confirming a luxury watch is genuine) requires specialized partnerships, domain expertise, and workflows that vary by category. Shouk relies on community trust, member reputation, and verified identities as the mechanisms for building confidence between buyers and sellers. Authentication services are best left to third parties that specialize in them.
+
+6. Future Vision: AI-Powered Marketplace Creation
+The marketplace creation flow described in Section 4 is designed to be approachable, but it still requires creators to make a series of deliberate configuration decisions: defining schema fields, setting membership rules, choosing subscription tiers. For experienced community leaders this is straightforward. For someone spinning up their first marketplace, it can feel like a cold start.
+A future version of Shouk will introduce AI-powered marketplace creation. Instead of configuring each setting manually, a creator describes their marketplace in natural language—the niche, the types of items being traded, what matters to the community, and how they want to manage access. Shouk’s AI then generates a complete draft marketplace: a suggested listing schema with appropriate field types, recommended membership rules, category assignment, and even a starting point for branding. The creator reviews, edits, and publishes—turning what could be a 15-minute setup into a 2-minute conversation.
+This capability has a compounding advantage: as more marketplaces are created on Shouk, the platform accumulates a rich understanding of what schemas, rules, and configurations work well for different niches. That knowledge feeds back into the AI, making its suggestions increasingly precise over time. A creator launching a vintage sneaker marketplace benefits from the patterns established by watch, trading card, and denim communities before them.
+This feature is not part of the MVP or the immediate post-MVP roadmap. It is documented here as a strategic direction that should inform architectural decisions today—particularly the flexibility of the schema engine and the way marketplace configuration data is structured—so that the path to AI-powered creation remains open.
+7. Risks & Open Questions
+Risk / Question
+Mitigation / Next Step
+Cold start problem: new marketplaces have no members or listings.
+Provide import tools for existing community data (e.g., CSV listings, member lists from spreadsheets). Consider onboarding concierge for early creators.
+Identity verification scope: which providers are sufficient, and how do we handle members who don’t use social media?
+Start with Facebook, Instagram, and LinkedIn OAuth. Explore government ID verification as a future tier. Validate with early creator interviews.
+Monetization model for Shouk itself: how does the company generate revenue?
+Options include a percentage of creator subscription revenue, a flat monthly SaaS fee per marketplace, or a tiered freemium model. Requires market research and pricing tests.
+Moderation at scale: as marketplaces grow, manual moderation may not keep up.
+Invest in automated flagging (duplicate listings, policy violations) and community-driven reporting tools. Explore AI-assisted moderation in future iterations.
+Without in-app messaging, will Shouk feel complete enough to drive adoption?
+Validate through user research. The hypothesis is that structured listings, search, and membership management alone solve the most acute pain points. Members already communicate through linked social accounts, and messaging is the first planned post-MVP addition.
+

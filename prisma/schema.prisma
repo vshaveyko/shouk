@@ -1,0 +1,497 @@
+// Shouks Prisma schema — marketplace platform MVP
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────
+// AUTH (next-auth)
+// ─────────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  passwordHash  String?
+  name          String?
+  displayName   String?
+  image         String?
+  bio           String?
+  defaultRole   UserRole  @default(MEMBER)
+  phoneNumber   String?
+  phoneVerified Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts          Account[]
+  sessions          Session[]
+  verifiedAccounts  VerifiedAccount[]
+  ownedMarketplaces Marketplace[]      @relation("MarketplaceOwner")
+  memberships       Membership[]
+  applications      Application[]
+  listings          Listing[]
+  bids              Bid[]
+  reports           Report[]           @relation("Reporter")
+  notifications     Notification[]
+  savedSearches     SavedSearch[]
+  saves             ListingSave[]
+  issuedInvites     Invite[]           @relation("InviteIssuer")
+  moderationActions ModerationAction[] @relation("ModeratorActions")
+  pushSubscriptions PushSubscription[]
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Verified social identity — links to marketplace's verification requirements
+model VerifiedAccount {
+  id         String         @id @default(cuid())
+  userId     String
+  provider   VerifyProvider
+  handle     String
+  profileUrl String?
+  verifiedAt DateTime       @default(now())
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, handle])
+  @@unique([userId, provider])
+}
+
+enum UserRole {
+  OWNER
+  MEMBER
+}
+
+enum VerifyProvider {
+  GOOGLE
+  FACEBOOK
+  INSTAGRAM
+  LINKEDIN
+  TWITTER
+  PHONE
+}
+
+// ─────────────────────────────────────────────────────────────
+// MARKETPLACE
+// ─────────────────────────────────────────────────────────────
+
+model Marketplace {
+  id                    String            @id @default(cuid())
+  slug                  String            @unique
+  name                  String
+  tagline               String?
+  description           String?           @db.Text
+  coverImageUrl         String?
+  logoUrl               String?
+  primaryColor          String?           @default("#4a7aff")
+  category              String
+  ownerId               String
+  entryMethod           EntryMethod       @default(APPLICATION)
+  requiredVerifications VerifyProvider[]
+  autoApprove           Boolean           @default(false)
+  auctionsEnabled       Boolean           @default(false)
+  antiSnipe             Boolean           @default(true)
+  moderationRequired    Boolean           @default(false)
+  isPaid                Boolean           @default(false)
+  monthlyPriceCents     Int?
+  annualPriceCents      Int?
+  status                MarketplaceStatus @default(ACTIVE)
+  publishedAt           DateTime?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  owner                User                  @relation("MarketplaceOwner", fields: [ownerId], references: [id])
+  memberships          Membership[]
+  applications         Application[]
+  listings             Listing[]
+  schemaFields         SchemaField[]
+  applicationQuestions ApplicationQuestion[]
+  invites              Invite[]
+  notifications        Notification[]
+  savedSearches        SavedSearch[]
+  listingSaves         ListingSave[]
+
+  @@index([ownerId])
+  @@index([status])
+}
+
+enum MarketplaceStatus {
+  DRAFT
+  ACTIVE
+  INACTIVE
+  SCHEDULED_DELETION
+}
+
+enum EntryMethod {
+  APPLICATION
+  INVITE
+  REFERRAL
+}
+
+// Listing schema field definitions
+model SchemaField {
+  id            String    @id @default(cuid())
+  marketplaceId String
+  order         Int
+  name          String
+  label         String
+  helpText      String?
+  type          FieldType
+  required      Boolean   @default(false)
+  options       Json?
+  minImages     Int?
+  maxImages     Int?
+  maxFileSizeMb Int?      @default(5)
+  cardPreview   Boolean   @default(false)
+  archived      Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+
+  marketplace Marketplace @relation(fields: [marketplaceId], references: [id], onDelete: Cascade)
+
+  @@index([marketplaceId])
+}
+
+enum FieldType {
+  SHORT_TEXT
+  LONG_TEXT
+  NUMBER
+  CURRENCY
+  SELECT
+  MULTI_SELECT
+  DATE
+  IMAGE
+}
+
+model ApplicationQuestion {
+  id            String    @id @default(cuid())
+  marketplaceId String
+  order         Int
+  label         String
+  helpText      String?
+  type          FieldType
+  required      Boolean   @default(false)
+  options       Json?
+
+  marketplace Marketplace @relation(fields: [marketplaceId], references: [id], onDelete: Cascade)
+
+  @@index([marketplaceId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// MEMBERSHIP
+// ─────────────────────────────────────────────────────────────
+
+model Membership {
+  id               String           @id @default(cuid())
+  userId           String
+  marketplaceId    String
+  role             MembershipRole   @default(MEMBER)
+  status           MembershipStatus @default(ACTIVE)
+  permissions      Json?
+  referrerId       String?
+  suspendedUntil   DateTime?
+  suspensionReason String?
+  banReason        String?
+  joinedAt         DateTime         @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  marketplace Marketplace @relation(fields: [marketplaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, marketplaceId])
+  @@index([marketplaceId])
+}
+
+enum MembershipRole {
+  OWNER
+  ADMIN
+  MODERATOR
+  MEMBER
+}
+
+enum MembershipStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
+// ─────────────────────────────────────────────────────────────
+// APPLICATION (membership applications)
+// ─────────────────────────────────────────────────────────────
+
+model Application {
+  id              String            @id @default(cuid())
+  userId          String
+  marketplaceId   String
+  answers         Json
+  status          ApplicationStatus @default(PENDING)
+  reviewerNote    String?
+  rejectionReason String?
+  referrerId      String?
+  reviewedBy      String?
+  reviewedAt      DateTime?
+  createdAt       DateTime          @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  marketplace Marketplace @relation(fields: [marketplaceId], references: [id], onDelete: Cascade)
+
+  @@index([marketplaceId, status])
+  @@index([userId])
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  NEEDS_INFO
+}
+
+// ─────────────────────────────────────────────────────────────
+// LISTING
+// ─────────────────────────────────────────────────────────────
+
+model Listing {
+  id                       String        @id @default(cuid())
+  marketplaceId            String
+  sellerId                 String
+  title                    String
+  type                     ListingType   @default(FIXED)
+  status                   ListingStatus @default(ACTIVE)
+  schemaValues             Json
+  images                   String[]
+  priceCents               Int?
+  currency                 String?       @default("USD")
+  description              String?       @db.Text
+  views                    Int           @default(0)
+  editedAt                 DateTime?
+  publishedAt              DateTime?
+  soldAt                   DateTime?
+  closedAt                 DateTime?
+  // Auction fields
+  auctionStartCents        Int?
+  auctionReserveCents      Int?
+  auctionMinIncrementCents Int?
+  auctionStartsAt          DateTime?
+  auctionEndsAt            DateTime?
+  createdAt                DateTime      @default(now())
+  updatedAt                DateTime      @updatedAt
+
+  marketplace       Marketplace        @relation(fields: [marketplaceId], references: [id], onDelete: Cascade)
+  seller            User               @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  bids              Bid[]
+  reports           Report[]
+  saves             ListingSave[]
+  moderationActions ModerationAction[]
+
+  @@index([marketplaceId, status])
+  @@index([sellerId])
+  @@index([type])
+}
+
+enum ListingType {
+  FIXED
+  AUCTION
+  ISO
+}
+
+enum ListingStatus {
+  DRAFT
+  PENDING_REVIEW
+  ACTIVE
+  SOLD
+  CLOSED
+  RESERVE_NOT_MET
+  WON
+  REMOVED
+  SHADOW_HIDDEN
+}
+
+model Bid {
+  id          String   @id @default(cuid())
+  listingId   String
+  userId      String
+  amountCents Int
+  createdAt   DateTime @default(now())
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+}
+
+model ListingSave {
+  id            String   @id @default(cuid())
+  userId        String
+  listingId     String
+  marketplaceId String
+  createdAt     DateTime @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing     Listing     @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  marketplace Marketplace @relation(fields: [marketplaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+}
+
+model Report {
+  id         String       @id @default(cuid())
+  listingId  String
+  reporterId String
+  reason     ReportReason
+  detail     String?
+  resolved   Boolean      @default(false)
+  createdAt  DateTime     @default(now())
+
+  listing  Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  reporter User    @relation("Reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+}
+
+enum ReportReason {
+  SPAM
+  MISLEADING
+  PROHIBITED
+  DUPLICATE
+  OTHER
+}
+
+model ModerationAction {
+  id          String   @id @default(cuid())
+  listingId   String?
+  moderatorId String
+  action      String
+  note        String?
+  createdAt   DateTime @default(now())
+
+  listing   Listing? @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  moderator User     @relation("ModeratorActions", fields: [moderatorId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────────────────────
+// INVITES & MIGRATION
+// ─────────────────────────────────────────────────────────────
+
+model Invite {
+  id            String    @id @default(cuid())
+  marketplaceId String
+  issuerId      String
+  code          String    @unique
+  email         String?
+  phone         String?
+  maxUses       Int       @default(1)
+  usedCount     Int       @default(0)
+  expiresAt     DateTime?
+  revoked       Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+
+  marketplace Marketplace @relation(fields: [marketplaceId], references: [id], onDelete: Cascade)
+  issuer      User        @relation("InviteIssuer", fields: [issuerId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────────────────────
+// SAVED SEARCH & NOTIFICATIONS
+// ─────────────────────────────────────────────────────────────
+
+model SavedSearch {
+  id            String           @id @default(cuid())
+  userId        String
+  marketplaceId String
+  name          String
+  query         Json
+  frequency     NotificationFreq @default(INSTANT)
+  createdAt     DateTime         @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  marketplace Marketplace @relation(fields: [marketplaceId], references: [id], onDelete: Cascade)
+}
+
+enum NotificationFreq {
+  INSTANT
+  DAILY
+  WEEKLY
+}
+
+model Notification {
+  id            String           @id @default(cuid())
+  userId        String
+  marketplaceId String?
+  kind          NotificationKind
+  title         String
+  preview       String?
+  deeplink      String?
+  data          Json?
+  readAt        DateTime?
+  createdAt     DateTime         @default(now())
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  marketplace Marketplace? @relation(fields: [marketplaceId], references: [id], onDelete: SetNull)
+
+  @@index([userId, readAt])
+}
+
+enum NotificationKind {
+  APPLICATION_SUBMITTED
+  APPLICATION_APPROVED
+  APPLICATION_REJECTED
+  APPLICATION_NEEDS_INFO
+  LISTING_APPROVED
+  LISTING_REJECTED
+  LISTING_FLAGGED
+  BID_OUTBID
+  AUCTION_WON
+  AUCTION_ENDED
+  ISO_MATCH
+  NEW_LISTING_MATCH
+  MENTION
+  SYSTEM
+}

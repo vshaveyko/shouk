@@ -1,0 +1,3705 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Shouks — Member Application</title>
+
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><path d='M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z' fill='%2314212D' stroke='%2314212D' stroke-width='2.4' stroke-linejoin='round'/><circle cx='22' cy='22' r='3.4' fill='%234DB7E8'/><circle cx='22' cy='10' r='2.4' fill='%23fff'/><circle cx='32.4' cy='28' r='2.4' fill='%23fff'/><circle cx='11.6' cy='28' r='2.4' fill='%23fff'/></svg>"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #ffffff;
+        --bg-soft: oklch(0.975 0.003 230);
+        --bg-panel: oklch(0.96 0.004 230);
+        --surface: #ffffff;
+        --line: oklch(0.9 0.005 230);
+        --line-soft: oklch(0.93 0.004 230);
+        --ink: oklch(0.2 0.02 240);
+        --ink-soft: oklch(0.38 0.02 240);
+        --muted: oklch(0.55 0.015 240);
+        --hover: oklch(0.95 0.005 230);
+
+        --blue: oklch(0.66 0.16 230);
+        --blue-ink: oklch(0.5 0.15 232);
+        --blue-soft: oklch(0.96 0.03 230);
+        --blue-softer: oklch(0.98 0.015 230);
+
+        --brand: oklch(0.55 0.17 25);
+        --brand-ink: oklch(0.4 0.14 25);
+        --brand-soft: oklch(0.97 0.03 25);
+
+        --success: oklch(0.58 0.12 155);
+        --success-soft: oklch(0.95 0.04 155);
+        --warn: oklch(0.72 0.13 75);
+        --warn-soft: oklch(0.97 0.04 75);
+        --danger: oklch(0.55 0.18 25);
+        --danger-soft: oklch(0.96 0.035 25);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Inter Tight", system-ui, sans-serif;
+        background: var(--bg-panel);
+        color: var(--ink);
+        font-size: 13.5px;
+        line-height: 1.5;
+        letter-spacing: -0.005em;
+        -webkit-font-smoothing: antialiased;
+      }
+      button {
+        font: inherit;
+        color: inherit;
+        background: none;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        margin: 0;
+        font-weight: 500;
+        letter-spacing: -0.015em;
+        color: var(--ink);
+      }
+      input,
+      textarea,
+      select {
+        font: inherit;
+        color: inherit;
+      }
+
+      .flow-nav {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: saturate(180%) blur(8px);
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 20px;
+      }
+      .flow-nav .fn-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 500;
+        white-space: nowrap;
+        flex: none;
+      }
+      .flow-nav .fn-title svg {
+        width: 20px;
+        height: 20px;
+        color: var(--ink);
+      }
+      .flow-nav .fn-title .slash {
+        color: var(--muted);
+        font-weight: 400;
+      }
+      .flow-nav .fn-title .flow {
+        color: var(--muted);
+        font-weight: 400;
+      }
+      .flow-nav .fn-steps {
+        display: flex;
+        gap: 4px;
+        margin-left: 16px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+      }
+      .flow-nav .step-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 11px;
+        border-radius: 7px;
+        font-size: 12.5px;
+        color: var(--muted);
+        font-weight: 500;
+        border: 1px solid transparent;
+        white-space: nowrap;
+        flex: none;
+      }
+      .flow-nav .step-btn .num {
+        display: inline-grid;
+        place-items: center;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--bg-soft);
+        border: 1px solid var(--line);
+        font-size: 10.5px;
+        font-weight: 600;
+        color: var(--muted);
+      }
+      .flow-nav .step-btn:hover {
+        color: var(--ink);
+        background: var(--hover);
+      }
+      .flow-nav .step-btn.active {
+        background: var(--ink);
+        color: #fff;
+      }
+      .flow-nav .step-btn.active .num {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: transparent;
+        color: #fff;
+      }
+      .flow-nav .spacer {
+        flex: 1;
+      }
+      .flow-nav .fn-kb {
+        font-size: 11px;
+        color: var(--muted);
+        background: var(--bg-soft);
+        padding: 4px 8px;
+        border-radius: 5px;
+        border: 1px solid var(--line-soft);
+        font-family: ui-monospace, monospace;
+        white-space: nowrap;
+      }
+
+      .screen-caption {
+        max-width: 1440px;
+        margin: 24px auto 10px;
+        padding: 0 20px;
+        display: flex;
+        align-items: baseline;
+        gap: 16px;
+        flex-wrap: nowrap;
+      }
+      .screen-caption .cap-num {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        font-weight: 600;
+        font-family: ui-monospace, monospace;
+        white-space: nowrap;
+      }
+      .screen-caption h2 {
+        font-family: "Instrument Serif", serif;
+        font-weight: 400;
+        font-size: 22px;
+        letter-spacing: -0.005em;
+        color: var(--ink);
+        white-space: nowrap;
+        flex: none;
+      }
+      .screen-caption .sub {
+        font-size: 13px;
+        color: var(--muted);
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .screen-frame {
+        max-width: 1440px;
+        margin: 0 auto 20px;
+        padding: 0 20px;
+      }
+
+      .browser-bar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-bottom: 0;
+        border-radius: 12px 12px 0 0;
+        padding: 10px 14px;
+      }
+      .browser-bar .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .browser-bar .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--line);
+      }
+      .browser-bar .dots .dot:nth-child(1) {
+        background: oklch(0.75 0.12 25);
+      }
+      .browser-bar .dots .dot:nth-child(2) {
+        background: oklch(0.8 0.12 75);
+      }
+      .browser-bar .dots .dot:nth-child(3) {
+        background: oklch(0.75 0.12 150);
+      }
+      .browser-bar .url {
+        flex: 1;
+        height: 28px;
+        border-radius: 7px;
+        background: var(--bg-soft);
+        border: 1px solid var(--line-soft);
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        font-family: ui-monospace, monospace;
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+
+      .app {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-top: 0;
+        border-radius: 0 0 12px 12px;
+        overflow: hidden;
+        min-height: 860px;
+      }
+
+      /* ===== Marketplace public navbar (for landing) ===== */
+      .mp-nav {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 14px 32px;
+        background: #fff;
+        border-bottom: 1px solid var(--line);
+      }
+      .mp-nav .brand-lockup {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+      }
+      .mp-nav .brand-logo {
+        width: 32px;
+        height: 32px;
+        border-radius: 7px;
+        background: linear-gradient(135deg, var(--brand), var(--brand-ink));
+        color: #fff;
+        font-family: "Instrument Serif", serif;
+        font-size: 18px;
+        display: grid;
+        place-items: center;
+      }
+      .mp-nav .brand-name {
+        font-size: 15px;
+      }
+      .mp-nav .spacer {
+        flex: 1;
+      }
+      .mp-nav .shouks-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11.5px;
+        color: var(--muted);
+        padding: 5px 10px;
+        border-radius: 6px;
+        background: var(--bg-soft);
+        border: 1px solid var(--line-soft);
+        white-space: nowrap;
+      }
+      .mp-nav .shouks-tag svg {
+        width: 12px;
+        height: 12px;
+        color: var(--blue);
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-size: 12.5px;
+        font-weight: 500;
+        letter-spacing: -0.005em;
+        transition: all 0.12s;
+        border: 1px solid transparent;
+        white-space: nowrap;
+      }
+      .btn svg {
+        width: 13px;
+        height: 13px;
+      }
+      .btn-outline {
+        background: #fff;
+        color: var(--ink);
+        border-color: var(--line);
+      }
+      .btn-outline:hover {
+        background: var(--hover);
+        border-color: oklch(0.85 0.01 230);
+      }
+      .btn-dark {
+        background: var(--ink);
+        color: #fff;
+      }
+      .btn-dark:hover {
+        background: oklch(0.28 0.03 240);
+      }
+      .btn-brand {
+        background: var(--brand);
+        color: #fff;
+      }
+      .btn-brand:hover {
+        background: var(--brand-ink);
+      }
+      .btn-ghost {
+        color: var(--muted);
+      }
+      .btn-ghost:hover {
+        color: var(--ink);
+        background: var(--hover);
+      }
+      .btn-lg {
+        padding: 11px 20px;
+        font-size: 13.5px;
+      }
+      .btn-sm {
+        padding: 5px 10px;
+        font-size: 11.5px;
+        gap: 5px;
+      }
+      .btn-sm svg {
+        width: 11px;
+        height: 11px;
+      }
+
+      /* ===== 3A Landing ===== */
+      .hero {
+        position: relative;
+        background:
+          radial-gradient(
+            ellipse at top right,
+            oklch(0.4 0.08 25 / 0.15),
+            transparent 60%
+          ),
+          linear-gradient(180deg, #fff, var(--bg-soft));
+        padding: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        min-height: 460px;
+      }
+      .hero-left {
+        padding: 56px 56px 48px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .hero-cat {
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--brand);
+        font-weight: 600;
+        margin-bottom: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .hero-cat::before {
+        content: "";
+        width: 24px;
+        height: 1px;
+        background: var(--brand);
+      }
+      .hero-title {
+        font-family: "Instrument Serif", serif;
+        font-weight: 400;
+        font-size: 56px;
+        line-height: 1.02;
+        letter-spacing: -0.015em;
+        margin-bottom: 18px;
+      }
+      .hero-title em {
+        font-style: italic;
+        color: var(--brand-ink);
+      }
+      .hero-lead {
+        font-size: 15px;
+        color: var(--ink-soft);
+        line-height: 1.55;
+        max-width: 520px;
+        margin-bottom: 28px;
+      }
+      .hero-stats {
+        display: flex;
+        gap: 36px;
+        margin-bottom: 32px;
+      }
+      .hero-stat .k {
+        font-family: "Instrument Serif", serif;
+        font-weight: 400;
+        font-size: 28px;
+        line-height: 1;
+        letter-spacing: -0.01em;
+        margin-bottom: 3px;
+      }
+      .hero-stat .s {
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+      .hero-cta {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .hero-cta .note {
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+
+      .hero-right {
+        position: relative;
+        padding: 0;
+        overflow: hidden;
+        background: linear-gradient(
+          135deg,
+          oklch(0.28 0.04 25),
+          oklch(0.15 0.02 25)
+        );
+      }
+      .hero-grid-pattern {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(oklch(0.55 0.15 25 / 0.08) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            oklch(0.55 0.15 25 / 0.08) 1px,
+            transparent 1px
+          );
+        background-size: 32px 32px;
+      }
+      .listing-teasers {
+        position: absolute;
+        inset: 0;
+        padding: 32px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        justify-content: center;
+      }
+      .teaser {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 10px;
+        padding: 12px 14px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        backdrop-filter: blur(8px);
+        color: #fff;
+        filter: blur(1.5px);
+        opacity: 0.88;
+      }
+      .teaser.sharp {
+        filter: none;
+        opacity: 1;
+      }
+      .teaser .tea-img {
+        width: 72px;
+        height: 52px;
+        border-radius: 6px;
+        background: linear-gradient(
+          135deg,
+          oklch(0.55 0.18 25),
+          oklch(0.25 0.08 25)
+        );
+        flex: none;
+        position: relative;
+        overflow: hidden;
+      }
+      .teaser.silver .tea-img {
+        background: linear-gradient(
+          135deg,
+          oklch(0.75 0.01 240),
+          oklch(0.45 0.01 240)
+        );
+      }
+      .teaser.yellow .tea-img {
+        background: linear-gradient(
+          135deg,
+          oklch(0.72 0.13 85),
+          oklch(0.4 0.08 70)
+        );
+      }
+      .teaser.black .tea-img {
+        background: linear-gradient(
+          135deg,
+          oklch(0.25 0.02 25),
+          oklch(0.08 0.01 25)
+        );
+      }
+      .teaser .tea-body {
+        flex: 1;
+        min-width: 0;
+      }
+      .teaser .tea-t {
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: -0.005em;
+        margin-bottom: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .teaser .tea-meta {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.7);
+        white-space: nowrap;
+      }
+      .teaser .tea-p {
+        font-family: "Instrument Serif", serif;
+        font-weight: 400;
+        font-size: 17px;
+        color: #fff;
+        flex: none;
+        white-space: nowrap;
+      }
+
+      .locked-overlay {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(6px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 12px;
+        padding: 14px 18px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--ink);
+        box-shadow: 0 8px 32px oklch(0 0 0 / 0.3);
+        z-index: 2;
+        white-space: nowrap;
+      }
+      .locked-overlay svg {
+        width: 14px;
+        height: 14px;
+        color: var(--brand);
+      }
+
+      .landing-strip {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 48px;
+        padding: 36px 56px;
+        background: #fff;
+        align-items: center;
+      }
+      .ls-about-label {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+      .ls-about-body {
+        font-size: 14px;
+        color: var(--ink-soft);
+        line-height: 1.6;
+        max-width: 560px;
+      }
+      .ls-meta {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        border-left: 1px solid var(--line);
+        padding-left: 48px;
+      }
+      .ls-meta-k {
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      .ls-meta-v {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--ink);
+      }
+
+      .landing-detail {
+        padding: 56px;
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 48px;
+      }
+      .detail-block h3 {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 600;
+        margin-bottom: 14px;
+      }
+      .detail-block p {
+        margin: 0 0 16px;
+        color: var(--ink-soft);
+        font-size: 14px;
+        line-height: 1.65;
+      }
+      .detail-block p:last-child {
+        margin-bottom: 0;
+      }
+      .rules-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .rule-item {
+        display: grid;
+        grid-template-columns: 18px 1fr;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--line-soft);
+      }
+      .rule-item:last-child {
+        border-bottom: 0;
+      }
+      .rule-item .r-num {
+        font-family: "Instrument Serif", serif;
+        font-size: 16px;
+        font-style: italic;
+        color: var(--brand);
+        line-height: 1;
+      }
+      .rule-item .r-body .r-t {
+        font-size: 13.5px;
+        font-weight: 600;
+        margin-bottom: 3px;
+      }
+      .rule-item .r-body .r-s {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .owner-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 20px;
+        position: sticky;
+        top: 72px;
+      }
+      .owner-card .oc-label {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 600;
+        margin-bottom: 14px;
+      }
+      .owner-card .oc-person {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+      .owner-card .oc-av {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--blue), oklch(0.42 0.13 232));
+        color: #fff;
+        font-size: 18px;
+        font-weight: 600;
+        display: grid;
+        place-items: center;
+        flex: none;
+      }
+      .owner-card .oc-name {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .owner-card .oc-loc {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+      .owner-card .oc-quote {
+        font-family: "Instrument Serif", serif;
+        font-style: italic;
+        font-size: 15px;
+        color: var(--ink-soft);
+        line-height: 1.5;
+        padding-left: 14px;
+        border-left: 2px solid var(--brand-soft);
+        margin-bottom: 16px;
+      }
+      .owner-card .oc-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        padding-top: 14px;
+        border-top: 1px solid var(--line-soft);
+      }
+      .owner-card .oc-stat .v {
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .owner-card .oc-stat .l {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 1px;
+      }
+
+      /* ===== Application form shell (shared by 3b, 3c, 3d, 3e) ===== */
+      .form-shell {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        min-height: 820px;
+      }
+      .form-side {
+        background: linear-gradient(
+          180deg,
+          oklch(0.22 0.03 25),
+          oklch(0.14 0.02 25)
+        );
+        color: #fff;
+        padding: 36px 28px;
+        display: flex;
+        flex-direction: column;
+      }
+      .form-side .fs-brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 36px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .form-side .fs-logo {
+        width: 32px;
+        height: 32px;
+        border-radius: 7px;
+        background: linear-gradient(
+          135deg,
+          oklch(0.65 0.16 25),
+          oklch(0.45 0.14 25)
+        );
+        display: grid;
+        place-items: center;
+        font-family: "Instrument Serif", serif;
+        font-size: 18px;
+      }
+      .form-side .fs-title {
+        font-family: "Instrument Serif", serif;
+        font-weight: 400;
+        font-size: 24px;
+        line-height: 1.15;
+        margin-bottom: 10px;
+      }
+      .form-side .fs-sub {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.65);
+        line-height: 1.5;
+        margin-bottom: 32px;
+      }
+
+      .fs-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-bottom: auto;
+      }
+      .fs-step {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 9px 10px;
+        border-radius: 7px;
+        font-size: 12.5px;
+        color: rgba(255, 255, 255, 0.55);
+        transition: color 0.12s;
+      }
+      .fs-step .ball {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 11px;
+        font-weight: 600;
+        display: grid;
+        place-items: center;
+        flex: none;
+      }
+      .fs-step.done {
+        color: rgba(255, 255, 255, 0.85);
+      }
+      .fs-step.done .ball {
+        background: var(--success);
+        border-color: var(--success);
+        color: #fff;
+      }
+      .fs-step.done .ball svg {
+        width: 11px;
+        height: 11px;
+        stroke-width: 3;
+      }
+      .fs-step.active {
+        color: #fff;
+        font-weight: 500;
+      }
+      .fs-step.active .ball {
+        background: #fff;
+        color: var(--ink);
+        border-color: #fff;
+      }
+      .fs-step .s {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.5);
+        margin-top: 1px;
+      }
+
+      .fs-foot {
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 11.5px;
+        color: rgba(255, 255, 255, 0.5);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .fs-foot svg {
+        width: 12px;
+        height: 12px;
+        color: var(--blue);
+      }
+      .fs-foot b {
+        color: rgba(255, 255, 255, 0.75);
+        font-weight: 600;
+      }
+
+      .form-body {
+        padding: 56px 72px;
+        max-width: 760px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      .form-body .fb-head {
+        margin-bottom: 36px;
+      }
+      .form-body h1 {
+        font-family: "Instrument Serif", serif;
+        font-weight: 400;
+        font-size: 36px;
+        line-height: 1.08;
+        letter-spacing: -0.01em;
+        margin-bottom: 10px;
+      }
+      .form-body h1 em {
+        font-style: italic;
+        color: var(--brand-ink);
+      }
+      .form-body .fb-lead {
+        font-size: 14px;
+        color: var(--muted);
+        line-height: 1.6;
+        max-width: 560px;
+      }
+      .form-body .fb-footer {
+        margin-top: auto;
+        padding-top: 32px;
+        border-top: 1px solid var(--line-soft);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      /* verification cards */
+      .verif-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 32px;
+      }
+      .verif-card {
+        background: #fff;
+        border: 1.5px solid var(--line);
+        border-radius: 12px;
+        padding: 18px 18px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        transition: all 0.12s;
+        cursor: pointer;
+      }
+      .verif-card:hover {
+        border-color: oklch(0.82 0.01 230);
+      }
+      .verif-card.done {
+        background: var(--success-soft);
+        border-color: oklch(0.82 0.09 155);
+      }
+      .verif-card.done:hover {
+        border-color: var(--success);
+      }
+      .verif-card .vc-hd {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .verif-card .vc-ic {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: var(--bg-soft);
+        display: grid;
+        place-items: center;
+        flex: none;
+        color: var(--ink-soft);
+      }
+      .verif-card.done .vc-ic {
+        background: #fff;
+        color: var(--success);
+      }
+      .verif-card .vc-ic svg {
+        width: 18px;
+        height: 18px;
+      }
+      .verif-card .vc-status {
+        font-size: 10.5px;
+        font-weight: 600;
+        padding: 3px 8px;
+        border-radius: 4px;
+        background: var(--bg-soft);
+        color: var(--muted);
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+      }
+      .verif-card.done .vc-status {
+        background: var(--success);
+        color: #fff;
+      }
+      .verif-card.done .vc-status svg {
+        width: 9px;
+        height: 9px;
+        stroke-width: 3;
+      }
+      .verif-card .vc-t {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 3px;
+      }
+      .verif-card .vc-s {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.5;
+        min-height: 36px;
+      }
+      .verif-card .vc-cta {
+        padding: 7px 12px;
+        border-radius: 6px;
+        background: var(--ink);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        align-self: flex-start;
+      }
+      .verif-card.done .vc-cta {
+        background: #fff;
+        color: var(--success);
+        border: 1px solid oklch(0.82 0.09 155);
+        font-weight: 500;
+      }
+      .verif-card.done .vc-cta:hover {
+        background: var(--success-soft);
+      }
+      .verif-card .vc-handle {
+        font-family: ui-monospace, monospace;
+        font-size: 11.5px;
+        color: var(--ink);
+        background: #fff;
+        border: 1px solid oklch(0.85 0.05 155);
+        padding: 3px 9px;
+        border-radius: 5px;
+        display: inline-block;
+        margin-top: 2px;
+      }
+
+      .req-note {
+        background: var(--blue-softer);
+        border: 1px solid var(--blue-soft);
+        border-radius: 10px;
+        padding: 14px 18px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        font-size: 12.5px;
+        color: var(--ink-soft);
+        line-height: 1.5;
+        margin-bottom: 28px;
+      }
+      .req-note svg {
+        width: 16px;
+        height: 16px;
+        color: var(--blue);
+        flex: none;
+      }
+      .req-note b {
+        color: var(--ink);
+        font-weight: 600;
+      }
+
+      /* form controls */
+      .field {
+        margin-bottom: 24px;
+      }
+      .field label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--ink);
+        margin-bottom: 6px;
+      }
+      .field .req {
+        color: var(--danger);
+        margin-left: 4px;
+      }
+      .field .opt {
+        font-size: 11.5px;
+        color: var(--muted);
+        font-weight: 400;
+        margin-left: 6px;
+      }
+      .field .help {
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 6px;
+        line-height: 1.5;
+      }
+      .field .char-count {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 6px;
+        text-align: right;
+      }
+      .input,
+      .textarea {
+        width: 100%;
+        padding: 10px 14px;
+        font-size: 14px;
+        background: #fff;
+        border: 1.5px solid var(--line);
+        border-radius: 8px;
+        color: var(--ink);
+        transition: all 0.12s;
+      }
+      .input:focus,
+      .textarea:focus {
+        outline: 0;
+        border-color: var(--blue);
+        box-shadow: 0 0 0 3px oklch(0.66 0.16 230 / 0.15);
+      }
+      .textarea {
+        resize: vertical;
+        min-height: 110px;
+        font-family: inherit;
+        line-height: 1.55;
+      }
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .chip {
+        padding: 7px 14px;
+        border-radius: 8px;
+        font-size: 12.5px;
+        font-weight: 500;
+        background: #fff;
+        border: 1.5px solid var(--line);
+        color: var(--ink-soft);
+        cursor: pointer;
+        transition: all 0.12s;
+        white-space: nowrap;
+      }
+      .chip:hover {
+        border-color: oklch(0.82 0.01 230);
+        color: var(--ink);
+      }
+      .chip.on {
+        background: var(--ink);
+        color: #fff;
+        border-color: var(--ink);
+      }
+
+      /* SMS verification module */
+      .phone-block {
+        background: var(--bg-soft);
+        border: 1.5px solid var(--line);
+        border-radius: 12px;
+        padding: 18px;
+        margin-top: 12px;
+      }
+      .phone-block.done {
+        background: var(--success-soft);
+        border-color: oklch(0.82 0.09 155);
+      }
+      .phone-block .pb-hd {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 14px;
+        margin-bottom: 12px;
+      }
+      .phone-block .pb-hd .pb-title {
+        font-size: 13.5px;
+        font-weight: 600;
+        margin-bottom: 2px;
+      }
+      .phone-block .pb-hd .pb-sub {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .phone-block .pb-row {
+        display: grid;
+        grid-template-columns: 88px 1fr auto;
+        gap: 8px;
+      }
+      .phone-block .pb-row .input {
+        background: #fff;
+      }
+      .phone-block .otp-row {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+        align-items: center;
+      }
+      .phone-block .otp-row .otp {
+        width: 42px;
+        height: 48px;
+        border-radius: 8px;
+        background: #fff;
+        border: 1.5px solid var(--line);
+        text-align: center;
+        font-size: 20px;
+        font-weight: 500;
+        font-family: ui-monospace, monospace;
+      }
+      .phone-block .otp-row .otp.filled {
+        border-color: var(--blue);
+        color: var(--ink);
+      }
+      .phone-block .otp-resend {
+        font-size: 12px;
+        color: var(--muted);
+        margin-left: auto;
+      }
+      .phone-block .otp-resend b {
+        color: var(--ink);
+      }
+      .phone-block.done .pb-ok {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+        background: #fff;
+        border: 1px solid oklch(0.82 0.09 155);
+        padding: 8px 12px;
+        border-radius: 7px;
+        font-size: 12.5px;
+      }
+      .phone-block.done .pb-ok svg {
+        width: 14px;
+        height: 14px;
+        color: var(--success);
+      }
+      .phone-block.done .pb-ok b {
+        color: var(--success);
+        font-weight: 600;
+      }
+
+      /* Review page */
+      .review-card {
+        border: 1.5px solid var(--line);
+        border-radius: 12px;
+        padding: 20px 22px;
+        margin-bottom: 14px;
+      }
+      .review-card .rc-hd {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+      }
+      .review-card .rc-hd h3 {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .review-card .rc-edit {
+        font-size: 12px;
+        color: var(--blue-ink);
+        font-weight: 500;
+      }
+      .review-card .rc-edit:hover {
+        text-decoration: underline;
+      }
+      .review-card .kv {
+        display: grid;
+        grid-template-columns: 160px 1fr;
+        gap: 16px;
+        padding: 10px 0;
+        border-top: 1px solid var(--line-soft);
+        font-size: 13px;
+        align-items: flex-start;
+      }
+      .review-card .kv:first-of-type {
+        border-top: 0;
+        padding-top: 0;
+      }
+      .review-card .kv .k {
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .review-card .kv .v {
+        color: var(--ink);
+      }
+      .review-card .kv .v.long {
+        line-height: 1.6;
+      }
+
+      .confirm-row {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        background: var(--bg-soft);
+        border: 1px solid var(--line);
+        padding: 14px 16px;
+        border-radius: 10px;
+        margin-top: 20px;
+      }
+      .confirm-row input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--brand);
+        flex: none;
+        margin-top: 1px;
+      }
+      .confirm-row .cr-t {
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--ink-soft);
+      }
+      .confirm-row .cr-t a {
+        color: var(--blue-ink);
+        font-weight: 500;
+        text-decoration: underline;
+      }
+
+      /* ===== Status screens (pending / approved / rejected / more-info) ===== */
+      .status-screen {
+        display: grid;
+        grid-template-columns: 1fr;
+        min-height: 780px;
+        place-items: center;
+        padding: 60px 32px;
+        background: radial-gradient(ellipse at top, oklch(0.98 0.02 25), #fff);
+      }
+      .status-content {
+        max-width: 560px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .status-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        margin-bottom: 28px;
+      }
+      .status-icon.pending {
+        background: var(--warn-soft);
+        color: oklch(0.48 0.15 55);
+      }
+      .status-icon.approved {
+        background: var(--success-soft);
+        color: var(--success);
+      }
+      .status-icon.rejected {
+        background: var(--bg-soft);
+        color: var(--muted);
+      }
+      .status-icon.moreinfo {
+        background: var(--blue-softer);
+        color: var(--blue);
+      }
+      .status-icon svg {
+        width: 36px;
+        height: 36px;
+      }
+      .status-icon.pending svg {
+        animation: pulse 2.4s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.75;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.05);
+        }
+      }
+
+      .status-eyebrow {
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        font-weight: 600;
+        color: var(--muted);
+        margin-bottom: 12px;
+      }
+      .status-title {
+        font-family: "Instrument Serif", serif;
+        font-weight: 400;
+        font-size: 42px;
+        line-height: 1.05;
+        letter-spacing: -0.01em;
+        margin-bottom: 14px;
+      }
+      .status-title em {
+        font-style: italic;
+        color: var(--brand-ink);
+      }
+      .status-lead {
+        font-size: 15px;
+        color: var(--ink-soft);
+        line-height: 1.6;
+        margin-bottom: 32px;
+      }
+
+      .expectations {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 20px 24px;
+        text-align: left;
+        width: 100%;
+        margin-bottom: 28px;
+      }
+      .expectations h4 {
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 600;
+        margin-bottom: 12px;
+      }
+      .expect-row {
+        display: grid;
+        grid-template-columns: 24px 1fr;
+        gap: 12px;
+        padding: 10px 0;
+        border-top: 1px solid var(--line-soft);
+        align-items: flex-start;
+      }
+      .expect-row:first-of-type {
+        border-top: 0;
+        padding-top: 0;
+      }
+      .expect-row .ex-ic {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        margin-top: 1px;
+        background: var(--bg-soft);
+        flex: none;
+      }
+      .expect-row .ex-ic.done {
+        background: var(--success-soft);
+        color: var(--success);
+      }
+      .expect-row .ex-ic.pending {
+        background: var(--warn-soft);
+        color: oklch(0.48 0.15 55);
+      }
+      .expect-row .ex-ic svg {
+        width: 11px;
+        height: 11px;
+        stroke-width: 2.5;
+      }
+      .expect-row .ex-t {
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 1px;
+      }
+      .expect-row .ex-s {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+
+      .status-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      /* Approved — "inside" teaser */
+      .welcome-note {
+        background: var(--brand-soft);
+        border: 1px solid oklch(0.88 0.05 25);
+        border-radius: 12px;
+        padding: 18px 22px;
+        text-align: left;
+        margin-bottom: 24px;
+        max-width: 100%;
+      }
+      .welcome-note h4 {
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--brand-ink);
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .welcome-note .wn-body {
+        font-family: "Instrument Serif", serif;
+        font-style: italic;
+        font-size: 16px;
+        color: var(--ink);
+        line-height: 1.55;
+        margin-bottom: 10px;
+      }
+      .welcome-note .wn-sig {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .welcome-note .wn-sig b {
+        color: var(--ink);
+        font-weight: 600;
+      }
+
+      /* Rejected reason block (optional) */
+      .reason-note {
+        background: var(--bg-soft);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 16px 18px;
+        text-align: left;
+        margin-bottom: 24px;
+        font-size: 13px;
+        color: var(--ink-soft);
+        line-height: 1.55;
+      }
+      .reason-note h4 {
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      /* More-info request block */
+      .moreinfo-block {
+        background: var(--blue-softer);
+        border: 1px solid var(--blue-soft);
+        border-radius: 10px;
+        padding: 18px 22px;
+        text-align: left;
+        margin-bottom: 24px;
+      }
+      .moreinfo-block h4 {
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--blue-ink);
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      .moreinfo-block .mi-body {
+        font-size: 13.5px;
+        color: var(--ink);
+        line-height: 1.6;
+        margin-bottom: 14px;
+      }
+
+      .mocknote {
+        max-width: 1440px;
+        margin: -12px auto 32px;
+        padding: 0 20px;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      .mocknote .tag {
+        padding: 2px 7px;
+        border-radius: 4px;
+        background: var(--bg-soft);
+        border: 1px solid var(--line-soft);
+        font-weight: 600;
+        color: var(--ink-soft);
+        font-size: 10.5px;
+        letter-spacing: 0.04em;
+        flex: none;
+      }
+      .mocknote b {
+        color: var(--ink-soft);
+        font-weight: 600;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ===== Flow nav ===== -->
+    <div class="flow-nav">
+      <div class="fn-title">
+        <svg viewBox="0 0 44 44" fill="none">
+          <path
+            d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+            stroke="currentColor"
+            stroke-width="2.4"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+            stroke="currentColor"
+            stroke-width="2.4"
+            stroke-linecap="round"
+          />
+          <path
+            d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
+          <circle cx="22" cy="22" r="3.4" fill="var(--blue)" />
+          <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+          <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+          <circle cx="11.6" cy="28" r="2.4" fill="currentColor" />
+        </svg>
+        <b>Shouks</b>
+        <span class="slash">/</span>
+        <span class="flow">Flow 03 · Member application</span>
+      </div>
+      <div class="fn-steps">
+        <button class="step-btn active" data-step="3a">
+          <span class="num">1</span> Landing
+        </button>
+        <button class="step-btn" data-step="3b">
+          <span class="num">2</span> Start
+        </button>
+        <button class="step-btn" data-step="3c">
+          <span class="num">3</span> Verify identity
+        </button>
+        <button class="step-btn" data-step="3d">
+          <span class="num">4</span> Questions
+        </button>
+        <button class="step-btn" data-step="3e">
+          <span class="num">5</span> Review
+        </button>
+        <button class="step-btn" data-step="3f">
+          <span class="num">6</span> Pending
+        </button>
+        <button class="step-btn" data-step="3g">
+          <span class="num">7</span> Approved
+        </button>
+        <button class="step-btn" data-step="3h">
+          <span class="num">8</span> Rejected
+        </button>
+        <button class="step-btn" data-step="3i">
+          <span class="num">9</span> More info
+        </button>
+      </div>
+      <div class="spacer"></div>
+      <span class="fn-kb">← →</span>
+    </div>
+
+    <!-- ============ 3A · LANDING ============ -->
+    <section class="screen" data-screen="3a">
+      <div class="screen-caption">
+        <span class="cap-num">01 / 09</span>
+        <h2>Marketplace landing</h2>
+        <span class="sub"
+          >Public-facing page. Anyone with the URL sees brand, rules, and owner
+          — listings stay hidden behind a lock.</span
+        >
+      </div>
+      <div class="screen-frame">
+        <div class="browser-bar">
+          <div class="dots">
+            <span class="dot"></span><span class="dot"></span
+            ><span class="dot"></span>
+          </div>
+          <div class="url">shouks.com / air-cooled-ferraris</div>
+        </div>
+        <div class="app">
+          <div class="mp-nav">
+            <div class="brand-lockup">
+              <div class="brand-logo">A</div>
+              <div>
+                <div class="brand-name">Air-Cooled Ferraris</div>
+                <div
+                  style="font-size: 11px; color: var(--muted); font-weight: 400"
+                >
+                  Pre-1998 only · 247 members
+                </div>
+              </div>
+            </div>
+            <div class="spacer"></div>
+            <div class="shouks-tag">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 2 21 7v10l-9 5-9-5V7l9-5Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                />
+                <circle cx="12" cy="12" r="2" fill="currentColor" />
+              </svg>
+              Hosted on Shouks
+            </div>
+            <button class="btn btn-outline btn-sm">Sign in</button>
+            <button class="btn btn-brand" data-goto="3b">
+              Request to join
+            </button>
+          </div>
+
+          <section class="hero">
+            <div class="hero-grid">
+              <div class="hero-left">
+                <div class="hero-cat">Vehicles · Invite-only</div>
+                <h1 class="hero-title">
+                  A room for people who <em>still</em> shift their own gears.
+                </h1>
+                <p class="hero-lead">
+                  A members-only community for owners and serious enthusiasts of
+                  pre-1998 Ferraris. No brokers, no flips.
+                </p>
+                <div class="hero-cta">
+                  <button class="btn btn-brand btn-lg" data-goto="3b">
+                    Request to join →
+                  </button>
+                  <span class="note">~48h review · free to apply</span>
+                </div>
+              </div>
+              <div class="hero-right">
+                <div class="hero-grid-pattern"></div>
+                <div class="listing-teasers">
+                  <div class="teaser yellow">
+                    <div class="tea-img"></div>
+                    <div class="tea-body">
+                      <div class="tea-t">1986 328 GTS · Giallo Fly</div>
+                      <div class="tea-meta">52k km · Manual · Matching #s</div>
+                    </div>
+                    <div class="tea-p">$158,000</div>
+                  </div>
+                  <div class="teaser sharp silver">
+                    <div class="tea-img"></div>
+                    <div class="tea-body">
+                      <div class="tea-t">1995 F355 Berlinetta · Argento</div>
+                      <div class="tea-meta">
+                        68k km · 6-spd · Auction · 2d left
+                      </div>
+                    </div>
+                    <div class="tea-p">$112,000</div>
+                  </div>
+                  <div class="teaser black">
+                    <div class="tea-img"></div>
+                    <div class="tea-body">
+                      <div class="tea-t">1987 328 GTS · Nero Daytona</div>
+                      <div class="tea-meta">43k km · Major service 2023</div>
+                    </div>
+                    <div class="tea-p">$147,500</div>
+                  </div>
+                  <div class="teaser">
+                    <div class="tea-img"></div>
+                    <div class="tea-body">
+                      <div class="tea-t">1989 Testarossa · Rosso Corsa</div>
+                      <div class="tea-meta">61k km · Matching #s</div>
+                    </div>
+                    <div class="tea-p">$184,000</div>
+                  </div>
+                  <div class="teaser yellow">
+                    <div class="tea-img"></div>
+                    <div class="tea-body">
+                      <div class="tea-t">1992 348 TB · Verde Pino</div>
+                      <div class="tea-meta">78k km · 5-spd</div>
+                    </div>
+                    <div class="tea-p">$94,500</div>
+                  </div>
+                </div>
+                <div class="locked-overlay">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect x="3" y="11" width="18" height="11" rx="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                  Listings visible to members only
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <div class="landing-strip">
+            <div class="ls-about">
+              <div class="ls-about-label">About this marketplace</div>
+              <div class="ls-about-body">
+                Air-Cooled Ferraris is for owners and serious enthusiasts of
+                pre-1998 Ferraris — the air-cooled and early water-cooled eras.
+                A small, deliberate community for people who drive the cars they
+                talk about.
+              </div>
+            </div>
+            <div class="ls-meta">
+              <div class="ls-meta-item">
+                <div class="ls-meta-k">Focus</div>
+                <div class="ls-meta-v">Pre-1998 Ferraris</div>
+              </div>
+              <div class="ls-meta-item">
+                <div class="ls-meta-k">Members</div>
+                <div class="ls-meta-v">247 verified</div>
+              </div>
+              <div class="ls-meta-item">
+                <div class="ls-meta-k">Review time</div>
+                <div class="ls-meta-v">~48 hours</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mocknote">
+        <span class="tag">Notes</span
+        ><span
+          >Simplified: hero does the heavy lifting (promise + lock + CTA), strip
+          below describes the marketplace itself and sets review expectations.
+          Owner personality is reserved for the apply flow side-rail.</span
+        >
+      </div>
+    </section>
+
+    <!-- ============ 3B · START APPLICATION ============ -->
+    <section class="screen" data-screen="3b" hidden>
+      <div class="screen-caption">
+        <span class="cap-num">02 / 09</span>
+        <h2>Start application</h2>
+        <span class="sub"
+          >Shouks account creation folded in — apply and create the account in
+          one step. Sets expectations before they invest time.</span
+        >
+      </div>
+      <div class="screen-frame">
+        <div class="browser-bar">
+          <div class="dots">
+            <span class="dot"></span><span class="dot"></span
+            ><span class="dot"></span>
+          </div>
+          <div class="url">shouks.com / air-cooled-ferraris / apply</div>
+        </div>
+        <div class="app">
+          <div class="form-shell">
+            <aside class="form-side">
+              <div class="fs-brand">
+                <div class="fs-logo">A</div>
+                Air-Cooled Ferraris
+              </div>
+              <div class="fs-title">
+                Join a deliberate community of pre-1998 Ferrari owners.
+              </div>
+              <div class="fs-sub">
+                Four quick steps. The owners review applications typically
+                within 48 hours.
+              </div>
+              <div class="fs-steps">
+                <div class="fs-step active">
+                  <div class="ball">1</div>
+                  <div>
+                    <div>Your account</div>
+                    <div class="s">Name, email, password</div>
+                  </div>
+                </div>
+                <div class="fs-step">
+                  <div class="ball">2</div>
+                  <div>
+                    <div>Verify identity</div>
+                    <div class="s">OAuth or SMS · 1+ required</div>
+                  </div>
+                </div>
+                <div class="fs-step">
+                  <div class="ball">3</div>
+                  <div>
+                    <div>Application</div>
+                    <div class="s">3 short questions</div>
+                  </div>
+                </div>
+                <div class="fs-step">
+                  <div class="ball">4</div>
+                  <div>
+                    <div>Review &amp; submit</div>
+                    <div class="s">Check and send</div>
+                  </div>
+                </div>
+              </div>
+              <div class="fs-foot">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M12 2 21 7v10l-9 5-9-5V7l9-5Z" />
+                </svg>
+                <span
+                  ><b>Hosted on Shouks</b> · your account works across every
+                  marketplace</span
+                >
+              </div>
+            </aside>
+
+            <div class="form-body">
+              <div class="fb-head">
+                <h1>Let's get you a <em>Shouks account</em>.</h1>
+                <div class="fb-lead">
+                  Reused across every Shouks marketplace you apply to. You'll be
+                  able to track applications, listings, and messages from one
+                  place.
+                </div>
+              </div>
+
+              <div
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px"
+              >
+                <div class="field">
+                  <label>First name <span class="req">*</span></label>
+                  <input class="input" value="Marcus" />
+                </div>
+                <div class="field">
+                  <label>Last name <span class="req">*</span></label>
+                  <input class="input" value="Kleinfelder" />
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Email <span class="req">*</span></label>
+                <input class="input" value="marcus@kleinfelder.ch" />
+                <div class="help">
+                  Used for account sign-in and application updates.
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Password <span class="req">*</span></label>
+                <input class="input" type="password" value="********" />
+                <div class="help">
+                  At least 10 characters. Or
+                  <a href="#" style="color: var(--blue-ink); font-weight: 500"
+                    >sign up with Google</a
+                  >
+                  — it counts toward identity verification too.
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Location <span class="opt">Optional</span></label>
+                <input
+                  class="input"
+                  value="Zurich, Switzerland"
+                  placeholder="City, country"
+                />
+                <div class="help">
+                  Shared with the marketplace owner only. Visible to members if
+                  you enable it.
+                </div>
+              </div>
+
+              <div class="confirm-row">
+                <input type="checkbox" checked />
+                <div class="cr-t">
+                  I agree to Shouks's <a href="#">Terms of Service</a> and
+                  <a href="#">Privacy Policy</a>, and I understand each
+                  marketplace has its own house rules I'm responsible for
+                  reading.
+                </div>
+              </div>
+
+              <div class="fb-footer">
+                <button class="btn btn-ghost" data-goto="3a">
+                  ← Back to marketplace
+                </button>
+                <div style="flex: 1"></div>
+                <button class="btn btn-brand btn-lg" data-goto="3c">
+                  Continue
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mocknote">
+        <span class="tag">Notes</span
+        ><span
+          >Account creation is inside the application flow, not before — reduces
+          drop-off. The dark side-rail matches the marketplace brand color,
+          reinforcing "you're applying to <b>this</b> marketplace" at every
+          step. Location is optional and the disclosure is inline so there's no
+          friction surprise later.</span
+        >
+      </div>
+    </section>
+
+    <!-- ============ 3C · VERIFY IDENTITY ============ -->
+    <section class="screen" data-screen="3c" hidden>
+      <div class="screen-caption">
+        <span class="cap-num">03 / 09</span>
+        <h2>Verify identity</h2>
+        <span class="sub"
+          >OAuth providers + SMS, configured per-marketplace. At least one
+          required. Done state shows handles that owners can
+          cross-reference.</span
+        >
+      </div>
+      <div class="screen-frame">
+        <div class="browser-bar">
+          <div class="dots">
+            <span class="dot"></span><span class="dot"></span
+            ><span class="dot"></span>
+          </div>
+          <div class="url">
+            shouks.com / air-cooled-ferraris / apply / verify
+          </div>
+        </div>
+        <div class="app">
+          <div class="form-shell">
+            <aside class="form-side">
+              <div class="fs-brand">
+                <div class="fs-logo">A</div>
+                Air-Cooled Ferraris
+              </div>
+              <div class="fs-title">
+                Step 2 of 4 — prove you're a real person.
+              </div>
+              <div class="fs-sub">
+                The owners here take anonymity seriously (against it, that is).
+              </div>
+              <div class="fs-steps">
+                <div class="fs-step done">
+                  <div class="ball">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div>Your account</div>
+                    <div class="s">Marcus Kleinfelder</div>
+                  </div>
+                </div>
+                <div class="fs-step active">
+                  <div class="ball">2</div>
+                  <div>
+                    <div>Verify identity</div>
+                    <div class="s">2 of 4 connected</div>
+                  </div>
+                </div>
+                <div class="fs-step">
+                  <div class="ball">3</div>
+                  <div>
+                    <div>Application</div>
+                    <div class="s">3 short questions</div>
+                  </div>
+                </div>
+                <div class="fs-step">
+                  <div class="ball">4</div>
+                  <div><div>Review &amp; submit</div></div>
+                </div>
+              </div>
+              <div class="fs-foot">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="3" y="11" width="18" height="11" rx="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+                <span
+                  ><b>Private by default</b> · only the owner sees your
+                  handles</span
+                >
+              </div>
+            </aside>
+
+            <div class="form-body">
+              <div class="fb-head">
+                <h1>Connect at least <em>one</em> account.</h1>
+                <div class="fb-lead">
+                  The marketplace owner chose the methods below. Connecting more
+                  than one raises your signal — applications with 3+
+                  verifications are approved at a higher rate.
+                </div>
+              </div>
+
+              <div class="req-note">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 8v4M12 16h.01" />
+                </svg>
+                <span
+                  ><b>Required for Air-Cooled Ferraris:</b> connect at least
+                  <b>one</b> method below. The owner has recommended connecting
+                  at least 3 for higher approval odds.</span
+                >
+              </div>
+
+              <div class="verif-grid">
+                <div class="verif-card done">
+                  <div class="vc-hd">
+                    <div class="vc-ic">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                          d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                          fill="#4285F4"
+                        />
+                        <path
+                          d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A10.997 10.997 0 0 0 12 23z"
+                          fill="#34A853"
+                        />
+                        <path
+                          d="M5.84 14.09a6.6 6.6 0 0 1 0-4.18V7.07H2.18a10.997 10.997 0 0 0 0 9.86l3.66-2.84z"
+                          fill="#FBBC05"
+                        />
+                        <path
+                          d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                          fill="#EA4335"
+                        />
+                      </svg>
+                    </div>
+                    <span class="vc-status"
+                      ><svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M20 6 9 17l-5-5" /></svg
+                      >Connected</span
+                    >
+                  </div>
+                  <div>
+                    <div class="vc-t">Google</div>
+                    <div class="vc-s">
+                      Fastest — you're already signed in on most browsers.
+                    </div>
+                  </div>
+                  <div class="vc-handle">marcus@kleinfelder.ch</div>
+                  <button class="vc-cta">Disconnect</button>
+                </div>
+
+                <div class="verif-card done">
+                  <div class="vc-hd">
+                    <div class="vc-ic">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        color="#1877F2"
+                      >
+                        <path
+                          d="M22 12a10 10 0 1 0-11.6 9.87v-7H8v-2.87h2.4V9.4c0-2.37 1.42-3.68 3.59-3.68 1.04 0 2.13.19 2.13.19v2.34h-1.2c-1.18 0-1.55.73-1.55 1.48v1.78h2.64L15.6 14h-2.23v7A10 10 0 0 0 22 12z"
+                        />
+                      </svg>
+                    </div>
+                    <span class="vc-status"
+                      ><svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M20 6 9 17l-5-5" /></svg
+                      >Connected</span
+                    >
+                  </div>
+                  <div>
+                    <div class="vc-t">Facebook</div>
+                    <div class="vc-s">
+                      Confirms your social identity. Owners like seeing
+                      car-related history.
+                    </div>
+                  </div>
+                  <div class="vc-handle">facebook.com/marcus.kleinfelder</div>
+                  <button class="vc-cta">Disconnect</button>
+                </div>
+
+                <div class="verif-card">
+                  <div class="vc-hd">
+                    <div class="vc-ic">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <rect x="2" y="2" width="20" height="20" rx="5" />
+                        <circle cx="12" cy="12" r="4" />
+                        <circle
+                          cx="17.5"
+                          cy="6.5"
+                          r="0.8"
+                          fill="currentColor"
+                        />
+                      </svg>
+                    </div>
+                    <span class="vc-status">Not connected</span>
+                  </div>
+                  <div>
+                    <div class="vc-t">Instagram</div>
+                    <div class="vc-s">
+                      Useful if you post about your car. Owner can see your
+                      grid, not your DMs.
+                    </div>
+                  </div>
+                  <button class="vc-cta">
+                    Connect Instagram
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M7 17 17 7M7 7h10v10" />
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="verif-card">
+                  <div class="vc-hd">
+                    <div class="vc-ic">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <rect x="6" y="2" width="12" height="20" rx="2" />
+                        <circle cx="12" cy="18" r="1" />
+                      </svg>
+                    </div>
+                    <span class="vc-status">Not connected</span>
+                  </div>
+                  <div>
+                    <div class="vc-t">Phone (SMS)</div>
+                    <div class="vc-s">
+                      One-time code. We don't share your number with the
+                      marketplace owner.
+                    </div>
+                  </div>
+                  <button class="vc-cta">Verify by SMS</button>
+                </div>
+              </div>
+
+              <div class="fb-footer">
+                <button class="btn btn-ghost" data-goto="3b">← Back</button>
+                <div style="flex: 1"></div>
+                <button class="btn btn-outline">Skip rest for now</button>
+                <button class="btn btn-brand btn-lg" data-goto="3d">
+                  Continue
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mocknote">
+        <span class="tag">Notes</span
+        ><span
+          >Verification cards show <b>connected handles inline</b> — raises
+          trust (no magic black box) and makes the owner-side view more legible.
+          The blue "required" banner makes the at-least-one rule unmissable.
+          Owner-configured providers mean this grid can be 2–4 cards depending
+          on marketplace settings.</span
+        >
+      </div>
+    </section>
+
+    <!-- ============ 3D · APPLICATION QUESTIONS ============ -->
+    <section class="screen" data-screen="3d" hidden>
+      <div class="screen-caption">
+        <span class="cap-num">04 / 09</span>
+        <h2>Application questions</h2>
+        <span class="sub"
+          >Owner-authored questions from Flow 2. Single page — saves on clicks,
+          encourages thoughtful answers.</span
+        >
+      </div>
+      <div class="screen-frame">
+        <div class="browser-bar">
+          <div class="dots">
+            <span class="dot"></span><span class="dot"></span
+            ><span class="dot"></span>
+          </div>
+          <div class="url">
+            shouks.com / air-cooled-ferraris / apply / questions
+          </div>
+        </div>
+        <div class="app">
+          <div class="form-shell">
+            <aside class="form-side">
+              <div class="fs-brand">
+                <div class="fs-logo">A</div>
+                Air-Cooled Ferraris
+              </div>
+              <div class="fs-title">
+                Step 3 of 4 — tell the owners a bit about you.
+              </div>
+              <div class="fs-sub">
+                Three short questions. The marketplace admins read every answer.
+              </div>
+              <div class="fs-steps">
+                <div class="fs-step done">
+                  <div class="ball">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div>Your account</div>
+                    <div class="s">Marcus Kleinfelder</div>
+                  </div>
+                </div>
+                <div class="fs-step done">
+                  <div class="ball">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div>Verify identity</div>
+                    <div class="s">3 of 4 connected</div>
+                  </div>
+                </div>
+                <div class="fs-step active">
+                  <div class="ball">3</div>
+                  <div>
+                    <div>Application</div>
+                    <div class="s">3 short questions</div>
+                  </div>
+                </div>
+                <div class="fs-step">
+                  <div class="ball">4</div>
+                  <div><div>Review &amp; submit</div></div>
+                </div>
+              </div>
+              <div class="fs-foot">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                  />
+                </svg>
+                <span
+                  ><b>Tip</b> · specifics beat generalities. Mention cars you've
+                  owned.</span
+                >
+              </div>
+            </aside>
+
+            <div class="form-body">
+              <div class="fb-head">
+                <h1>A few questions from <em>Air-Cooled Ferraris</em>.</h1>
+                <div class="fb-lead">
+                  Set by the marketplace admins. Your answers are shared only
+                  with them.
+                </div>
+              </div>
+
+              <div class="field">
+                <label
+                  >1 · How long have you owned / been collecting Ferraris?
+                  <span class="req">*</span></label
+                >
+                <input
+                  class="input"
+                  value="12 years — since I bought my first 328 GTS in 2012."
+                  placeholder="A sentence is fine."
+                />
+              </div>
+
+              <div class="field">
+                <label
+                  >2 · Tell us about your current or most memorable Ferrari.
+                  <span class="opt">Photos welcome via a link</span>
+                  <span class="req">*</span></label
+                >
+                <textarea class="textarea">
+I've owned my 328 GTS since 2012 — daily-drove it through university (a choice I don't recommend). It's a 1988 Rosso Corsa / crema car with the original targa top and, somehow, matching numbers despite a previous owner's attempt at "improvement." Currently part-way through a 348 TB restoration in the garage; pulled the engine last winter, bell housing is off, and I'm ready for the fun part. Happy to share progress photos: https://imgur.com/gallery/mk-328-348</textarea
+                >
+                <div class="char-count">512 / 2000</div>
+              </div>
+
+              <div class="field">
+                <label
+                  >3 · Are you primarily a collector, seller, or both?
+                  <span class="req">*</span></label
+                >
+                <div class="chip-row">
+                  <button class="chip on">Collector</button>
+                  <button class="chip">Seller</button>
+                  <button class="chip">Both</button>
+                  <button class="chip">Just a fan</button>
+                </div>
+                <div class="help">
+                  Sellers need all 4 identity verifications before they can
+                  list. Collectors just need one.
+                </div>
+              </div>
+
+              <div class="fb-footer">
+                <button class="btn btn-ghost" data-goto="3c">← Back</button>
+                <div style="flex: 1"></div>
+                <span
+                  style="
+                    font-size: 11.5px;
+                    color: var(--muted);
+                    margin-right: 8px;
+                  "
+                  >Answers auto-save</span
+                >
+                <button class="btn btn-brand btn-lg" data-goto="3e">
+                  Review answers
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mocknote">
+        <span class="tag">Notes</span
+        ><span
+          >Single-page form is correct for 3–5 questions. Framing answers as
+          going to the marketplace (not a single owner) reinforces it's a
+          community, not a gatekeeper. The "collector / seller / both / just a
+          fan" help-text hints at downstream consequence (seller = all 4
+          verifications) without a wall of disclaimers. [truncated] a person,
+          not a system. The "collector / seller / both / just a fan" help-text
+          hints at downstream consequence (seller = all 4 verifications) without
+          being a wall of disclaimers.</span
+        >
+      </div>
+    </section>
+
+    <!-- ============ 3E · REVIEW & SUBMIT ============ -->
+    <section class="screen" data-screen="3e" hidden>
+      <div class="screen-caption">
+        <span class="cap-num">05 / 09</span>
+        <h2>Review &amp; submit</h2>
+        <span class="sub"
+          >Summary with per-section edit links. Confirmation checkbox before
+          submit — no surprises.</span
+        >
+      </div>
+      <div class="screen-frame">
+        <div class="browser-bar">
+          <div class="dots">
+            <span class="dot"></span><span class="dot"></span
+            ><span class="dot"></span>
+          </div>
+          <div class="url">
+            shouks.com / air-cooled-ferraris / apply / review
+          </div>
+        </div>
+        <div class="app">
+          <div class="form-shell">
+            <aside class="form-side">
+              <div class="fs-brand">
+                <div class="fs-logo">A</div>
+                Air-Cooled Ferraris
+              </div>
+              <div class="fs-title">One last look before you submit.</div>
+              <div class="fs-sub">
+                You can still edit anything below. After submitting, you'll wait
+                for owner review — typically 48 hours.
+              </div>
+              <div class="fs-steps">
+                <div class="fs-step done">
+                  <div class="ball">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  </div>
+                  <div><div>Your account</div></div>
+                </div>
+                <div class="fs-step done">
+                  <div class="ball">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div>Verify identity</div>
+                    <div class="s">3 of 4 connected</div>
+                  </div>
+                </div>
+                <div class="fs-step done">
+                  <div class="ball">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div>Application</div>
+                    <div class="s">3 answers</div>
+                  </div>
+                </div>
+                <div class="fs-step active">
+                  <div class="ball">4</div>
+                  <div><div>Review &amp; submit</div></div>
+                </div>
+              </div>
+              <div class="fs-foot">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 8v4M12 16h.01" />
+                </svg>
+                <span>Owner typically reviews within <b>48 hours</b>.</span>
+              </div>
+            </aside>
+
+            <div class="form-body">
+              <div class="fb-head">
+                <h1>Ready to send?</h1>
+                <div class="fb-lead">
+                  Here's what the marketplace admins will see. Edit any section
+                  — your answers are saved.
+                </div>
+              </div>
+
+              <div class="review-card">
+                <div class="rc-hd">
+                  <h3>Account</h3>
+                  <a class="rc-edit" data-goto="3b">Edit ↗</a>
+                </div>
+                <div class="kv">
+                  <div class="k">Name</div>
+                  <div class="v">Marcus Kleinfelder</div>
+                </div>
+                <div class="kv">
+                  <div class="k">Email</div>
+                  <div class="v">marcus@kleinfelder.ch</div>
+                </div>
+                <div class="kv">
+                  <div class="k">Location</div>
+                  <div class="v">Zurich, Switzerland</div>
+                </div>
+              </div>
+
+              <div class="review-card">
+                <div class="rc-hd">
+                  <h3>Identity verification · 3 of 4</h3>
+                  <a class="rc-edit" data-goto="3c">Edit ↗</a>
+                </div>
+                <div class="kv">
+                  <div class="k">Google</div>
+                  <div class="v">marcus@kleinfelder.ch</div>
+                </div>
+                <div class="kv">
+                  <div class="k">Facebook</div>
+                  <div class="v">facebook.com/marcus.kleinfelder</div>
+                </div>
+                <div class="kv">
+                  <div class="k">Instagram</div>
+                  <div class="v">@marcus.km · 1.2k followers</div>
+                </div>
+                <div class="kv">
+                  <div class="k" style="color: var(--muted)">Phone (SMS)</div>
+                  <div class="v" style="color: var(--muted)">Not connected</div>
+                </div>
+              </div>
+
+              <div class="review-card">
+                <div class="rc-hd">
+                  <h3>Application answers · 3 of 3</h3>
+                  <a class="rc-edit" data-goto="3d">Edit ↗</a>
+                </div>
+                <div class="kv">
+                  <div class="k">Years collecting</div>
+                  <div class="v long">
+                    12 years — since I bought my first 328 GTS in 2012.
+                  </div>
+                </div>
+                <div class="kv">
+                  <div class="k">About your Ferrari</div>
+                  <div class="v long">
+                    I've owned my 328 GTS since 2012 — daily-drove it through
+                    university (a choice I don't recommend). It's a 1988 Rosso
+                    Corsa / crema car with the original targa top and, somehow,
+                    matching numbers despite a previous owner's attempt at
+                    "improvement." Currently part-way through a 348 TB
+                    restoration in the garage…
+                    <a href="#" style="color: var(--blue-ink); font-weight: 500"
+                      >show full</a
+                    >
+                  </div>
+                </div>
+                <div class="kv">
+                  <div class="k">Role</div>
+                  <div class="v">Collector</div>
+                </div>
+              </div>
+
+              <div class="confirm-row">
+                <input type="checkbox" checked />
+                <div class="cr-t">
+                  I've read the
+                  <a href="#">Air-Cooled Ferraris house rules</a> and understand
+                  my application will be reviewed by the marketplace's owners. I
+                  can withdraw my application at any time from my Shouks
+                  account.
+                </div>
+              </div>
+
+              <div class="fb-footer">
+                <button class="btn btn-ghost" data-goto="3d">
+                  ← Back to answers
+                </button>
+                <div style="flex: 1"></div>
+                <button class="btn btn-brand btn-lg" data-goto="3f">
+                  Submit application
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="m22 2-7 20-4-9-9-4 20-7Z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mocknote">
+        <span class="tag">Notes</span
+        ><span
+          >Review card labels match the owner's view in Flow 5 — same phrasing,
+          same section order. The "not connected" row is grey rather than
+          missing so applicants consider whether to go back and add one last
+          verification. Long answers are truncated with a "show full" to keep
+          the page scannable.</span
+        >
+      </div>
+    </section>
+
+    <!-- ============ 3F · PENDING ============ -->
+    <section class="screen" data-screen="3f" hidden>
+      <div class="screen-caption">
+        <span class="cap-num">06 / 09</span>
+        <h2>Pending — waiting state</h2>
+        <span class="sub"
+          >Landing after submit. Sets expectations for what happens next and how
+          the applicant is notified.</span
+        >
+      </div>
+      <div class="screen-frame">
+        <div class="browser-bar">
+          <div class="dots">
+            <span class="dot"></span><span class="dot"></span
+            ><span class="dot"></span>
+          </div>
+          <div class="url">
+            shouks.com / air-cooled-ferraris / apply / submitted
+          </div>
+        </div>
+        <div class="app">
+          <div class="mp-nav">
+            <div class="brand-lockup">
+              <div class="brand-logo">A</div>
+              <div>
+                <div class="brand-name">Air-Cooled Ferraris</div>
+                <div
+                  style="font-size: 11px; color: var(--muted); font-weight: 400"
+                >
+                  Pre-1998 only · 247 members
+                </div>
+              </div>
+            </div>
+            <div class="spacer"></div>
+            <div class="shouks-tag">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 2 21 7v10l-9 5-9-5V7l9-5Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                />
+                <circle cx="12" cy="12" r="2" fill="currentColor" /></svg
+              >Hosted on Shouks
+            </div>
+            <div
+              style="
+                font-size: 12px;
+                color: var(--ink-soft);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+              "
+            >
+              <div
+                style="
+                  width: 28px;
+                  height: 28px;
+                  border-radius: 50%;
+                  background: linear-gradient(
+                    135deg,
+                    oklch(0.65 0.15 260),
+                    oklch(0.45 0.12 260)
+                  );
+                  color: #fff;
+                  font-size: 12px;
+                  font-weight: 600;
+                  display: grid;
+                  place-items: center;
+                "
+              >
+                M
+              </div>
+              Marcus
+            </div>
+          </div>
+
+          <div class="status-screen">
+            <div class="status-content">
+              <div class="status-icon pending">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+              </div>
+              <div class="status-eyebrow">Application submitted · 12:42 PM</div>
+              <h1 class="status-title">
+                Your application is <em>in review</em>.
+              </h1>
+              <p class="status-lead">
+                Air-Cooled Ferraris typically responds within
+                <b style="color: var(--ink)">48 hours</b> — a bit longer over
+                weekends.
+              </p>
+
+              <div class="expectations">
+                <h4>What happens next</h4>
+                <div class="expect-row">
+                  <span class="ex-ic done"
+                    ><svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M20 6 9 17l-5-5" /></svg
+                  ></span>
+                  <div>
+                    <div class="ex-t">Application sent</div>
+                    <div class="ex-s">
+                      Copy emailed to
+                      <b style="color: var(--ink)">marcus@kleinfelder.ch</b>.
+                    </div>
+                  </div>
+                </div>
+                <div class="expect-row">
+                  <span class="ex-ic pending"
+                    ><svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="3" />
+                      <path
+                        d="M12 1v6M12 17v6M4.2 4.2l4.3 4.3M15.5 15.5l4.3 4.3M1 12h6M17 12h6M4.2 19.8l4.3-4.3M15.5 8.5l4.3-4.3"
+                      /></svg
+                  ></span>
+                  <div>
+                    <div class="ex-t">Owner review</div>
+                    <div class="ex-s">
+                      The marketplace admins will read your answers and
+                      verification signal. You'll hear back here and by email.
+                    </div>
+                  </div>
+                </div>
+                <div class="expect-row">
+                  <span class="ex-ic"
+                    ><svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M5 12h14M12 5l7 7-7 7" /></svg
+                  ></span>
+                  <div>
+                    <div class="ex-t">Decision</div>
+                    <div class="ex-s">
+                      Approved → you're in. Need more info → the admins will
+                      reach out. Declined → we'll let you know gently and you
+                      can apply elsewhere.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="status-actions">
+                <button class="btn btn-outline">Edit application</button>
+                <button class="btn btn-outline">Withdraw</button>
+                <button class="btn btn-dark">
+                  Browse other marketplaces
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+              <div
+                style="margin-top: 18px; font-size: 11.5px; color: var(--muted)"
+              >
+                While you wait, check out
+                <a href="#" style="color: var(--blue-ink); font-weight: 500"
+                  >Chrono Collective</a
+                >
+                and
+                <a href="#" style="color: var(--blue-ink); font-weight: 500"
+                  >Patek &amp; Friends</a
+                >
+                — similar communities also on Shouks.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mocknote">
+        <span class="tag">Notes</span
+        ><span
+          >Pending state is a <b>real page</b>, not a modal — applicants come
+          back to the URL repeatedly while waiting. The three-step expectations
+          block deflects "should I email them?" anxiety. Withdraw is kept
+          visible but low-emphasis. Cross-sell to other marketplaces converts
+          dead time into discovery — a small Shouks network effect.</span
+        >
+      </div>
+    </section>
+
+    <!-- ============ 3G · APPROVED ============ -->
+    <section class="screen" data-screen="3g" hidden>
+      <div class="screen-caption">
+        <span class="cap-num">07 / 09</span>
+        <h2>Approved</h2>
+        <span class="sub"
+          >Pulled from owner's welcome note in Flow 5c. Primary CTA pulls them
+          straight into the marketplace.</span
+        >
+      </div>
+      <div class="screen-frame">
+        <div class="browser-bar">
+          <div class="dots">
+            <span class="dot"></span><span class="dot"></span
+            ><span class="dot"></span>
+          </div>
+          <div class="url">shouks.com / air-cooled-ferraris / welcome</div>
+        </div>
+        <div class="app">
+          <div class="mp-nav">
+            <div class="brand-lockup">
+              <div class="brand-logo">A</div>
+              <div>
+                <div class="brand-name">Air-Cooled Ferraris</div>
+                <div
+                  style="font-size: 11px; color: var(--muted); font-weight: 400"
+                >
+                  Pre-1998 only · 247 members
+                </div>
+              </div>
+            </div>
+            <div class="spacer"></div>
+            <div class="shouks-tag">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 2 21 7v10l-9 5-9-5V7l9-5Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                />
+                <circle cx="12" cy="12" r="2" fill="currentColor" /></svg
+              >Hosted on Shouks
+            </div>
+            <div
+              style="
+                font-size: 12px;
+                color: var(--ink-soft);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+              "
+            >
+              <div
+                style="
+                  width: 28px;
+                  height: 28px;
+                  border-radius: 50%;
+                  background: linear-gradient(
+                    135deg,
+                    oklch(0.65 0.15 260),
+                    oklch(0.45 0.12 260)
+                  );
+                  color: #fff;
+                  font-size: 12px;
+                  font-weight: 600;
+                  display: grid;
+                  place-items: center;
+                "
+              >
+                M
+              </div>
+              Marcus
+            </div>
+          </div>
+
+          <div
+            class="status-screen"
+            style="
+              background: radial-gradient(
+                ellipse at top,
+                var(--success-soft),
+                #fff
+              );
+            "
+          >
+            <div class="status-content">
+              <div class="status-icon approved">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+              </div>
+              <div class="status-eyebrow" style="color: var(--success)">
+                Approved · 2 hours ago
+              </div>
+              <h1 class="status-title">
+                Welcome to <em>Air-Cooled Ferraris</em>.
+              </h1>
+              <p class="status-lead">
+                You now have full access — browse listings, message members, and
+                post your own car if you want to sell. Take a look around first;
+                there's no hurry.
+              </p>
+
+              <div class="welcome-note">
+                <h4>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    width="12"
+                    height="12"
+                  >
+                    <path
+                      d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                    />
+                  </svg>
+                  A note from Jonathan
+                </h4>
+                <div class="wn-body">
+                  "Marcus — welcome in. That 328 restoration thread sounds like
+                  exactly the kind of content this community thrives on. Feel
+                  free to post progress as it goes."
+                </div>
+                <div class="wn-sig">
+                  <b>Jonathan Cole</b> · owner, Air-Cooled Ferraris
+                </div>
+              </div>
+
+              <div class="expectations" style="background: #fff">
+                <h4>Three things worth doing first</h4>
+                <div class="expect-row">
+                  <span class="ex-ic"
+                    ><svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" /></svg
+                  ></span>
+                  <div>
+                    <div class="ex-t">Set up your member profile</div>
+                    <div class="ex-s">
+                      Add your garage — the cars you own or have owned. Other
+                      members judge a lot by this.
+                    </div>
+                  </div>
+                </div>
+                <div class="expect-row">
+                  <span class="ex-ic"
+                    ><svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <rect x="3" y="3" width="18" height="18" rx="2" />
+                      <path d="M3 9h18M9 21V9" /></svg
+                  ></span>
+                  <div>
+                    <div class="ex-t">Browse the 89 current listings</div>
+                    <div class="ex-s">
+                      Save anything you're tracking. Live auctions are
+                      highlighted with a countdown.
+                    </div>
+                  </div>
+                </div>
+                <div class="expect-row">
+                  <span class="ex-ic"
+                    ><svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
+                      /></svg
+                  ></span>
+                  <div>
+                    <div class="ex-t">Introduce yourself</div>
+                    <div class="ex-s">
+                      There's an #introductions channel where members post their
+                      first car, favorite drive, and what they're looking for.
+                      One post, no pressure.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="status-actions">
+                <button class="btn btn-outline">Set up profile</button>
+                <button class="btn btn-brand btn-lg">
+                  Enter marketplace
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mocknote">
+        <span class="tag">Notes</span
+        ><span
+          >Welcome note surfaces the owner's optional message from Flow 5c (only
+          place a name shows up — as a signature, not throughout the UI). Three
+          "first things to do" cards onboard without a forced tour. Entry CTA
+          goes to the marketplace home, not a profile wizard — respects
+          momentum. cards onboard without a multi-step tour. Entry CTA goes to
+          the marketplace home, not a forced profile wizard — respects the
+          applicant's momentum.</span
+        >
+      </div>
+    </section>
+
+    <!-- ============ 3H · REJECTED ============ -->
+    <section class="screen" data-screen="3h" hidden>
+      <div class="screen-caption">
+        <span class="cap-num">08 / 09</span>
+        <h2>Rejected</h2>
+        <span class="sub"
+          >Gentle, non-punitive. Applicant can reapply after 30 days; suggests
+          adjacent marketplaces that might fit.</span
+        >
+      </div>
+      <div class="screen-frame">
+        <div class="browser-bar">
+          <div class="dots">
+            <span class="dot"></span><span class="dot"></span
+            ><span class="dot"></span>
+          </div>
+          <div class="url">shouks.com / air-cooled-ferraris / application</div>
+        </div>
+        <div class="app">
+          <div class="mp-nav">
+            <div class="brand-lockup">
+              <div class="brand-logo">A</div>
+              <div>
+                <div class="brand-name">Air-Cooled Ferraris</div>
+                <div
+                  style="font-size: 11px; color: var(--muted); font-weight: 400"
+                >
+                  Pre-1998 only · 247 members
+                </div>
+              </div>
+            </div>
+            <div class="spacer"></div>
+            <div class="shouks-tag">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 2 21 7v10l-9 5-9-5V7l9-5Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                />
+                <circle cx="12" cy="12" r="2" fill="currentColor" /></svg
+              >Hosted on Shouks
+            </div>
+            <div
+              style="
+                font-size: 12px;
+                color: var(--ink-soft);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+              "
+            >
+              <div
+                style="
+                  width: 28px;
+                  height: 28px;
+                  border-radius: 50%;
+                  background: linear-gradient(
+                    135deg,
+                    oklch(0.65 0.15 260),
+                    oklch(0.45 0.12 260)
+                  );
+                  color: #fff;
+                  font-size: 12px;
+                  font-weight: 600;
+                  display: grid;
+                  place-items: center;
+                "
+              >
+                D
+              </div>
+              Daria
+            </div>
+          </div>
+
+          <div class="status-screen" style="background: var(--bg-panel)">
+            <div class="status-content">
+              <div class="status-icon rejected">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                  />
+                </svg>
+              </div>
+              <div class="status-eyebrow">Decision made · 3 hours ago</div>
+              <h1 class="status-title">Not this time.</h1>
+              <p class="status-lead">
+                The Air-Cooled Ferraris owners have reviewed your application
+                and decided it's not the right fit. This isn't a reflection on
+                you — every marketplace has a specific community they're
+                building.
+              </p>
+
+              <div class="reason-note">
+                <h4>Note from the marketplace</h4>
+                This marketplace is focused on pre-1998 Ferraris specifically,
+                and we keep the community small and hands-on. We'd love to see
+                you in a broader Ferrari community on Shouks — a few suggestions
+                below.
+              </div>
+
+              <div class="expectations">
+                <h4>Communities that may fit better</h4>
+                <div
+                  class="expect-row"
+                  style="
+                    grid-template-columns: 36px 1fr auto;
+                    align-items: center;
+                  "
+                >
+                  <div
+                    style="
+                      width: 32px;
+                      height: 32px;
+                      border-radius: 7px;
+                      background: linear-gradient(
+                        135deg,
+                        oklch(0.45 0.12 280),
+                        oklch(0.25 0.08 280)
+                      );
+                      color: #fff;
+                      font-family: &quot;Instrument Serif&quot;, serif;
+                      font-size: 16px;
+                      display: grid;
+                      place-items: center;
+                    "
+                  >
+                    F
+                  </div>
+                  <div>
+                    <div class="ex-t">Ferrari Owners Worldwide</div>
+                    <div class="ex-s">
+                      All Ferraris, any era · 4,200 members · open to apply
+                    </div>
+                  </div>
+                  <button class="btn btn-outline btn-sm">Visit →</button>
+                </div>
+                <div
+                  class="expect-row"
+                  style="
+                    grid-template-columns: 36px 1fr auto;
+                    align-items: center;
+                  "
+                >
+                  <div
+                    style="
+                      width: 32px;
+                      height: 32px;
+                      border-radius: 7px;
+                      background: linear-gradient(
+                        135deg,
+                        oklch(0.5 0.14 155),
+                        oklch(0.3 0.1 155)
+                      );
+                      color: #fff;
+                      font-family: &quot;Instrument Serif&quot;, serif;
+                      font-size: 16px;
+                      display: grid;
+                      place-items: center;
+                    "
+                  >
+                    M
+                  </div>
+                  <div>
+                    <div class="ex-t">Modena Enthusiasts</div>
+                    <div class="ex-s">
+                      Classic Italian grand tourers · 890 members · open to
+                      apply
+                    </div>
+                  </div>
+                  <button class="btn btn-outline btn-sm">Visit →</button>
+                </div>
+              </div>
+
+              <div class="status-actions">
+                <button class="btn btn-ghost">Reapply in 30 days</button>
+                <button class="btn btn-outline">Browse all marketplaces</button>
+              </div>
+              <div
+                style="
+                  margin-top: 18px;
+                  font-size: 11.5px;
+                  color: var(--muted);
+                  max-width: 440px;
+                "
+              >
+                Your Shouks account remains active. You can apply to up to 3
+                other marketplaces at the same time.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mocknote">
+        <span class="tag">Notes</span
+        ><span
+          >Tone is <b>the design decision here</b>: no red, no apology, no "try
+          again." The owner's optional reason note from Flow 5c surfaces
+          directly — honesty over softened corp-speak. Suggested marketplaces
+          convert rejection into onboarding for the wider Shouks network, which
+          is in Shouks's interest and often genuinely useful for the
+          applicant.</span
+        >
+      </div>
+    </section>
+
+    <!-- ============ 3I · MORE INFO REQUESTED ============ -->
+    <section class="screen" data-screen="3i" hidden>
+      <div class="screen-caption">
+        <span class="cap-num">09 / 09</span>
+        <h2>More info requested</h2>
+        <span class="sub"
+          >Owner pinged the applicant for clarification. Middle state —
+          application still open, can be updated and re-submitted.</span
+        >
+      </div>
+      <div class="screen-frame">
+        <div class="browser-bar">
+          <div class="dots">
+            <span class="dot"></span><span class="dot"></span
+            ><span class="dot"></span>
+          </div>
+          <div class="url">shouks.com / air-cooled-ferraris / application</div>
+        </div>
+        <div class="app">
+          <div class="mp-nav">
+            <div class="brand-lockup">
+              <div class="brand-logo">A</div>
+              <div>
+                <div class="brand-name">Air-Cooled Ferraris</div>
+                <div
+                  style="font-size: 11px; color: var(--muted); font-weight: 400"
+                >
+                  Pre-1998 only · 247 members
+                </div>
+              </div>
+            </div>
+            <div class="spacer"></div>
+            <div class="shouks-tag">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 2 21 7v10l-9 5-9-5V7l9-5Z"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                />
+                <circle cx="12" cy="12" r="2" fill="currentColor" /></svg
+              >Hosted on Shouks
+            </div>
+            <div
+              style="
+                font-size: 12px;
+                color: var(--ink-soft);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+              "
+            >
+              <div
+                style="
+                  width: 28px;
+                  height: 28px;
+                  border-radius: 50%;
+                  background: linear-gradient(
+                    135deg,
+                    oklch(0.62 0.16 30),
+                    oklch(0.42 0.13 30)
+                  );
+                  color: #fff;
+                  font-size: 12px;
+                  font-weight: 600;
+                  display: grid;
+                  place-items: center;
+                "
+              >
+                A
+              </div>
+              Alessandra
+            </div>
+          </div>
+
+          <div
+            class="status-screen"
+            style="
+              background: radial-gradient(
+                ellipse at top,
+                var(--blue-softer),
+                #fff
+              );
+            "
+          >
+            <div class="status-content">
+              <div class="status-icon moreinfo">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                  />
+                </svg>
+              </div>
+              <div class="status-eyebrow" style="color: var(--blue-ink)">
+                Owner needs a bit more · 1 hour ago
+              </div>
+              <h1 class="status-title">
+                A <em>follow-up</em> from the marketplace.
+              </h1>
+              <p class="status-lead">
+                Your application is on hold while we get this sorted. Answer the
+                question below and re-submit — no need to start over.
+              </p>
+
+              <div class="moreinfo-block">
+                <h4>Their question</h4>
+                <div class="mi-body">
+                  "Thanks for applying. You mentioned running a small dealer in
+                  Monza — could you share a link or two to the shop's website or
+                  Instagram? Also curious what your typical inventory turnover
+                  looks like. Dealer members here post under stricter rules (no
+                  flipper listings, full service history required), so I want to
+                  make sure it's a fit before approving."
+                </div>
+                <div
+                  style="
+                    font-size: 12px;
+                    color: var(--muted);
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                  "
+                >
+                  <div
+                    style="
+                      width: 22px;
+                      height: 22px;
+                      border-radius: 50%;
+                      background: linear-gradient(
+                        135deg,
+                        var(--blue),
+                        oklch(0.42 0.13 232)
+                      );
+                      color: #fff;
+                      font-size: 10px;
+                      font-weight: 600;
+                      display: grid;
+                      place-items: center;
+                    "
+                  >
+                    J
+                  </div>
+                  <b style="color: var(--ink)">Air-Cooled Ferraris admin</b> ·
+                  sent 1 hour ago
+                </div>
+              </div>
+
+              <div
+                class="field"
+                style="text-align: left; width: 100%; margin-bottom: 12px"
+              >
+                <label>Your reply <span class="req">*</span></label>
+                <textarea
+                  class="textarea"
+                  placeholder="Answer their question. Links welcome."
+                >
+Hi — totally understand. The shop is Ricci Classica, https://riccicla.it · Instagram @riccicla. We turn over roughly 12–15 cars a year, mostly consignment for long-term owners. No flipping. Happy to walk through the business on a call if that helps.</textarea
+                >
+              </div>
+
+              <div
+                style="
+                  background: var(--bg-soft);
+                  border: 1px solid var(--line);
+                  border-radius: 10px;
+                  padding: 12px 16px;
+                  font-size: 12px;
+                  color: var(--muted);
+                  text-align: left;
+                  width: 100%;
+                  margin-bottom: 20px;
+                "
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  style="
+                    width: 12px;
+                    height: 12px;
+                    vertical-align: -1px;
+                    margin-right: 6px;
+                  "
+                >
+                  <path
+                    d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                  />
+                </svg>
+                Your reply goes back to the marketplace admins. You'll hear
+                again within 48 hours.
+              </div>
+
+              <div class="status-actions">
+                <button class="btn btn-outline">View my application</button>
+                <button class="btn btn-brand btn-lg">
+                  Send reply
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="m22 2-7 20-4-9-9-4 20-7Z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mocknote">
+        <span class="tag">Notes</span
+        ><span
+          >This is the state that <b>actually moves applications forward</b> — a
+          two-way conversation, not a binary yes/no. The owner's question is
+          quoted verbatim so tone carries through. Inline reply (not a separate
+          page or email thread) keeps the interaction in-context. Reply goes
+          back into Flow 5c's detail view as a new message on the
+          application.</span
+        >
+      </div>
+    </section>
+
+    <script>
+      const steps = ["3a", "3b", "3c", "3d", "3e", "3f", "3g", "3h", "3i"];
+      let cur = 0;
+      try {
+        const s = localStorage.getItem("shouks.flow3.step");
+        if (s) cur = Math.max(0, steps.indexOf(s));
+      } catch {}
+
+      function show(i) {
+        cur = Math.max(0, Math.min(steps.length - 1, i));
+        document.querySelectorAll(".screen").forEach(s => {
+          s.hidden = s.dataset.screen !== steps[cur];
+        });
+        document.querySelectorAll(".flow-nav .step-btn").forEach((b, idx) => {
+          b.classList.toggle("active", idx === cur);
+        });
+        try {
+          localStorage.setItem("shouks.flow3.step", steps[cur]);
+        } catch {}
+        window.scrollTo({ top: 0, behavior: "instant" });
+      }
+
+      document.querySelectorAll(".flow-nav .step-btn").forEach((b, i) => {
+        b.addEventListener("click", () => show(i));
+      });
+
+      document.addEventListener("click", e => {
+        const goto = e.target.closest("[data-goto]");
+        if (goto) {
+          const t = goto.dataset.goto;
+          const i = steps.indexOf(t);
+          if (i >= 0) show(i);
+        }
+      });
+
+      document.addEventListener("keydown", e => {
+        if (e.target.matches("input,textarea")) return;
+        if (e.key === "ArrowRight") show(cur + 1);
+        if (e.key === "ArrowLeft") show(cur - 1);
+      });
+
+      show(cur);
+    </script>
+  </body>
+</html>

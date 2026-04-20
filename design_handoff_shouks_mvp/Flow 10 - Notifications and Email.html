@@ -1,0 +1,3279 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Shouks — Notifications &amp; Email</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><path d='M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z' fill='%2314212D' stroke='%2314212D' stroke-width='2.4' stroke-linejoin='round'/><circle cx='22' cy='22' r='3.4' fill='%234DB7E8'/><circle cx='22' cy='10' r='2.4' fill='%23fff'/><circle cx='32.4' cy='28' r='2.4' fill='%23fff'/><circle cx='11.6' cy='28' r='2.4' fill='%23fff'/></svg>"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #ffffff;
+        --bg-soft: oklch(0.975 0.003 230);
+        --bg-panel: oklch(0.96 0.004 230);
+        --surface: #ffffff;
+        --line: oklch(0.9 0.005 230);
+        --line-soft: oklch(0.93 0.004 230);
+        --ink: oklch(0.2 0.02 240);
+        --ink-soft: oklch(0.38 0.02 240);
+        --muted: oklch(0.55 0.015 240);
+        --hover: oklch(0.95 0.005 230);
+        --blue: oklch(0.66 0.16 230);
+        --blue-ink: oklch(0.5 0.15 232);
+        --blue-soft: oklch(0.96 0.03 230);
+        --blue-softer: oklch(0.98 0.015 230);
+        --success: oklch(0.58 0.12 155);
+        --success-soft: oklch(0.95 0.04 155);
+        --warn: oklch(0.72 0.13 75);
+        --warn-soft: oklch(0.97 0.04 75);
+        --danger: oklch(0.55 0.18 25);
+        --danger-soft: oklch(0.96 0.035 25);
+        --amber: oklch(0.72 0.14 65);
+        --amber-soft: oklch(0.97 0.04 65);
+        --accent: oklch(0.55 0.17 25);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Inter Tight", system-ui, sans-serif;
+        background: var(--bg-panel);
+        color: var(--ink);
+        font-size: 13.5px;
+        line-height: 1.5;
+        letter-spacing: -0.005em;
+        -webkit-font-smoothing: antialiased;
+      }
+      button {
+        font: inherit;
+        color: inherit;
+        background: none;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        margin: 0;
+        font-weight: 500;
+        letter-spacing: -0.015em;
+        color: var(--ink);
+      }
+
+      /* ===== Flow nav ===== */
+      .flow-nav {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: saturate(180%) blur(8px);
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 20px;
+      }
+      .flow-nav .fn-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 500;
+        white-space: nowrap;
+        flex: none;
+      }
+      .flow-nav .fn-title svg {
+        width: 20px;
+        height: 20px;
+        color: var(--ink);
+      }
+      .flow-nav .fn-title .slash,
+      .flow-nav .fn-title .flow {
+        color: var(--muted);
+        font-weight: 400;
+      }
+      .flow-nav .fn-steps {
+        display: flex;
+        gap: 4px;
+        margin-left: 16px;
+        flex-wrap: wrap;
+      }
+      .flow-nav .step-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 11px;
+        border-radius: 7px;
+        font-size: 12.5px;
+        color: var(--muted);
+        font-weight: 500;
+        white-space: nowrap;
+        flex: none;
+      }
+      .flow-nav .step-btn .num {
+        display: inline-grid;
+        place-items: center;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--bg-soft);
+        border: 1px solid var(--line);
+        font-size: 10.5px;
+        font-weight: 600;
+        color: var(--muted);
+      }
+      .flow-nav .step-btn:hover {
+        color: var(--ink);
+        background: var(--hover);
+      }
+      .flow-nav .step-btn.active {
+        background: var(--ink);
+        color: #fff;
+      }
+      .flow-nav .step-btn.active .num {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: transparent;
+        color: #fff;
+      }
+      .flow-nav .spacer {
+        flex: 1;
+      }
+      .flow-nav .fn-group-label {
+        font-size: 10px;
+        color: var(--muted);
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 0 4px 0 10px;
+        border-left: 1px solid var(--line);
+        margin-left: 8px;
+        align-self: center;
+      }
+
+      /* ===== Screen + frame ===== */
+      .screen-caption {
+        max-width: 1280px;
+        margin: 24px auto 10px;
+        padding: 0 20px;
+        display: flex;
+        align-items: baseline;
+        gap: 16px;
+      }
+      .screen-caption .cap-num {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        font-weight: 600;
+        font-family: ui-monospace, monospace;
+      }
+      .screen-caption h2 {
+        font-family: "Instrument Serif", serif;
+        font-weight: 400;
+        font-size: 22px;
+        letter-spacing: -0.005em;
+        flex: none;
+      }
+      .screen-caption .sub {
+        font-size: 13px;
+        color: var(--muted);
+        flex: 1;
+      }
+      .screen-frame {
+        max-width: 1280px;
+        margin: 0 auto 20px;
+        padding: 0 20px;
+      }
+
+      .browser-bar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-bottom: 0;
+        border-radius: 12px 12px 0 0;
+        padding: 10px 14px;
+      }
+      .browser-bar .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .browser-bar .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .browser-bar .dots .dot:nth-child(1) {
+        background: oklch(0.75 0.12 25);
+      }
+      .browser-bar .dots .dot:nth-child(2) {
+        background: oklch(0.8 0.12 75);
+      }
+      .browser-bar .dots .dot:nth-child(3) {
+        background: oklch(0.75 0.12 150);
+      }
+      .browser-bar .url {
+        flex: 1;
+        height: 28px;
+        border-radius: 7px;
+        background: var(--bg-soft);
+        border: 1px solid var(--line-soft);
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        font-family: ui-monospace, monospace;
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+
+      .app {
+        background: var(--bg-soft);
+        border: 1px solid var(--line);
+        border-top: 0;
+        border-radius: 0 0 12px 12px;
+        overflow: hidden;
+        min-height: 720px;
+        position: relative;
+      }
+
+      /* ===== Shouks navbar (reused for in-app screens) ===== */
+      .navbar {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 12px 22px;
+        background: #fff;
+        border-bottom: 1px solid var(--line);
+      }
+      .navbar .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        font-size: 15px;
+      }
+      .navbar .brand svg {
+        width: 22px;
+        height: 22px;
+        color: var(--ink);
+      }
+      .navbar .nav-links {
+        display: flex;
+        gap: 2px;
+      }
+      .navbar .nav-links a {
+        padding: 7px 12px;
+        border-radius: 7px;
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .navbar .nav-links a:hover,
+      .navbar .nav-links a.active {
+        color: var(--ink);
+        background: var(--hover);
+      }
+      .navbar .spacer {
+        flex: 1;
+      }
+      .navbar .search {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 12px;
+        border-radius: 8px;
+        background: var(--bg-soft);
+        border: 1px solid var(--line-soft);
+        font-size: 12.5px;
+        color: var(--muted);
+        width: 240px;
+      }
+      .navbar .search svg {
+        width: 13px;
+        height: 13px;
+      }
+      .nav-bell {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        color: var(--ink-soft);
+        position: relative;
+      }
+      .nav-bell:hover {
+        background: var(--hover);
+        color: var(--ink);
+      }
+      .nav-bell svg {
+        width: 17px;
+        height: 17px;
+      }
+      .nav-bell.open {
+        background: var(--hover);
+        color: var(--ink);
+      }
+      .nav-bell .dot-count {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        min-width: 17px;
+        height: 17px;
+        padding: 0 4px;
+        border-radius: 999px;
+        background: var(--danger);
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        line-height: 1;
+        display: grid;
+        place-items: center;
+        border: 2px solid #fff;
+      }
+      .navbar .avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--blue), oklch(0.42 0.13 232));
+        color: #fff;
+        font-size: 12.5px;
+        font-weight: 600;
+        display: grid;
+        place-items: center;
+      }
+
+      /* ===== Notifications dropdown ===== */
+      .n-frame-bg {
+        min-height: 680px;
+        padding: 32px 24px 80px;
+        background:
+          radial-gradient(
+            700px 220px at 85% 12%,
+            oklch(0.68 0.1 230 / 0.12),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 260px at 10% 80%,
+            oklch(0.7 0.14 65 / 0.08),
+            transparent 60%
+          ),
+          var(--bg-soft);
+        position: relative;
+      }
+      .n-placeholder-card {
+        max-width: 420px;
+        margin: 60px auto;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 22px 24px;
+        box-shadow: 0 1px 2px oklch(0 0 0 / 0.03);
+      }
+      .n-placeholder-card .ph-k {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        color: var(--muted);
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .n-placeholder-card h3 {
+        font-size: 15px;
+        font-weight: 500;
+        letter-spacing: -0.005em;
+        margin-bottom: 6px;
+      }
+      .n-placeholder-card p {
+        font-size: 12.5px;
+        color: var(--muted);
+        margin: 0 0 4px;
+      }
+
+      /* Dropdown panel anchored to bell */
+      .n-anchor-wrap {
+        position: relative;
+      }
+      .n-tray {
+        position: absolute;
+        top: calc(100% + 10px);
+        right: 0;
+        width: 420px;
+        max-height: 560px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        box-shadow:
+          0 24px 60px -18px oklch(0 0 0 / 0.2),
+          0 4px 14px -6px oklch(0 0 0 / 0.08);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        z-index: 20;
+      }
+      .n-tray::before {
+        content: "";
+        position: absolute;
+        top: -6px;
+        right: 10px;
+        width: 12px;
+        height: 12px;
+        background: #fff;
+        border-left: 1px solid var(--line);
+        border-top: 1px solid var(--line);
+        transform: rotate(45deg);
+      }
+      .n-tray .n-hd {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 16px;
+        border-bottom: 1px solid var(--line);
+      }
+      .n-tray .n-hd h3 {
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: -0.005em;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .n-tray .n-hd .unread-pill {
+        font-size: 10.5px;
+        font-weight: 600;
+        padding: 2px 7px;
+        border-radius: 999px;
+        background: var(--danger);
+        color: #fff;
+      }
+      .n-tray .n-hd .mark-read {
+        font-size: 12px;
+        color: var(--blue-ink);
+        font-weight: 500;
+        padding: 5px 8px;
+        border-radius: 6px;
+      }
+      .n-tray .n-hd .mark-read:hover {
+        background: var(--blue-softer);
+      }
+      .n-tray .n-hd .close-x {
+        width: 22px;
+        height: 22px;
+        border-radius: 6px;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+      }
+      .n-tray .n-hd .close-x:hover {
+        background: var(--hover);
+        color: var(--ink);
+      }
+      .n-tray .n-hd .close-x svg {
+        width: 13px;
+        height: 13px;
+      }
+
+      /* Tabs inside tray */
+      .n-tabs {
+        display: flex;
+        gap: 2px;
+        padding: 8px 10px 0;
+        border-bottom: 1px solid var(--line-soft);
+        background: #fff;
+      }
+      .n-tabs button {
+        padding: 7px 11px 9px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--muted);
+        border-bottom: 2px solid transparent;
+        margin-bottom: -1px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .n-tabs button:hover {
+        color: var(--ink);
+      }
+      .n-tabs button.on {
+        color: var(--ink);
+        border-bottom-color: var(--ink);
+        font-weight: 600;
+      }
+      .n-tabs .chip {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 1px 6px;
+        border-radius: 999px;
+        background: var(--bg-soft);
+        color: var(--muted);
+      }
+      .n-tabs button.on .chip.has-unread {
+        background: var(--danger);
+        color: #fff;
+      }
+
+      .n-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 4px 0;
+      }
+      .n-group-title {
+        font-size: 10.5px;
+        font-weight: 600;
+        color: var(--muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 12px 16px 4px;
+      }
+      .n-row {
+        display: grid;
+        grid-template-columns: 34px 1fr auto;
+        gap: 12px;
+        padding: 11px 16px;
+        border-bottom: 1px solid var(--line-soft);
+        position: relative;
+        cursor: pointer;
+        align-items: start;
+      }
+      .n-row:hover {
+        background: oklch(0.985 0.005 230);
+      }
+      .n-row.unread {
+        background: var(--blue-softer);
+      }
+      .n-row.unread:hover {
+        background: oklch(0.96 0.03 230);
+      }
+      .n-row.unread::before {
+        content: "";
+        position: absolute;
+        left: 6px;
+        top: 18px;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--blue);
+      }
+      .n-row .n-icn {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        flex: none;
+        margin-top: 2px;
+      }
+      .n-row .n-icn svg {
+        width: 14px;
+        height: 14px;
+      }
+      .n-row .n-icn.ico-offer {
+        background: oklch(0.95 0.04 155);
+        color: oklch(0.38 0.12 155);
+      }
+      .n-row .n-icn.ico-bid {
+        background: var(--amber-soft);
+        color: oklch(0.45 0.14 65);
+      }
+      .n-row .n-icn.ico-auction-end {
+        background: oklch(0.96 0.035 25);
+        color: var(--danger);
+      }
+      .n-row .n-icn.ico-match {
+        background: oklch(0.95 0.04 280);
+        color: oklch(0.45 0.18 285);
+      }
+      .n-row .n-icn.ico-msg {
+        background: var(--blue-softer);
+        color: var(--blue-ink);
+      }
+      .n-row .n-icn.ico-app {
+        background: var(--blue-softer);
+        color: var(--blue-ink);
+      }
+      .n-row .n-icn.ico-review {
+        background: oklch(0.97 0.04 75);
+        color: oklch(0.45 0.13 70);
+      }
+      .n-row .n-icn.ico-mod {
+        background: oklch(0.92 0.015 240);
+        color: oklch(0.35 0.03 240);
+      }
+      .n-row .n-body {
+        min-width: 0;
+      }
+      .n-row .n-text {
+        font-size: 12.5px;
+        line-height: 1.45;
+        color: var(--ink);
+        letter-spacing: -0.005em;
+      }
+      .n-row .n-text b {
+        font-weight: 600;
+      }
+      .n-row .n-text .mp-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 1px 6px 1px 2px;
+        border-radius: 4px;
+        background: var(--bg-soft);
+        margin-right: 2px;
+        font-size: 10.5px;
+        font-weight: 500;
+        color: var(--ink-soft);
+      }
+      .n-row .n-text .mp-tag .mp-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 3px;
+        display: inline-block;
+      }
+      .n-row .n-meta {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 3px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .n-row .n-meta .dot {
+        width: 2.5px;
+        height: 2.5px;
+        border-radius: 50%;
+        background: var(--muted);
+      }
+      .n-row .n-cta {
+        font-size: 11.5px;
+        color: var(--blue-ink);
+        font-weight: 500;
+        margin-top: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .n-row .n-cta svg {
+        width: 10px;
+        height: 10px;
+      }
+      .n-row .n-side {
+        font-size: 10.5px;
+        color: var(--muted);
+        white-space: nowrap;
+        margin-top: 4px;
+      }
+      .n-row .n-thumb {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        flex: none;
+        margin-top: 4px;
+      }
+
+      /* Tray footer */
+      .n-foot {
+        padding: 8px 10px;
+        border-top: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #fff;
+      }
+      .n-foot a {
+        flex: 1;
+        text-align: center;
+        padding: 7px;
+        border-radius: 7px;
+        font-size: 12px;
+        color: var(--ink-soft);
+        font-weight: 500;
+      }
+      .n-foot a:hover {
+        background: var(--hover);
+        color: var(--ink);
+      }
+      .n-foot .settings-link {
+        color: var(--muted);
+        padding: 7px 10px;
+        font-size: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        flex: none;
+      }
+      .n-foot .settings-link svg {
+        width: 12px;
+        height: 12px;
+      }
+
+      /* Empty state */
+      .n-empty {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 24px;
+        text-align: center;
+        gap: 6px;
+      }
+      .n-empty .emoji-ring {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          var(--blue-softer),
+          oklch(0.96 0.04 155)
+        );
+        border: 1px solid var(--line);
+        display: grid;
+        place-items: center;
+        color: var(--success);
+        margin-bottom: 6px;
+      }
+      .n-empty .emoji-ring svg {
+        width: 22px;
+        height: 22px;
+      }
+      .n-empty h4 {
+        font-family: "Instrument Serif", serif;
+        font-weight: 400;
+        font-size: 20px;
+        letter-spacing: -0.005em;
+      }
+      .n-empty p {
+        font-size: 12.5px;
+        color: var(--muted);
+        margin: 0;
+        max-width: 280px;
+      }
+      .n-empty .tiny-link {
+        margin-top: 10px;
+        font-size: 11.5px;
+        color: var(--blue-ink);
+        font-weight: 500;
+        padding: 6px 10px;
+        border-radius: 6px;
+        border: 1px solid var(--line);
+      }
+
+      /* ===== Email step: gmail-ish window ===== */
+      .mail-wrap {
+        background: #f6f8fb;
+        padding: 28px 24px 60px;
+        min-height: 660px;
+      }
+      .mail-window {
+        max-width: 880px;
+        margin: 0 auto;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        box-shadow: 0 20px 60px -24px oklch(0 0 0 / 0.15);
+        overflow: hidden;
+      }
+      .mail-hdr-bar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 16px;
+        border-bottom: 1px solid var(--line);
+        background: #fff;
+      }
+      .mail-hdr-bar .mw-dots {
+        display: flex;
+        gap: 6px;
+      }
+      .mail-hdr-bar .mw-dots span {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .mail-hdr-bar .mw-dots span:nth-child(1) {
+        background: oklch(0.75 0.12 25);
+      }
+      .mail-hdr-bar .mw-dots span:nth-child(2) {
+        background: oklch(0.8 0.12 75);
+      }
+      .mail-hdr-bar .mw-dots span:nth-child(3) {
+        background: oklch(0.75 0.12 150);
+      }
+      .mail-hdr-bar .mw-label {
+        font-size: 11.5px;
+        color: var(--muted);
+        font-family: ui-monospace, monospace;
+        flex: 1;
+        text-align: center;
+      }
+      .mail-hdr-bar .mw-tool {
+        width: 22px;
+        height: 22px;
+        border-radius: 5px;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+      }
+      .mail-hdr-bar .mw-tool svg {
+        width: 12px;
+        height: 12px;
+      }
+
+      .mail-meta {
+        padding: 18px 28px 14px;
+        border-bottom: 1px solid var(--line-soft);
+        display: grid;
+        grid-template-columns: 44px 1fr auto;
+        gap: 12px;
+        align-items: start;
+      }
+      .mail-meta .mm-av {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: #14212d;
+        color: #fff;
+        display: grid;
+        place-items: center;
+      }
+      .mail-meta .mm-av svg {
+        width: 22px;
+        height: 22px;
+      }
+      .mail-meta .mm-subject {
+        font-family: "Instrument Serif", serif;
+        font-weight: 400;
+        font-size: 22px;
+        letter-spacing: -0.005em;
+        line-height: 1.15;
+        margin-bottom: 5px;
+        color: var(--ink);
+      }
+      .mail-meta .mm-from {
+        font-size: 12.5px;
+        color: var(--ink-soft);
+        margin-bottom: 2px;
+      }
+      .mail-meta .mm-from b {
+        color: var(--ink);
+        font-weight: 600;
+      }
+      .mail-meta .mm-to {
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+      .mail-meta .mm-date {
+        font-size: 11.5px;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+
+      /* Email body layout */
+      .mail-body {
+        padding: 28px 28px 36px;
+        font-size: 14px;
+        line-height: 1.6;
+        color: var(--ink-soft);
+      }
+      .mail-body p {
+        margin: 0 0 16px;
+      }
+      .mail-body .eb-hero {
+        font-family: "Instrument Serif", serif;
+        font-weight: 400;
+        font-size: 30px;
+        letter-spacing: -0.01em;
+        line-height: 1.15;
+        color: var(--ink);
+        margin: 0 0 14px;
+      }
+      .mail-body .eb-hero em {
+        font-style: italic;
+        color: var(--blue-ink);
+      }
+      .mail-body .eb-sub {
+        font-size: 14.5px;
+        color: var(--ink-soft);
+        margin-bottom: 28px;
+        max-width: 560px;
+      }
+      .mail-body .eb-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 18px;
+        background: var(--ink);
+        color: #fff;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        margin: 4px 0 20px;
+      }
+      .mail-body .eb-btn svg {
+        width: 12px;
+        height: 12px;
+      }
+      .mail-body .eb-btn-outline {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 17px;
+        background: #fff;
+        color: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        margin: 4px 0 20px;
+      }
+
+      /* Email hero card (welcome, approved) */
+      .eb-cover {
+        height: 160px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        background:
+          radial-gradient(
+            400px 160px at 80% 20%,
+            oklch(0.7 0.15 230 / 0.55),
+            transparent 60%
+          ),
+          radial-gradient(
+            360px 160px at 15% 90%,
+            oklch(0.75 0.14 65 / 0.4),
+            transparent 60%
+          ),
+          linear-gradient(135deg, oklch(0.98 0.01 230), oklch(0.94 0.025 230));
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--line-soft);
+      }
+      .eb-cover svg.brand {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 76px;
+        height: 76px;
+        color: var(--ink);
+        opacity: 0.92;
+      }
+
+      /* Auction won summary + listing card inside email */
+      .eb-listing {
+        display: grid;
+        grid-template-columns: 120px 1fr;
+        gap: 16px;
+        padding: 16px;
+        margin-bottom: 24px;
+        background: var(--bg-soft);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+      }
+      .eb-listing .ebl-img {
+        width: 120px;
+        height: 96px;
+        border-radius: 8px;
+        background: linear-gradient(
+          135deg,
+          oklch(0.45 0.16 25),
+          oklch(0.25 0.1 25)
+        );
+      }
+      .eb-listing .ebl-t {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 4px;
+      }
+      .eb-listing .ebl-m {
+        font-size: 12px;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+      .eb-listing .ebl-price {
+        font-size: 22px;
+        font-family: "Instrument Serif", serif;
+        color: var(--ink);
+      }
+      .eb-listing .ebl-price .cur {
+        font-size: 11px;
+        color: var(--muted);
+        margin-right: 4px;
+        font-family: "Inter Tight", sans-serif;
+        letter-spacing: 0.05em;
+      }
+
+      /* Approved-style check chip */
+      .eb-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px 6px 8px;
+        border-radius: 999px;
+        background: var(--success-soft);
+        color: oklch(0.38 0.13 155);
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 18px;
+      }
+      .eb-badge svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      /* Summary/definitions list inside email */
+      .eb-dl {
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        gap: 6px 18px;
+        padding: 16px 18px;
+        background: var(--bg-soft);
+        border-radius: 10px;
+        font-size: 13px;
+        margin-bottom: 20px;
+      }
+      .eb-dl dt {
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .eb-dl dd {
+        color: var(--ink);
+        margin: 0;
+        font-weight: 500;
+      }
+
+      /* Match card in new-match email */
+      .eb-match-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 22px;
+      }
+      .eb-match-grid .emg-card {
+        background: var(--bg-soft);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px;
+      }
+      .eb-match-grid .emg-card .emg-k {
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--muted);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .eb-match-grid .emg-card .emg-img {
+        height: 70px;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        background: linear-gradient(
+          135deg,
+          oklch(0.94 0.04 85),
+          oklch(0.86 0.1 65)
+        );
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+      }
+      .eb-match-grid .emg-card .emg-img svg {
+        width: 24px;
+        height: 24px;
+      }
+      .eb-match-grid .emg-card .emg-img.listing-img-match {
+        background: linear-gradient(
+          135deg,
+          oklch(0.45 0.16 25),
+          oklch(0.25 0.1 25)
+        );
+      }
+      .eb-match-grid .emg-card .emg-t {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ink);
+      }
+      .eb-match-grid .emg-card .emg-p {
+        font-size: 11.5px;
+        color: var(--muted);
+        margin-top: 2px;
+      }
+
+      /* Email footer */
+      .eb-foot {
+        border-top: 1px solid var(--line-soft);
+        margin-top: 28px;
+        padding-top: 20px;
+        font-size: 11.5px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+      .eb-foot a {
+        color: var(--muted);
+        text-decoration: underline;
+      }
+      .eb-foot .foot-brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        color: var(--ink-soft);
+        font-weight: 500;
+      }
+      .eb-foot .foot-brand svg {
+        width: 14px;
+        height: 14px;
+        color: var(--ink);
+      }
+
+      /* Mocknote */
+      .mocknote {
+        max-width: 1280px;
+        margin: -10px auto 28px;
+        padding: 12px 20px 0;
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.55;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      .mocknote .tag {
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 2px 7px;
+        border-radius: 4px;
+        background: var(--bg-soft);
+        color: var(--muted);
+        border: 1px solid var(--line-soft);
+        flex: none;
+        margin-top: 1px;
+      }
+      .mocknote b {
+        color: var(--ink-soft);
+        font-weight: 600;
+      }
+      .mocknote i {
+        color: var(--ink-soft);
+        font-style: normal;
+        font-weight: 500;
+      }
+
+      /* Hidden utility */
+      [hidden] {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="flow-nav">
+      <div class="fn-title">
+        <svg viewBox="0 0 44 44" fill="none">
+          <path
+            d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+            stroke="currentColor"
+            stroke-width="2.4"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+            stroke="currentColor"
+            stroke-width="2.4"
+            stroke-linecap="round"
+          />
+          <path
+            d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
+          <circle cx="22" cy="22" r="3.4" fill="#4DB7E8" />
+          <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+          <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+          <circle cx="11.6" cy="28" r="2.4" fill="currentColor" />
+        </svg>
+        <span>Shouks</span>
+        <span class="slash">/</span>
+        <span class="flow">Flow 10 — Notifications &amp; Email</span>
+      </div>
+      <div class="fn-steps" id="fnSteps">
+        <span class="fn-group-label">In-app</span>
+        <button class="step-btn active" data-step="10a">
+          <span class="num">A</span> Empty
+        </button>
+        <button class="step-btn" data-step="10b">
+          <span class="num">B</span> Unread
+        </button>
+        <button class="step-btn" data-step="10c">
+          <span class="num">C</span> Read
+        </button>
+        <span class="fn-group-label">Email</span>
+        <button class="step-btn" data-step="10d">
+          <span class="num">D</span> Welcome
+        </button>
+        <button class="step-btn" data-step="10e">
+          <span class="num">E</span> Approved
+        </button>
+        <button class="step-btn" data-step="10f">
+          <span class="num">F</span> Auction won
+        </button>
+        <button class="step-btn" data-step="10g">
+          <span class="num">G</span> ISO match
+        </button>
+      </div>
+      <div class="spacer"></div>
+    </nav>
+
+    <!-- ================= 10A · EMPTY BELL ================= -->
+    <section
+      class="screen"
+      data-screen="10a"
+      data-screen-label="10A · Bell · Empty"
+    >
+      <div class="screen-caption">
+        <span class="cap-num">10 / A</span>
+        <h2>Bell · All caught up</h2>
+        <span class="sub"
+          >Empty state inside a Shouks marketplace header. Keeps the bell
+          friendly on quiet days.</span
+        >
+      </div>
+      <div class="screen-frame">
+        <div class="browser-bar">
+          <div class="dots">
+            <span class="dot"></span><span class="dot"></span
+            ><span class="dot"></span>
+          </div>
+          <div class="url">shouks.com / ferrari-frenzy</div>
+        </div>
+        <div class="app">
+          <div class="navbar">
+            <a class="brand"
+              ><svg viewBox="0 0 44 44" fill="none">
+                <path
+                  d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+                <circle cx="22" cy="22" r="3.4" fill="#4DB7E8" />
+                <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+                <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+                <circle cx="11.6" cy="28" r="2.4" fill="currentColor" /></svg
+              >Shouks</a
+            >
+            <nav class="nav-links">
+              <a class="active">Browse</a><a>My listings</a><a>Messages</a>
+            </nav>
+            <div class="spacer"></div>
+            <div class="search">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" /></svg
+              >Search…
+            </div>
+            <div class="n-anchor-wrap">
+              <button class="nav-bell open">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                  <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                </svg>
+              </button>
+              <div class="n-tray">
+                <div class="n-hd">
+                  <h3>Notifications</h3>
+                  <button class="close-x">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="n-tabs">
+                  <button class="on">All <span class="chip">0</span></button>
+                  <button>Mentions</button>
+                  <button>Sales</button>
+                  <button>ISO</button>
+                </div>
+                <div class="n-empty">
+                  <div class="emoji-ring">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  </div>
+                  <h4>All caught up</h4>
+                  <p>
+                    No new notifications. When there's something to know — an
+                    offer, a match, a review — it'll land here.
+                  </p>
+                  <button class="tiny-link">Browse listings →</button>
+                </div>
+                <div class="n-foot">
+                  <a class="settings-link"
+                    ><svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="3" />
+                      <path
+                        d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"
+                      /></svg
+                    >Preferences</a
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="avatar">J</div>
+          </div>
+          <div class="n-frame-bg">
+            <div class="n-placeholder-card">
+              <div class="ph-k">Context</div>
+              <h3>A quiet day on Ferrari Frenzy</h3>
+              <p>
+                The page behind the tray is Browse. We blur it to keep focus on
+                the dropdown — the user has clicked the bell and found nothing
+                new.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mocknote">
+        <span class="tag">Notes</span
+        ><span
+          >Empty is friendly, not apologetic. A soft check-ring, a single
+          sentence of reassurance, and a nudge back to discovery. No red dot on
+          the bell when empty.</span
+        >
+      </div>
+    </section>
+
+    <!-- ================= 10B · UNREAD ================= -->
+    <section
+      class="screen"
+      data-screen="10b"
+      data-screen-label="10B · Bell · Unread"
+      hidden
+    >
+      <div class="screen-caption">
+        <span class="cap-num">10 / B</span>
+        <h2>Bell · Unread</h2>
+        <span class="sub"
+          >7 unread notifications grouped by day. Blue rail + highlight
+          indicates unread. Tabs filter by category.</span
+        >
+      </div>
+      <div class="screen-frame">
+        <div class="browser-bar">
+          <div class="dots">
+            <span class="dot"></span><span class="dot"></span
+            ><span class="dot"></span>
+          </div>
+          <div class="url">shouks.com / ferrari-frenzy</div>
+        </div>
+        <div class="app">
+          <div class="navbar">
+            <a class="brand"
+              ><svg viewBox="0 0 44 44" fill="none">
+                <path
+                  d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+                <circle cx="22" cy="22" r="3.4" fill="#4DB7E8" />
+                <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+                <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+                <circle cx="11.6" cy="28" r="2.4" fill="currentColor" /></svg
+              >Shouks</a
+            >
+            <nav class="nav-links">
+              <a class="active">Browse</a><a>My listings</a><a>Messages</a>
+            </nav>
+            <div class="spacer"></div>
+            <div class="search">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" /></svg
+              >Search…
+            </div>
+            <div class="n-anchor-wrap">
+              <button class="nav-bell open">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                  <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                </svg>
+                <span class="dot-count">7</span>
+              </button>
+              <div class="n-tray">
+                <div class="n-hd">
+                  <h3>
+                    Notifications <span class="unread-pill">7 unread</span>
+                  </h3>
+                  <button class="mark-read">Mark all read</button>
+                  <button class="close-x">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="n-tabs">
+                  <button class="on">
+                    All <span class="chip has-unread">7</span>
+                  </button>
+                  <button>Mentions <span class="chip">1</span></button>
+                  <button>Sales <span class="chip">3</span></button>
+                  <button>ISO <span class="chip">2</span></button>
+                </div>
+                <div class="n-list">
+                  <div class="n-group-title">Today</div>
+
+                  <div class="n-row unread">
+                    <div class="n-icn ico-match">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.3-4.3" />
+                      </svg>
+                    </div>
+                    <div class="n-body">
+                      <div class="n-text">
+                        <b>Marco C.</b> posted a listing matching your ISO
+                        <b>"1987–1991 Testarossa · Nero or Rosso Corsa"</b>
+                      </div>
+                      <div class="n-meta">
+                        <span class="mp-tag"
+                          ><span
+                            class="mp-dot"
+                            style="
+                              background: linear-gradient(
+                                135deg,
+                                oklch(0.55 0.17 25),
+                                oklch(0.3 0.1 25)
+                              );
+                            "
+                          ></span
+                          >Ferrari Frenzy</span
+                        ><span class="dot"></span>14 min ago
+                      </div>
+                      <a class="n-cta"
+                        >View listing
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path d="M5 12h14M13 5l7 7-7 7" /></svg
+                      ></a>
+                    </div>
+                    <div></div>
+                  </div>
+
+                  <div class="n-row unread">
+                    <div class="n-icn ico-offer">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6"
+                        />
+                      </svg>
+                    </div>
+                    <div class="n-body">
+                      <div class="n-text">
+                        <b>Nadia V.</b> offered <b>$68,000</b> on your
+                        <b>1984 308 GTS</b>
+                      </div>
+                      <div class="n-meta">
+                        <span class="mp-tag"
+                          ><span
+                            class="mp-dot"
+                            style="
+                              background: linear-gradient(
+                                135deg,
+                                oklch(0.55 0.17 25),
+                                oklch(0.3 0.1 25)
+                              );
+                            "
+                          ></span
+                          >Ferrari Frenzy</span
+                        ><span class="dot"></span>42 min ago
+                      </div>
+                      <a class="n-cta"
+                        >Accept, counter or decline
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path d="M5 12h14M13 5l7 7-7 7" /></svg
+                      ></a>
+                    </div>
+                    <div></div>
+                  </div>
+
+                  <div class="n-row unread">
+                    <div class="n-icn ico-auction-end">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 6v6l4 2" />
+                      </svg>
+                    </div>
+                    <div class="n-body">
+                      <div class="n-text">
+                        <b>Auction ends in 1 hour</b> — you're the high bidder
+                        on <b>1997 F355 Spider</b> at $91,500
+                      </div>
+                      <div class="n-meta">
+                        <span class="mp-tag"
+                          ><span
+                            class="mp-dot"
+                            style="
+                              background: linear-gradient(
+                                135deg,
+                                oklch(0.55 0.17 25),
+                                oklch(0.3 0.1 25)
+                              );
+                            "
+                          ></span
+                          >Ferrari Frenzy</span
+                        ><span class="dot"></span>2h ago
+                      </div>
+                      <a class="n-cta"
+                        >Go to auction
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path d="M5 12h14M13 5l7 7-7 7" /></svg
+                      ></a>
+                    </div>
+                    <div></div>
+                  </div>
+
+                  <div class="n-row unread">
+                    <div class="n-icn ico-msg">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                        />
+                      </svg>
+                    </div>
+                    <div class="n-body">
+                      <div class="n-text">
+                        <b>James L.</b> sent you a message about
+                        <b>1991 Testarossa service records</b>
+                      </div>
+                      <div class="n-meta">
+                        <span class="mp-tag"
+                          ><span
+                            class="mp-dot"
+                            style="
+                              background: linear-gradient(
+                                135deg,
+                                oklch(0.55 0.17 25),
+                                oklch(0.3 0.1 25)
+                              );
+                            "
+                          ></span
+                          >Ferrari Frenzy</span
+                        ><span class="dot"></span>3h ago
+                      </div>
+                    </div>
+                    <div></div>
+                  </div>
+
+                  <div class="n-group-title">Yesterday</div>
+
+                  <div class="n-row unread">
+                    <div class="n-icn ico-app">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                    </div>
+                    <div class="n-body">
+                      <div class="n-text">
+                        Your application to <b>Heritage Denim</b> was
+                        <b style="color: var(--success)">approved</b>
+                      </div>
+                      <div class="n-meta">
+                        <span class="mp-tag"
+                          ><span
+                            class="mp-dot"
+                            style="
+                              background: linear-gradient(
+                                135deg,
+                                oklch(0.55 0.11 110),
+                                oklch(0.3 0.08 110)
+                              );
+                            "
+                          ></span
+                          >Heritage Denim</span
+                        ><span class="dot"></span>Yesterday · 4:18 PM
+                      </div>
+                      <a class="n-cta"
+                        >Start browsing
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path d="M5 12h14M13 5l7 7-7 7" /></svg
+                      ></a>
+                    </div>
+                    <div></div>
+                  </div>
+
+                  <div class="n-row unread">
+                    <div class="n-icn ico-bid">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="m14 14 8 8M2 2l8 8M16 6l-8 8M16 16l6 6-6 6M8 8 2 2l6-6"
+                        />
+                      </svg>
+                    </div>
+                    <div class="n-body">
+                      <div class="n-text">
+                        <b>You've been outbid</b> on <b>1972 Dino 246 GTS</b>.
+                        New high: $488,000
+                      </div>
+                      <div class="n-meta">
+                        <span class="mp-tag"
+                          ><span
+                            class="mp-dot"
+                            style="
+                              background: linear-gradient(
+                                135deg,
+                                oklch(0.55 0.17 25),
+                                oklch(0.3 0.1 25)
+                              );
+                            "
+                          ></span
+                          >Ferrari Frenzy</span
+                        ><span class="dot"></span>Yesterday · 11:02 AM
+                      </div>
+                      <a class="n-cta"
+                        >Bid again
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path d="M5 12h14M13 5l7 7-7 7" /></svg
+                      ></a>
+                    </div>
+                    <div></div>
+                  </div>
+
+                  <div class="n-group-title">Earlier this week</div>
+
+                  <div class="n-row unread">
+                    <div class="n-icn ico-review">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <polygon
+                          points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                        />
+                      </svg>
+                    </div>
+                    <div class="n-body">
+                      <div class="n-text">
+                        <b>Marco C.</b> left you a 5-star review for
+                        <b>1992 512 TR</b>
+                      </div>
+                      <div class="n-meta">
+                        <span class="mp-tag"
+                          ><span
+                            class="mp-dot"
+                            style="
+                              background: linear-gradient(
+                                135deg,
+                                oklch(0.55 0.17 25),
+                                oklch(0.3 0.1 25)
+                              );
+                            "
+                          ></span
+                          >Ferrari Frenzy</span
+                        ><span class="dot"></span>Tue
+                      </div>
+                    </div>
+                    <div></div>
+                  </div>
+
+                  <div class="n-row">
+                    <div class="n-icn ico-mod">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+                      </svg>
+                    </div>
+                    <div class="n-body">
+                      <div class="n-text">
+                        Welcome to <b>Ferrari Frenzy</b>. Listings are reviewed
+                        by moderators within 4 hours.
+                      </div>
+                      <div class="n-meta">
+                        <span class="mp-tag"
+                          ><span
+                            class="mp-dot"
+                            style="
+                              background: linear-gradient(
+                                135deg,
+                                oklch(0.55 0.17 25),
+                                oklch(0.3 0.1 25)
+                              );
+                            "
+                          ></span
+                          >Ferrari Frenzy</span
+                        ><span class="dot"></span>Mar 14
+                      </div>
+                    </div>
+                    <div></div>
+                  </div>
+                </div>
+                <div class="n-foot">
+                  <a class="settings-link"
+                    ><svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="3" />
+                      <path
+                        d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"
+                      /></svg
+                    >Preferences</a
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="avatar">J</div>
+          </div>
+          <div class="n-frame-bg">
+            <div class="n-placeholder-card">
+              <div class="ph-k">Context</div>
+              <h3>Seven things to know</h3>
+              <p>
+                Grouped by day. Unread items get a blue rail + softly tinted
+                row, so the eye can count at a glance without reading. The
+                bell's red "7" goes away the moment the tray opens (not when
+                each is read).
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mocknote">
+        <span class="tag">Notes</span
+        ><span
+          >Each notification = 1 icon (typed by event), 1 sentence of plain
+          English, marketplace tag + relative time, and an optional inline CTA.
+          Tabs filter by category — <b>Sales</b> (offers/bids/auction/sold),
+          <b>ISO</b> (matches), <b>Mentions</b> (messages/reviews). Clicking the
+          row marks just that one read. <b>Mark all read</b> wipes the batch.
+          Across-marketplace activity lives in the same tray — the mp-tag tells
+          you where each thing happened.</span
+        >
+      </div>
+    </section>
+
+    <!-- ================= 10C · READ ================= -->
+    <section
+      class="screen"
+      data-screen="10c"
+      data-screen-label="10C · Bell · Read"
+      hidden
+    >
+      <div class="screen-caption">
+        <span class="cap-num">10 / C</span>
+        <h2>Bell · Read</h2>
+        <span class="sub"
+          >Same list after "Mark all read". Bell loses the red count; rows go
+          neutral. Nothing is hidden — Shouks is not ephemeral.</span
+        >
+      </div>
+      <div class="screen-frame">
+        <div class="browser-bar">
+          <div class="dots">
+            <span class="dot"></span><span class="dot"></span
+            ><span class="dot"></span>
+          </div>
+          <div class="url">shouks.com / ferrari-frenzy</div>
+        </div>
+        <div class="app">
+          <div class="navbar">
+            <a class="brand"
+              ><svg viewBox="0 0 44 44" fill="none">
+                <path
+                  d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+                <circle cx="22" cy="22" r="3.4" fill="#4DB7E8" />
+                <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+                <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+                <circle cx="11.6" cy="28" r="2.4" fill="currentColor" /></svg
+              >Shouks</a
+            >
+            <nav class="nav-links">
+              <a class="active">Browse</a><a>My listings</a><a>Messages</a>
+            </nav>
+            <div class="spacer"></div>
+            <div class="search">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" /></svg
+              >Search…
+            </div>
+            <div class="n-anchor-wrap">
+              <button class="nav-bell open">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                  <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                </svg>
+              </button>
+              <div class="n-tray">
+                <div class="n-hd">
+                  <h3>Notifications</h3>
+                  <button class="close-x">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M18 6 6 18M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <div class="n-tabs">
+                  <button class="on">All <span class="chip">8</span></button>
+                  <button>Mentions</button>
+                  <button>Sales</button>
+                  <button>ISO</button>
+                </div>
+                <div class="n-list">
+                  <div class="n-group-title">Today</div>
+
+                  <div class="n-row">
+                    <div class="n-icn ico-match">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.3-4.3" />
+                      </svg>
+                    </div>
+                    <div class="n-body">
+                      <div class="n-text">
+                        <b>Marco C.</b> posted a listing matching your ISO
+                        <b>"1987–1991 Testarossa"</b>
+                      </div>
+                      <div class="n-meta">
+                        <span class="mp-tag"
+                          ><span
+                            class="mp-dot"
+                            style="
+                              background: linear-gradient(
+                                135deg,
+                                oklch(0.55 0.17 25),
+                                oklch(0.3 0.1 25)
+                              );
+                            "
+                          ></span
+                          >Ferrari Frenzy</span
+                        ><span class="dot"></span>14 min ago
+                      </div>
+                    </div>
+                    <div></div>
+                  </div>
+
+                  <div class="n-row">
+                    <div class="n-icn ico-offer">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7H14a3.5 3.5 0 0 1 0 7H6"
+                        />
+                      </svg>
+                    </div>
+                    <div class="n-body">
+                      <div class="n-text">
+                        <b>Nadia V.</b> offered <b>$68,000</b> on your
+                        <b>1984 308 GTS</b>
+                      </div>
+                      <div class="n-meta">
+                        <span class="mp-tag"
+                          ><span
+                            class="mp-dot"
+                            style="
+                              background: linear-gradient(
+                                135deg,
+                                oklch(0.55 0.17 25),
+                                oklch(0.3 0.1 25)
+                              );
+                            "
+                          ></span
+                          >Ferrari Frenzy</span
+                        ><span class="dot"></span>42 min ago
+                      </div>
+                    </div>
+                    <div></div>
+                  </div>
+
+                  <div class="n-row">
+                    <div class="n-icn ico-auction-end">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 6v6l4 2" />
+                      </svg>
+                    </div>
+                    <div class="n-body">
+                      <div class="n-text">
+                        <b>Auction ends in 1 hour</b> — you're high bidder on
+                        <b>1997 F355 Spider</b>
+                      </div>
+                      <div class="n-meta">
+                        <span class="mp-tag"
+                          ><span
+                            class="mp-dot"
+                            style="
+                              background: linear-gradient(
+                                135deg,
+                                oklch(0.55 0.17 25),
+                                oklch(0.3 0.1 25)
+                              );
+                            "
+                          ></span
+                          >Ferrari Frenzy</span
+                        ><span class="dot"></span>2h ago
+                      </div>
+                    </div>
+                    <div></div>
+                  </div>
+
+                  <div class="n-row">
+                    <div class="n-icn ico-msg">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                        />
+                      </svg>
+                    </div>
+                    <div class="n-body">
+                      <div class="n-text">
+                        <b>James L.</b> sent you a message about
+                        <b>Testarossa service records</b>
+                      </div>
+                      <div class="n-meta">
+                        <span class="mp-tag"
+                          ><span
+                            class="mp-dot"
+                            style="
+                              background: linear-gradient(
+                                135deg,
+                                oklch(0.55 0.17 25),
+                                oklch(0.3 0.1 25)
+                              );
+                            "
+                          ></span
+                          >Ferrari Frenzy</span
+                        ><span class="dot"></span>3h ago
+                      </div>
+                    </div>
+                    <div></div>
+                  </div>
+
+                  <div class="n-group-title">Yesterday</div>
+
+                  <div class="n-row">
+                    <div class="n-icn ico-app">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M20 6 9 17l-5-5" />
+                      </svg>
+                    </div>
+                    <div class="n-body">
+                      <div class="n-text">
+                        Your application to <b>Heritage Denim</b> was
+                        <b style="color: var(--success)">approved</b>
+                      </div>
+                      <div class="n-meta">
+                        <span class="mp-tag"
+                          ><span
+                            class="mp-dot"
+                            style="
+                              background: linear-gradient(
+                                135deg,
+                                oklch(0.55 0.11 110),
+                                oklch(0.3 0.08 110)
+                              );
+                            "
+                          ></span
+                          >Heritage Denim</span
+                        ><span class="dot"></span>Yesterday · 4:18 PM
+                      </div>
+                    </div>
+                    <div></div>
+                  </div>
+
+                  <div class="n-row">
+                    <div class="n-icn ico-bid">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="m14 14 8 8M2 2l8 8M16 6l-8 8" />
+                      </svg>
+                    </div>
+                    <div class="n-body">
+                      <div class="n-text">
+                        <b>You've been outbid</b> on <b>1972 Dino 246 GTS</b>.
+                        New high: $488,000
+                      </div>
+                      <div class="n-meta">
+                        <span class="mp-tag"
+                          ><span
+                            class="mp-dot"
+                            style="
+                              background: linear-gradient(
+                                135deg,
+                                oklch(0.55 0.17 25),
+                                oklch(0.3 0.1 25)
+                              );
+                            "
+                          ></span
+                          >Ferrari Frenzy</span
+                        ><span class="dot"></span>Yesterday · 11:02 AM
+                      </div>
+                    </div>
+                    <div></div>
+                  </div>
+
+                  <div class="n-group-title">Earlier this week</div>
+
+                  <div class="n-row">
+                    <div class="n-icn ico-review">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <polygon
+                          points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                        />
+                      </svg>
+                    </div>
+                    <div class="n-body">
+                      <div class="n-text">
+                        <b>Marco C.</b> left you a 5-star review for
+                        <b>1992 512 TR</b>
+                      </div>
+                      <div class="n-meta">
+                        <span class="mp-tag"
+                          ><span
+                            class="mp-dot"
+                            style="
+                              background: linear-gradient(
+                                135deg,
+                                oklch(0.55 0.17 25),
+                                oklch(0.3 0.1 25)
+                              );
+                            "
+                          ></span
+                          >Ferrari Frenzy</span
+                        ><span class="dot"></span>Tue
+                      </div>
+                    </div>
+                    <div></div>
+                  </div>
+
+                  <div class="n-row">
+                    <div class="n-icn ico-mod">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+                      </svg>
+                    </div>
+                    <div class="n-body">
+                      <div class="n-text">
+                        Welcome to <b>Ferrari Frenzy</b>. Listings are reviewed
+                        within 4 hours.
+                      </div>
+                      <div class="n-meta">
+                        <span class="mp-tag"
+                          ><span
+                            class="mp-dot"
+                            style="
+                              background: linear-gradient(
+                                135deg,
+                                oklch(0.55 0.17 25),
+                                oklch(0.3 0.1 25)
+                              );
+                            "
+                          ></span
+                          >Ferrari Frenzy</span
+                        ><span class="dot"></span>Mar 14
+                      </div>
+                    </div>
+                    <div></div>
+                  </div>
+                </div>
+                <div class="n-foot">
+                  <a class="settings-link"
+                    ><svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="3" />
+                      <path
+                        d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"
+                      /></svg
+                    >Preferences</a
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="avatar">J</div>
+          </div>
+          <div class="n-frame-bg">
+            <div class="n-placeholder-card">
+              <div class="ph-k">Context</div>
+              <h3>Read state</h3>
+              <p>
+                After "Mark all read" the blue rails disappear and the bell goes
+                quiet. History stays — notifications are not dismissed, just
+                de-emphasized.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mocknote">
+        <span class="tag">Notes</span
+        ><span
+          >Read state is just the absence of emphasis — same rows, same content,
+          same order. We don't hide or collapse. Users should be able to re-open
+          the tray and retrace their steps.</span
+        >
+      </div>
+    </section>
+
+    <!-- ================= 10D · EMAIL · WELCOME ================= -->
+    <section
+      class="screen"
+      data-screen="10d"
+      data-screen-label="10D · Email · Welcome"
+      hidden
+    >
+      <div class="screen-caption">
+        <span class="cap-num">10 / D</span>
+        <h2>Email · Welcome</h2>
+        <span class="sub"
+          >Sent once, after first successful login. Warm, short, one clear next
+          step.</span
+        >
+      </div>
+      <div class="screen-frame">
+        <div class="mail-wrap">
+          <div class="mail-window">
+            <div class="mail-hdr-bar">
+              <div class="mw-dots"><span></span><span></span><span></span></div>
+              <div class="mw-label">Inbox · Jane Chen · jane@chen.studio</div>
+              <button class="mw-tool">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="3 6 5 6 21 6" />
+                  <path
+                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                  />
+                </svg>
+              </button>
+              <button class="mw-tool">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M3 4v6h6M21 20v-6h-6" />
+                  <path
+                    d="M3.51 15a9 9 0 0 0 14.85 3.36L21 14M21 9A9 9 0 0 0 6.15 5.64L3 10"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div class="mail-meta">
+              <div class="mm-av">
+                <svg viewBox="0 0 44 44" fill="none">
+                  <path
+                    d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+                    stroke="currentColor"
+                    stroke-width="2.4"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+                    stroke="currentColor"
+                    stroke-width="2.4"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  />
+                  <circle cx="22" cy="22" r="3.4" fill="#4DB7E8" />
+                  <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+                  <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+                  <circle cx="11.6" cy="28" r="2.4" fill="currentColor" />
+                </svg>
+              </div>
+              <div>
+                <div class="mm-subject">Welcome to Shouks, Jane.</div>
+                <div class="mm-from">
+                  From <b>Shouks</b> &lt;hello@shouks.com&gt;
+                </div>
+                <div class="mm-to">To jane@chen.studio</div>
+              </div>
+              <div class="mm-date">Mar 14, 9:02 AM</div>
+            </div>
+            <div class="mail-body">
+              <div class="eb-cover">
+                <svg class="brand" viewBox="0 0 44 44" fill="none">
+                  <path
+                    d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+                    stroke="currentColor"
+                    stroke-width="2.4"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  />
+                  <circle cx="22" cy="22" r="3.4" fill="#4DB7E8" />
+                  <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+                  <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+                  <circle cx="11.6" cy="28" r="2.4" fill="currentColor" />
+                </svg>
+              </div>
+              <div class="eb-hero">
+                A home for the things you <em>actually</em> collect.
+              </div>
+              <p class="eb-sub">
+                Shouks is where private communities buy, sell and trade. Every
+                listing is rooted in a marketplace run by people who know the
+                category — and the people.
+              </p>
+              <p>
+                You're in. Your next step is to find or start your first
+                marketplace:
+              </p>
+              <a class="eb-btn"
+                >Explore marketplaces
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M5 12h14M13 5l7 7-7 7" /></svg
+              ></a>
+              <p style="color: var(--ink); font-weight: 500; margin-top: 4px">
+                A few good ways to start:
+              </p>
+              <p style="margin-left: 10px; color: var(--ink-soft)">
+                &bull;&nbsp;&nbsp;Search for a community you already trust (a
+                forum, a Discord, an Instagram group) — chances are their
+                marketplace is on Shouks.<br />
+                &bull;&nbsp;&nbsp;Browse the directory by category — we lean
+                toward small, high-trust rooms over mega-marketplaces.<br />
+                &bull;&nbsp;&nbsp;If you <b>run</b> a community, you can open a
+                marketplace of your own in about five minutes.
+              </p>
+              <p>
+                We'll only email you when it matters — offers, application
+                decisions, auctions you're winning, and matches for anything
+                you're hunting.
+              </p>
+              <p style="margin-top: 28px">— The Shouks team</p>
+              <div class="eb-foot">
+                <div class="foot-brand">
+                  <svg viewBox="0 0 44 44" fill="none">
+                    <path
+                      d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+                      stroke="currentColor"
+                      stroke-width="2.6"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+                      stroke="currentColor"
+                      stroke-width="2.4"
+                      stroke-linecap="round"
+                    />
+                    <path
+                      d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                    />
+                    <circle cx="22" cy="22" r="3.4" fill="#4DB7E8" />
+                    <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+                    <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+                    <circle cx="11.6" cy="28" r="2.4" fill="currentColor" />
+                  </svg>
+                  Shouks, Inc. · Philadelphia, PA
+                </div>
+                You're receiving this because you signed up for Shouks on Mar
+                14, 2025. <a>Email preferences</a> ·
+                <a>Unsubscribe from product updates</a> (transactional emails
+                like offers and matches will continue).
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mocknote">
+        <span class="tag">Notes</span
+        ><span
+          >One hero line, one action, a short explainer. We don't push too hard
+          — we tell them we'll be quiet unless it matters. The unsubscribe text
+          explicitly separates marketing from transactional mail so the reader
+          knows what they're opting out of.</span
+        >
+      </div>
+    </section>
+
+    <!-- ================= 10E · EMAIL · APPLICATION APPROVED ================= -->
+    <section
+      class="screen"
+      data-screen="10e"
+      data-screen-label="10E · Email · Approved"
+      hidden
+    >
+      <div class="screen-caption">
+        <span class="cap-num">10 / E</span>
+        <h2>Email · Application approved</h2>
+        <span class="sub"
+          >Sent when a moderator approves a join request. The moment of truth —
+          make it feel earned.</span
+        >
+      </div>
+      <div class="screen-frame">
+        <div class="mail-wrap">
+          <div class="mail-window">
+            <div class="mail-hdr-bar">
+              <div class="mw-dots"><span></span><span></span><span></span></div>
+              <div class="mw-label">Inbox · Jane Chen · jane@chen.studio</div>
+              <button class="mw-tool">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="3 6 5 6 21 6" />
+                  <path
+                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                  />
+                </svg>
+              </button>
+              <button class="mw-tool">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M3 4v6h6M21 20v-6h-6" />
+                  <path
+                    d="M3.51 15a9 9 0 0 0 14.85 3.36L21 14M21 9A9 9 0 0 0 6.15 5.64L3 10"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div class="mail-meta">
+              <div
+                class="mm-av"
+                style="
+                  background: linear-gradient(
+                    135deg,
+                    oklch(0.55 0.11 110),
+                    oklch(0.3 0.08 110)
+                  );
+                "
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M12 3v18M3 12h18" stroke-linecap="round" />
+                </svg>
+              </div>
+              <div>
+                <div class="mm-subject">
+                  You're in. Welcome to Heritage Denim.
+                </div>
+                <div class="mm-from">
+                  From
+                  <b>Heritage Denim on Shouks</b> &lt;no-reply@shouks.com&gt;
+                </div>
+                <div class="mm-to">To jane@chen.studio</div>
+              </div>
+              <div class="mm-date">Yesterday, 4:18 PM</div>
+            </div>
+            <div class="mail-body">
+              <div class="eb-badge">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M20 6 9 17l-5-5" /></svg
+                >Approved by Heritage Denim
+              </div>
+              <div class="eb-hero">Hey Jane — <em>you're in.</em></div>
+              <p class="eb-sub">
+                <b style="color: var(--ink)">Samir Ahmed</b>, the owner of
+                Heritage Denim, reviewed your application and approved it. You
+                can now browse every listing, post your own, and message members
+                directly.
+              </p>
+              <a class="eb-btn"
+                >Open Heritage Denim
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M5 12h14M13 5l7 7-7 7" /></svg
+              ></a>
+              <dl class="eb-dl">
+                <dt>Marketplace</dt>
+                <dd>Heritage Denim</dd>
+                <dt>Members</dt>
+                <dd>1,244</dd>
+                <dt>Your role</dt>
+                <dd>Member (verified)</dd>
+                <dt>Reviewed by</dt>
+                <dd>Samir Ahmed · Owner</dd>
+              </dl>
+              <p style="color: var(--ink); font-weight: 500">
+                Three quick things:
+              </p>
+              <p style="margin-left: 10px; color: var(--ink-soft)">
+                1.&nbsp;&nbsp;<b>Please read the marketplace rules</b> —
+                Heritage Denim's cover condition descriptions, fade grades, and
+                shipping. Two breaches = review.<br />
+                2.&nbsp;&nbsp;<b>Post an intro, if you like</b>. Members warm
+                fastest to people who say hello first.<br />
+                3.&nbsp;&nbsp;<b>Set up a wanted ad (ISO)</b>. If something
+                you're hunting lands here, we'll ping you the moment it does.
+              </p>
+              <p style="margin-top: 28px">
+                — Samir &amp; the Heritage Denim team
+              </p>
+              <div class="eb-foot">
+                <div class="foot-brand">
+                  <svg viewBox="0 0 44 44" fill="none">
+                    <path
+                      d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+                      stroke="currentColor"
+                      stroke-width="2.6"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+                      stroke="currentColor"
+                      stroke-width="2.4"
+                      stroke-linecap="round"
+                    />
+                    <path
+                      d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                    />
+                    <circle cx="22" cy="22" r="3.4" fill="#4DB7E8" />
+                    <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+                    <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+                    <circle cx="11.6" cy="28" r="2.4" fill="currentColor" />
+                  </svg>
+                  Sent via Shouks · Heritage Denim
+                </div>
+                This is a transactional email about your Heritage Denim
+                application. <a>Email preferences</a>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mocknote">
+        <span class="tag">Notes</span
+        ><span
+          >Co-signed by the marketplace + Shouks so the trust cue is right (<i
+            >"Samir reviewed your application"</i
+          >, not <i>"A system approved you"</i>). The three next-steps set
+          expectation: rules, intro, ISO — which is the flywheel.
+          <b>Rejected variant</b> keeps the same shell but swaps the badge
+          (neutral grey), the hero ("Application not accepted"), and replaces
+          CTAs with "Read feedback" + a pointer to similar marketplaces.</span
+        >
+      </div>
+    </section>
+
+    <!-- ================= 10F · EMAIL · AUCTION WON ================= -->
+    <section
+      class="screen"
+      data-screen="10f"
+      data-screen-label="10F · Email · Auction won"
+      hidden
+    >
+      <div class="screen-caption">
+        <span class="cap-num">10 / F</span>
+        <h2>Email · Auction won</h2>
+        <span class="sub"
+          >Sent to the winning bidder the moment an auction closes. Celebratory
+          but tightly transactional — next steps are money and shipping.</span
+        >
+      </div>
+      <div class="screen-frame">
+        <div class="mail-wrap">
+          <div class="mail-window">
+            <div class="mail-hdr-bar">
+              <div class="mw-dots"><span></span><span></span><span></span></div>
+              <div class="mw-label">Inbox · Jane Chen · jane@chen.studio</div>
+              <button class="mw-tool">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="3 6 5 6 21 6" />
+                  <path
+                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                  />
+                </svg>
+              </button>
+              <button class="mw-tool">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M3 4v6h6M21 20v-6h-6" />
+                  <path
+                    d="M3.51 15a9 9 0 0 0 14.85 3.36L21 14M21 9A9 9 0 0 0 6.15 5.64L3 10"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div class="mail-meta">
+              <div
+                class="mm-av"
+                style="
+                  background: linear-gradient(
+                    135deg,
+                    oklch(0.55 0.17 25),
+                    oklch(0.3 0.1 25)
+                  );
+                "
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="m14 14 8 8M2 2l8 8M16 6l-8 8" />
+                </svg>
+              </div>
+              <div>
+                <div class="mm-subject">
+                  You won: 1997 F355 Spider · $94,000
+                </div>
+                <div class="mm-from">
+                  From
+                  <b>Ferrari Frenzy on Shouks</b> &lt;no-reply@shouks.com&gt;
+                </div>
+                <div class="mm-to">To jane@chen.studio</div>
+              </div>
+              <div class="mm-date">Today, 7:00 PM</div>
+            </div>
+            <div class="mail-body">
+              <div
+                class="eb-badge"
+                style="background: oklch(0.96 0.035 25); color: var(--danger)"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polygon
+                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                  /></svg
+                >Auction won · Ferrari Frenzy
+              </div>
+              <div class="eb-hero">
+                Congratulations, Jane — <em>it's yours.</em>
+              </div>
+              <p class="eb-sub">
+                You placed the winning bid on
+                <b style="color: var(--ink)"
+                  >1997 F355 Spider · 6-speed, 28k miles</b
+                >. Payment is due within
+                <b style="color: var(--ink)">48 hours</b> to keep your
+                reputation score clean.
+              </p>
+
+              <div class="eb-listing">
+                <div class="ebl-img"></div>
+                <div>
+                  <div class="ebl-t">1997 Ferrari F355 Spider · 6-speed</div>
+                  <div class="ebl-m">
+                    Sold by Marco C. · 28,412 mi · Argento Nürburgring over
+                    Bordeaux
+                  </div>
+                  <div class="ebl-price">
+                    <span class="cur">USD</span>$94,000
+                  </div>
+                </div>
+              </div>
+
+              <dl class="eb-dl">
+                <dt>Winning bid</dt>
+                <dd>$94,000</dd>
+                <dt>Buyer's premium</dt>
+                <dd>$2,350 (2.5%)</dd>
+                <dt>Total due</dt>
+                <dd>$96,350 USD</dd>
+                <dt>Pay by</dt>
+                <dd>Fri, Mar 28 · 7:00 PM</dd>
+                <dt>Seller</dt>
+                <dd>Marco C. · 4.97★ · 142 sales</dd>
+              </dl>
+
+              <a class="eb-btn"
+                >Complete payment
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M5 12h14M13 5l7 7-7 7" /></svg
+              ></a>
+              <a class="eb-btn-outline">Message Marco</a>
+              <p
+                style="
+                  color: var(--muted);
+                  font-size: 12.5px;
+                  line-height: 1.55;
+                  margin-top: 4px;
+                "
+              >
+                Shouks holds payment in escrow until you confirm the car arrived
+                as described. If you need a pre-delivery inspection,
+                <a style="color: var(--blue-ink)">request one</a> before paying
+                — it pauses the 48-hour clock.
+              </p>
+              <div class="eb-foot">
+                <div class="foot-brand">
+                  <svg viewBox="0 0 44 44" fill="none">
+                    <path
+                      d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+                      stroke="currentColor"
+                      stroke-width="2.6"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+                      stroke="currentColor"
+                      stroke-width="2.4"
+                      stroke-linecap="round"
+                    />
+                    <path
+                      d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                    />
+                    <circle cx="22" cy="22" r="3.4" fill="#4DB7E8" />
+                    <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+                    <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+                    <circle cx="11.6" cy="28" r="2.4" fill="currentColor" />
+                  </svg>
+                  Sent via Shouks · Ferrari Frenzy
+                </div>
+                Transactional receipt. Reference: #AUC-2025-03-28-F355. Reply
+                with questions or open a support thread in-app.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mocknote">
+        <span class="tag">Notes</span
+        ><span
+          >Hybrid of celebration + invoice. The badge, the hero line, then the
+          cold hard numbers. Two CTAs — pay (primary) and message seller
+          (outline). The escrow + inspection pointer is the MVP trust story in
+          one paragraph.</span
+        >
+      </div>
+    </section>
+
+    <!-- ================= 10G · EMAIL · NEW MATCH (ISO) ================= -->
+    <section
+      class="screen"
+      data-screen="10g"
+      data-screen-label="10G · Email · ISO match"
+      hidden
+    >
+      <div class="screen-caption">
+        <span class="cap-num">10 / G</span>
+        <h2>Email · New match for your ISO</h2>
+        <span class="sub"
+          >A seller posted a listing that matches a wanted ad. Sent within
+          minutes — the whole point is speed to message.</span
+        >
+      </div>
+      <div class="screen-frame">
+        <div class="mail-wrap">
+          <div class="mail-window">
+            <div class="mail-hdr-bar">
+              <div class="mw-dots"><span></span><span></span><span></span></div>
+              <div class="mw-label">Inbox · Jane Chen · jane@chen.studio</div>
+              <button class="mw-tool">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="3 6 5 6 21 6" />
+                  <path
+                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                  />
+                </svg>
+              </button>
+              <button class="mw-tool">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M3 4v6h6M21 20v-6h-6" />
+                  <path
+                    d="M3.51 15a9 9 0 0 0 14.85 3.36L21 14M21 9A9 9 0 0 0 6.15 5.64L3 10"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div class="mail-meta">
+              <div
+                class="mm-av"
+                style="
+                  background: linear-gradient(
+                    135deg,
+                    oklch(0.55 0.17 25),
+                    oklch(0.3 0.1 25)
+                  );
+                "
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
+              </div>
+              <div>
+                <div class="mm-subject">
+                  Match found: Testarossa for $184,000 on Ferrari Frenzy
+                </div>
+                <div class="mm-from">
+                  From
+                  <b>Ferrari Frenzy on Shouks</b> &lt;no-reply@shouks.com&gt;
+                </div>
+                <div class="mm-to">To jane@chen.studio</div>
+              </div>
+              <div class="mm-date">14 min ago</div>
+            </div>
+            <div class="mail-body">
+              <div
+                class="eb-badge"
+                style="
+                  background: oklch(0.95 0.04 280);
+                  color: oklch(0.42 0.18 285);
+                "
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.3-4.3" /></svg
+                >ISO match · Ferrari Frenzy
+              </div>
+              <div class="eb-hero">One of your hunts just <em>landed</em>.</div>
+              <p class="eb-sub">
+                Marco C. posted a listing that matches your wanted ad
+                <b style="color: var(--ink)"
+                  >"1987–1991 Testarossa · Nero or Rosso Corsa"</b
+                >. Three other members are also watching — if you want to be
+                first, move quickly.
+              </p>
+
+              <div class="eb-match-grid">
+                <div class="emg-card">
+                  <div class="emg-k">Your ISO</div>
+                  <div class="emg-img">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="11" cy="11" r="8" />
+                      <path d="m21 21-4.3-4.3" />
+                    </svg>
+                  </div>
+                  <div class="emg-t">1987–1991 Testarossa</div>
+                  <div class="emg-p">
+                    Budget $150–200k · Nero or Rosso Corsa · &lt;45k miles
+                  </div>
+                </div>
+                <div class="emg-card">
+                  <div class="emg-k">The match</div>
+                  <div class="emg-img listing-img-match"></div>
+                  <div class="emg-t">1987 Testarossa · Nero</div>
+                  <div class="emg-p">
+                    $184,000 · 38,412 mi · Monospecchio · Excellent
+                  </div>
+                </div>
+              </div>
+
+              <a class="eb-btn"
+                >View listing
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M5 12h14M13 5l7 7-7 7" /></svg
+              ></a>
+              <a class="eb-btn-outline">Message Marco</a>
+              <p
+                style="
+                  color: var(--muted);
+                  font-size: 12.5px;
+                  line-height: 1.55;
+                  margin-top: 4px;
+                "
+              >
+                Not quite right?
+                <a style="color: var(--blue-ink)">Adjust your ISO</a> to sharpen
+                future matches, or
+                <a style="color: var(--blue-ink)">pause it</a> if you've filled
+                the hunt.
+              </p>
+              <div class="eb-foot">
+                <div class="foot-brand">
+                  <svg viewBox="0 0 44 44" fill="none">
+                    <path
+                      d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+                      stroke="currentColor"
+                      stroke-width="2.6"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+                      stroke="currentColor"
+                      stroke-width="2.4"
+                      stroke-linecap="round"
+                    />
+                    <path
+                      d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                    />
+                    <circle cx="22" cy="22" r="3.4" fill="#4DB7E8" />
+                    <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+                    <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+                    <circle cx="11.6" cy="28" r="2.4" fill="currentColor" />
+                  </svg>
+                  Sent via Shouks · Ferrari Frenzy
+                </div>
+                You're receiving this because you have an active ISO in Ferrari
+                Frenzy. <a>Adjust matches</a> · <a>Pause this ISO</a>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mocknote">
+        <span class="tag">Notes</span
+        ><span
+          >The side-by-side <i>"Your ISO vs The match"</i> cards are the reason
+          this exists — at a glance the reader sees it's a real match, not spam.
+          Two CTAs mirror auction won (view + message). Footer copy ties the
+          email to its trigger ("you have an active ISO") so unsubscribes are
+          surgical instead of nuclear.</span
+        >
+      </div>
+    </section>
+
+    <script>
+      const steps = ["10a", "10b", "10c", "10d", "10e", "10f", "10g"];
+      const LS_KEY = "shouks.flow10.step";
+      function show(idx) {
+        const k = steps[idx];
+        document
+          .querySelectorAll(".screen")
+          .forEach(s => (s.hidden = s.dataset.screen !== k));
+        document
+          .querySelectorAll(".step-btn")
+          .forEach(b => b.classList.toggle("active", b.dataset.step === k));
+        try {
+          localStorage.setItem(LS_KEY, k);
+        } catch (e) {}
+        window.scrollTo({ top: 0, behavior: "instant" });
+      }
+      document.addEventListener("click", e => {
+        const step = e.target.closest("[data-step]");
+        if (step) {
+          const i = steps.indexOf(step.dataset.step);
+          if (i >= 0) show(i);
+        }
+        const goto = e.target.closest("[data-goto]");
+        if (goto) {
+          const i = steps.indexOf(goto.dataset.goto);
+          if (i >= 0) show(i);
+        }
+      });
+      // Initial
+      let initial = 0;
+      try {
+        const saved = localStorage.getItem(LS_KEY);
+        if (saved && steps.includes(saved)) initial = steps.indexOf(saved);
+      } catch (e) {}
+      show(initial);
+    </script>
+  </body>
+</html>

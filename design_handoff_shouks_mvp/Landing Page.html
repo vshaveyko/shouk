@@ -1,0 +1,1321 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Shouks — One platform, two sides</title>
+
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44' fill='none'><path d='M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z' stroke='%230f1a2e' stroke-width='3' stroke-linejoin='round'/><circle cx='22' cy='22' r='5' fill='%234a7aff'/><circle cx='22' cy='10' r='3.2' fill='%230f1a2e'/><circle cx='32.4' cy='28' r='3.2' fill='%230f1a2e'/><circle cx='11.6' cy='28' r='3.2' fill='%230f1a2e'/></svg>"
+    />
+
+    <!-- Fonts: a friendly modern pairing; Instrument Serif for moments of warmth, Inter Tight as workhorse -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&amp;family=Instrument+Serif:ital@0;1&amp;display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* ─── TOKENS ─── */
+      :root {
+        /* neutrals, warm white paper */
+        --bg: oklch(0.985 0.004 230);
+        --surface: #ffffff;
+        --ink: oklch(0.18 0.02 240);
+        --ink-soft: oklch(0.36 0.015 240);
+        --muted: oklch(0.56 0.012 240);
+        --line: oklch(0.92 0.006 240);
+        --line-soft: oklch(0.95 0.005 240);
+        --hover: oklch(0.965 0.005 240);
+
+        /* riviera blue — bright, confident, friendly */
+        --blue: oklch(0.62 0.17 242);
+        --blue-ink: oklch(0.42 0.15 244);
+        --blue-wash: oklch(0.965 0.02 240);
+        --blue-ring: oklch(0.62 0.17 242 / 0.3);
+
+        /* utility */
+        --ok: oklch(0.62 0.14 160);
+        --radius: 10px;
+        --radius-lg: 16px;
+        --shadow-xs: 0 1px 0 oklch(0.18 0.02 240 / 0.03);
+        --shadow-md:
+          0 4px 14px oklch(0.18 0.02 240 / 0.06),
+          0 1px 2px oklch(0.18 0.02 240 / 0.04);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+        font-feature-settings: "ss01", "cv11";
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        line-height: 1.5;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        margin: 0;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+      p {
+        margin: 0;
+      }
+      .serif {
+        font-family: "Instrument Serif", ui-serif, Georgia, serif;
+        font-weight: 400;
+        font-style: italic;
+        letter-spacing: -0.01em;
+      }
+
+      /* ─── LAYOUT ─── */
+      .container {
+        width: 100%;
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+      @media (max-width: 640px) {
+        .container {
+          padding: 0 20px;
+        }
+      }
+
+      /* ─── NAV ─── */
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: color-mix(in oklab, var(--bg), transparent 20%);
+        backdrop-filter: saturate(180%) blur(12px);
+        -webkit-backdrop-filter: saturate(180%) blur(12px);
+        border-bottom: 1px solid var(--line);
+      }
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 64px;
+      }
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        font-size: 18px;
+      }
+      .brand-mark {
+        width: 28px;
+        height: 28px;
+        display: inline-grid;
+        place-items: center;
+        color: var(--ink);
+        flex: none;
+      }
+      .brand-mark svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .nav-links a {
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 14px;
+        color: var(--ink-soft);
+        transition:
+          background 120ms,
+          color 120ms;
+      }
+      .nav-links a:hover {
+        background: var(--hover);
+        color: var(--ink);
+      }
+      .nav-cta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      @media (max-width: 720px) {
+        .nav-links a:not(.persist) {
+          display: none;
+        }
+      }
+
+      /* ─── BUTTONS ─── */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        height: 38px;
+        padding: 0 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: -0.005em;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: all 140ms;
+        white-space: nowrap;
+      }
+      .btn-primary {
+        background: var(--ink);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: oklch(0.26 0.025 240);
+      }
+      .btn-ghost {
+        background: transparent;
+        color: var(--ink);
+      }
+      .btn-ghost:hover {
+        background: var(--hover);
+      }
+      .btn-outline {
+        background: transparent;
+        color: var(--ink);
+        border-color: var(--line);
+      }
+      .btn-outline:hover {
+        background: var(--hover);
+        border-color: oklch(0.82 0.01 240);
+      }
+      .btn-blue {
+        background: var(--blue);
+        color: #fff;
+        box-shadow: 0 1px 0 oklch(0.4 0.15 244 / 0.35) inset;
+      }
+      .btn-blue:hover {
+        background: var(--blue-ink);
+      }
+      .btn-lg {
+        height: 46px;
+        padding: 0 22px;
+        font-size: 15px;
+        border-radius: 10px;
+      }
+
+      /* ─── HERO ─── */
+      .hero {
+        position: relative;
+        padding: 64px 0 96px;
+        overflow: hidden;
+        border-bottom: 1px solid var(--line);
+      }
+      .hero-grid-bg {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(var(--line-soft) 1px, transparent 1px),
+          linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+        background-size: 56px 56px;
+        mask-image: radial-gradient(
+          ellipse at 50% 40%,
+          #000 0%,
+          transparent 72%
+        );
+        -webkit-mask-image: radial-gradient(
+          ellipse at 50% 40%,
+          #000 0%,
+          transparent 72%
+        );
+        pointer-events: none;
+        opacity: 0.9;
+      }
+      .hero-inner {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        max-width: 820px;
+        margin: 0 auto;
+      }
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px 6px 8px;
+        border-radius: 999px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        font-size: 12px;
+        color: var(--ink-soft);
+        font-weight: 500;
+        box-shadow: var(--shadow-xs);
+        margin-bottom: 28px;
+      }
+      .eyebrow-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--blue);
+        box-shadow: 0 0 0 4px var(--blue-wash);
+      }
+      .hero h1 {
+        font-size: clamp(40px, 6.2vw, 72px);
+        line-height: 1.02;
+        letter-spacing: -0.035em;
+        margin-bottom: 20px;
+      }
+      .hero h1 .accent {
+        color: var(--blue);
+      }
+      .hero h1 .serif {
+        display: inline-block;
+        padding: 0 2px;
+      }
+      .hero p.lede {
+        font-size: clamp(17px, 1.4vw, 20px);
+        color: var(--ink-soft);
+        max-width: 640px;
+        margin: 0 auto 28px;
+        line-height: 1.55;
+      }
+      .hero-cta {
+        display: inline-flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .hero-meta {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+        margin-top: 36px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .hero-meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .hero-meta-dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: currentColor;
+        opacity: 0.4;
+      }
+
+      /* ─── SECTION BASE ─── */
+      section.block {
+        padding: 96px 0;
+      }
+      .section-head {
+        text-align: center;
+        max-width: 680px;
+        margin: 0 auto 56px;
+      }
+      .section-kicker {
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--blue-ink);
+        font-weight: 600;
+        margin-bottom: 14px;
+      }
+      .section-head h2 {
+        font-size: clamp(30px, 3.8vw, 44px);
+        line-height: 1.08;
+        letter-spacing: -0.03em;
+        margin-bottom: 14px;
+      }
+      .section-head p {
+        color: var(--ink-soft);
+        font-size: 17px;
+        line-height: 1.55;
+      }
+
+      /* ─── TWO SIDES ─── */
+      .sides {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+      }
+      @media (max-width: 880px) {
+        .sides {
+          grid-template-columns: 1fr;
+        }
+      }
+      .side {
+        position: relative;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        padding: 36px;
+        overflow: hidden;
+        transition:
+          transform 200ms,
+          box-shadow 200ms;
+      }
+      .side:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
+      .side-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        font-weight: 600;
+        color: var(--ink-soft);
+        margin-bottom: 18px;
+      }
+      .side-tag .num {
+        width: 20px;
+        height: 20px;
+        border-radius: 5px;
+        display: grid;
+        place-items: center;
+        background: var(--ink);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0;
+      }
+      .side.join .side-tag .num {
+        background: var(--blue);
+      }
+      .side h3 {
+        font-size: 28px;
+        letter-spacing: -0.028em;
+        line-height: 1.1;
+        margin-bottom: 12px;
+      }
+      .side p.side-lede {
+        color: var(--ink-soft);
+        font-size: 15px;
+        line-height: 1.55;
+        margin-bottom: 22px;
+      }
+      .side-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 14px;
+        margin-bottom: 28px;
+      }
+      .side-list li {
+        display: flex;
+        gap: 12px;
+        font-size: 14px;
+        color: var(--ink);
+        line-height: 1.5;
+      }
+      .side-list svg {
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        margin-top: 2px;
+        color: var(--ink-soft);
+      }
+      .side.join .side-list svg {
+        color: var(--blue);
+      }
+      .side-foot {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+      }
+      .side-foot .btn {
+        height: 40px;
+      }
+
+      /* ─── HOW IT WORKS ─── */
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+      }
+      @media (max-width: 820px) {
+        .steps {
+          grid-template-columns: 1fr;
+        }
+      }
+      .step {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        padding: 28px;
+        position: relative;
+      }
+      .step-num {
+        font-family: "Instrument Serif", serif;
+        font-style: italic;
+        font-size: 44px;
+        color: var(--blue);
+        line-height: 1;
+        letter-spacing: -0.04em;
+        margin-bottom: 20px;
+        font-weight: 400;
+      }
+      .step h4 {
+        font-size: 18px;
+        letter-spacing: -0.02em;
+        margin-bottom: 8px;
+      }
+      .step p {
+        font-size: 14px;
+        color: var(--ink-soft);
+        line-height: 1.55;
+      }
+
+      /* ─── TRUST ─── */
+      .trust {
+        background: var(--ink);
+        color: oklch(0.94 0.005 240);
+        border-radius: 20px;
+        padding: 56px;
+        position: relative;
+        overflow: hidden;
+      }
+      .trust-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 1fr;
+        gap: 48px;
+        align-items: center;
+      }
+      @media (max-width: 820px) {
+        .trust-grid {
+          grid-template-columns: 1fr;
+          gap: 32px;
+        }
+        .trust {
+          padding: 40px 28px;
+        }
+      }
+      .trust-kicker {
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: oklch(0.78 0.08 242);
+        font-weight: 600;
+        margin-bottom: 14px;
+      }
+      .trust h2 {
+        font-size: clamp(28px, 3.4vw, 40px);
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+        margin-bottom: 18px;
+        color: #fff;
+      }
+      .trust p {
+        color: oklch(0.84 0.015 240);
+        font-size: 16px;
+        line-height: 1.6;
+        max-width: 440px;
+      }
+
+      .verify-stack {
+        display: grid;
+        gap: 10px;
+        background: oklch(0.22 0.022 240);
+        border: 1px solid oklch(0.3 0.02 240);
+        border-radius: 14px;
+        padding: 20px;
+      }
+      .verify-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        background: oklch(0.18 0.02 240);
+        font-size: 13px;
+      }
+      .verify-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: oklch(0.92 0.005 240);
+      }
+      .verify-badge {
+        width: 28px;
+        height: 28px;
+        border-radius: 7px;
+        display: grid;
+        place-items: center;
+        background: oklch(0.3 0.02 240);
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .verify-ok {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: oklch(0.78 0.13 160);
+        font-size: 12px;
+        font-weight: 500;
+      }
+      .verify-ok-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: oklch(0.72 0.15 160);
+        box-shadow: 0 0 0 3px oklch(0.72 0.15 160 / 0.18);
+      }
+
+      /* ─── FEATURED (marketplaces preview) ─── */
+      .featured-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+      @media (max-width: 880px) {
+        .featured-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      @media (max-width: 560px) {
+        .featured-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .mp-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        transition:
+          transform 180ms,
+          box-shadow 180ms;
+      }
+      .mp-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+      }
+      .mp-banner {
+        height: 132px;
+        position: relative;
+        overflow: hidden;
+      }
+      /* Placeholder striped banner — flagged for real imagery */
+      .mp-banner.stripes {
+        background-image: repeating-linear-gradient(
+          135deg,
+          oklch(0.95 0.004 240) 0 12px,
+          oklch(0.97 0.003 240) 12px 24px
+        );
+      }
+      .mp-banner.ferrari {
+        background: linear-gradient(
+          135deg,
+          oklch(0.48 0.2 28),
+          oklch(0.26 0.14 25)
+        );
+      }
+      .mp-banner.arsenal {
+        background: linear-gradient(
+          135deg,
+          oklch(0.52 0.18 25),
+          oklch(0.3 0.12 25)
+        );
+      }
+      .mp-banner-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          180deg,
+          transparent 40%,
+          rgba(0, 0, 0, 0.45) 100%
+        );
+      }
+      .mp-banner-label {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        font-family: ui-monospace, monospace;
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .mp-banner-title {
+        position: absolute;
+        bottom: 12px;
+        left: 14px;
+        right: 14px;
+        color: #fff;
+        font-weight: 600;
+        font-size: 16px;
+        letter-spacing: -0.015em;
+      }
+      .mp-body {
+        padding: 14px 16px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .mp-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        color: var(--ink-soft);
+      }
+      .mp-cat {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .mp-stats {
+        display: flex;
+        gap: 14px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .mp-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 500;
+        background: var(--blue-wash);
+        color: var(--blue-ink);
+      }
+      .mp-badge.closed {
+        background: oklch(0.96 0.005 240);
+        color: var(--ink-soft);
+      }
+
+      .placeholder-card {
+        display: grid;
+        place-items: center;
+        background: var(--surface);
+        border: 1px dashed oklch(0.85 0.008 240);
+        border-radius: var(--radius-lg);
+        min-height: 228px;
+        text-align: center;
+        padding: 20px;
+      }
+      .placeholder-card .p-title {
+        font-family: ui-monospace, monospace;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+      .placeholder-card .p-sub {
+        font-size: 13px;
+        color: var(--ink-soft);
+        max-width: 200px;
+      }
+
+      /* ─── FINAL CTA ─── */
+      .final-cta {
+        text-align: center;
+        background: var(--blue-wash);
+        border: 1px solid oklch(0.91 0.03 240);
+        border-radius: 20px;
+        padding: 72px 40px;
+      }
+      .final-cta h2 {
+        font-size: clamp(32px, 4vw, 48px);
+        letter-spacing: -0.03em;
+        line-height: 1.05;
+        margin-bottom: 14px;
+      }
+      .final-cta p {
+        color: var(--ink-soft);
+        font-size: 17px;
+        margin-bottom: 28px;
+      }
+      .final-cta .hero-cta {
+        justify-content: center;
+      }
+
+      /* ─── FOOTER ─── */
+      footer {
+        padding: 48px 0 40px;
+        border-top: 1px solid var(--line);
+        margin-top: 96px;
+      }
+      .foot-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .foot-links {
+        display: flex;
+        gap: 24px;
+      }
+      .foot-links a:hover {
+        color: var(--ink);
+      }
+      @media (max-width: 620px) {
+        .foot-inner {
+          flex-direction: column;
+          text-align: center;
+        }
+      }
+
+      /* ─── helper ─── */
+      .icon {
+        width: 16px;
+        height: 16px;
+        stroke-width: 1.8;
+      }
+    </style>
+  </head>
+  <body data-cc-id="cc-1" style="cursor: crosshair">
+    <!-- ═════ NAV ═════ -->
+    <header class="nav">
+      <div class="container nav-inner">
+        <a href="/" class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 44 44" fill="none">
+              <path
+                d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+                stroke="currentColor"
+                stroke-width="2.4"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+                stroke="currentColor"
+                stroke-width="2.4"
+                stroke-linecap="round"
+              />
+              <path
+                d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+              <circle cx="22" cy="22" r="3.4" fill="var(--blue)" />
+              <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+              <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+              <circle cx="11.6" cy="28" r="2.4" fill="currentColor" />
+              <g stroke="currentColor" stroke-width="1.2" opacity="0.35">
+                <path d="M22 10 22 22M32.4 28 22 22M11.6 28 22 22" />
+              </g>
+            </svg>
+          </span>
+          <span>Shouks</span>
+        </a>
+
+        <nav class="nav-links" aria-label="Primary">
+          <a href="#how">How it works</a>
+          <a href="#sides">Why Shouks</a>
+          <a href="/explore">Explore</a>
+        </nav>
+
+        <div class="nav-cta">
+          <a href="/login" class="btn btn-ghost nav-links persist">Log in</a>
+          <a href="/login" class="btn btn-primary">Get started</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- ═════ HERO ═════ -->
+    <section class="hero">
+      <div class="hero-grid-bg" aria-hidden="true"></div>
+      <div class="container hero-inner" data-cc-id="cc-3">
+        <span class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          A home for communities built on trust
+        </span>
+        <h1>
+          Where communities<br />
+          run their <span class="serif accent">own markets.</span>
+        </h1>
+        <p class="lede" data-cc-id="cc-2" style=""><br /></p>
+        <div class="hero-cta">
+          <a href="/login" class="btn btn-blue btn-lg">
+            Get started
+            <svg
+              class="icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M5 12h14"></path>
+              <path d="m12 5 7 7-7 7"></path>
+            </svg>
+          </a>
+          <a href="/explore" class="btn btn-outline btn-lg"
+            >Browse marketplaces</a
+          >
+        </div>
+
+        <div class="hero-meta">
+          <span class="hero-meta-item">Free to join</span>
+          <span class="hero-meta-dot"></span>
+          <span class="hero-meta-item">Verified members</span>
+          <span class="hero-meta-dot"></span>
+          <span class="hero-meta-item">Your rules, your community</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═════ TWO SIDES ═════ -->
+    <section class="block" id="sides">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-kicker">Two sides, one account</div>
+          <h2>Buy and sell with people who actually care.</h2>
+          <p>
+            Every Shouks account can browse communities you love and run one of
+            your own. No second signup, no switching apps.
+          </p>
+        </div>
+
+        <div class="sides">
+          <!-- JOIN -->
+          <div class="side join">
+            <div class="side-tag">
+              <span class="num">1</span> Join a community
+            </div>
+            <h3>Find the people who know what you're looking for.</h3>
+            <p class="side-lede">
+              Every marketplace is curated. Apply once, and you're part of a
+              community where listings are real, prices make sense, and members
+              have been vetted.
+            </p>
+            <ul class="side-list">
+              <li>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                >
+                  <path d="m21 21-4.3-4.3"></path>
+                  <circle cx="11" cy="11" r="8"></circle>
+                </svg>
+                Search by what actually matters — brand, year, condition, price
+                — not keywords.
+              </li>
+              <li>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"
+                  ></path>
+                  <path d="M13 2v7h7"></path>
+                  <path d="m9 15 2 2 4-4"></path>
+                </svg>
+                Save searches, get pinged the second something matches.
+              </li>
+              <li>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                >
+                  <path d="M20 7h-9"></path>
+                  <path d="M14 17H5"></path>
+                  <circle cx="17" cy="17" r="3"></circle>
+                  <circle cx="7" cy="7" r="3"></circle>
+                </svg>
+                Bid live in open auctions, or grab fixed-price listings straight
+                away.
+              </li>
+            </ul>
+            <div class="side-foot">
+              <a href="/explore" class="btn btn-primary"
+                >Explore marketplaces</a
+              >
+              <span style="font-size: 13px; color: var(--muted)"
+                >Free to join</span
+              >
+            </div>
+          </div>
+
+          <!-- CREATE -->
+          <div class="side create">
+            <div class="side-tag"><span class="num">2</span> Run your own</div>
+            <h3>Spin up a marketplace for your people in minutes.</h3>
+            <p class="side-lede">
+              Bring your WhatsApp group, Facebook group, or Discord into a
+              proper home. Set the rules, design the listing form, vet who gets
+              in.
+            </p>
+            <ul class="side-list">
+              <li>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                  ></path>
+                  <path d="M14 2v6h6"></path>
+                  <path d="M10 12h4"></path>
+                  <path d="M10 16h4"></path>
+                </svg>
+                Build the listing form yourself — the fields you need, none of
+                the ones you don't.
+              </li>
+              <li>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                >
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M22 11h-6"></path>
+                  <path d="M22 16h-6"></path>
+                  <path d="M22 6h-6"></path>
+                </svg>
+                Decide who gets in — applications, invite codes, or referrals.
+              </li>
+              <li>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                >
+                  <path d="M12 2v20"></path>
+                  <path
+                    d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+                  ></path>
+                </svg>
+                Charge a membership fee if you want. Stripe does the rest.
+              </li>
+            </ul>
+            <div class="side-foot">
+              <a href="/create" class="btn btn-primary">Start a marketplace</a>
+              <span style="font-size: 13px; color: var(--muted)"
+                >Under 10 minutes</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═════ HOW IT WORKS ═════ -->
+    <section class="block" id="how" style="padding-top: 32px">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-kicker">How it works</div>
+          <h2>Simple enough to launch today.</h2>
+          <p>
+            Whether you're joining someone else's community or starting your
+            own, the path is short.
+          </p>
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">01</div>
+            <h4>Create an account</h4>
+            <p>
+              Sign up once with your email or Google. Verify your identity with
+              the accounts you already use — Facebook, Instagram, LinkedIn, or
+              phone.
+            </p>
+          </div>
+          <div class="step">
+            <div class="step-num">02</div>
+            <h4>Join, or create</h4>
+            <p>
+              Apply to marketplaces that match what you collect, trade, or
+              follow. Or define your own — name it, brand it, decide who gets
+              in.
+            </p>
+          </div>
+          <div class="step">
+            <div class="step-num">03</div>
+            <h4>Start transacting</h4>
+            <p>
+              List items using the community's form. Bid on auctions. Contact
+              sellers directly. Deals happen between members — Shouks stays out
+              of the way.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═════ TRUST ═════ -->
+    <section class="block" style="padding-top: 48px">
+      <div class="container">
+        <div class="trust">
+          <div class="trust-grid">
+            <div>
+              <div class="trust-kicker">Trust lives at the door</div>
+              <h2>
+                Every member gets the same vetting. That's what makes the
+                listings worth something.
+              </h2>
+              <p>
+                Anonymous marketplaces fill up with scams. Curated ones fill up
+                with deals. On Shouks, every member — buyer or seller — clears
+                the same bar before they're let in. No bots, no burner accounts,
+                no guessing who's real.
+              </p>
+            </div>
+            <div class="verify-stack" aria-hidden="true">
+              <div class="verify-row">
+                <div class="verify-left">
+                  <span
+                    class="verify-badge"
+                    style="background: #1877f2; color: #fff"
+                    >f</span
+                  >
+                  <span>Facebook linked</span>
+                </div>
+                <span class="verify-ok"
+                  ><span class="verify-ok-dot"></span>Verified</span
+                >
+              </div>
+              <div class="verify-row">
+                <div class="verify-left">
+                  <span
+                    class="verify-badge"
+                    style="
+                      background: linear-gradient(
+                        135deg,
+                        #f58529,
+                        #dd2a7b,
+                        #515bd4
+                      );
+                      color: #fff;
+                    "
+                    >IG</span
+                  >
+                  <span>Instagram linked</span>
+                </div>
+                <span class="verify-ok"
+                  ><span class="verify-ok-dot"></span>Verified</span
+                >
+              </div>
+              <div class="verify-row">
+                <div class="verify-left">
+                  <span
+                    class="verify-badge"
+                    style="background: #0a66c2; color: #fff"
+                    >in</span
+                  >
+                  <span>LinkedIn linked</span>
+                </div>
+                <span class="verify-ok"
+                  ><span class="verify-ok-dot"></span>Verified</span
+                >
+              </div>
+              <div class="verify-row">
+                <div class="verify-left">
+                  <span
+                    class="verify-badge"
+                    style="background: oklch(0.3 0.02 240); color: #fff"
+                    >☎︎</span
+                  >
+                  <span>Phone +1 (415) ··· 4912</span>
+                </div>
+                <span class="verify-ok"
+                  ><span class="verify-ok-dot"></span>Verified</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═════ FEATURED COMMUNITIES ═════ -->
+    <section class="block" style="padding-top: 48px">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-kicker">Communities on Shouks</div>
+          <h2>Small, vetted, and real.</h2>
+          <p>We're just getting started. Here's who's live today.</p>
+        </div>
+
+        <div class="featured-grid">
+          <!-- Ferrari Frenzy -->
+          <a class="mp-card" href="/marketplace/ferrari-frenzy">
+            <div class="mp-banner ferrari">
+              <div class="mp-banner-overlay"></div>
+              <div class="mp-banner-label">
+                &lt;-- collector vehicles --&gt;
+              </div>
+              <div class="mp-banner-title">Ferrari Frenzy</div>
+            </div>
+            <div class="mp-body">
+              <div class="mp-meta">
+                <span class="mp-cat">Vehicles</span>
+                <span class="mp-badge">Application</span>
+              </div>
+              <div class="mp-stats">
+                <span>128 members</span>
+                <span>24 listings</span>
+              </div>
+            </div>
+          </a>
+
+          <!-- Gooners United -->
+          <a class="mp-card" href="/marketplace/gooners-united">
+            <div class="mp-banner arsenal">
+              <div class="mp-banner-overlay"></div>
+              <div class="mp-banner-label">
+                &lt;-- football memorabilia --&gt;
+              </div>
+              <div class="mp-banner-title">Gooners United</div>
+            </div>
+            <div class="mp-body">
+              <div class="mp-meta">
+                <span class="mp-cat">Memorabilia</span>
+                <span class="mp-badge">Invite only</span>
+              </div>
+              <div class="mp-stats">
+                <span>42 members</span>
+                <span>7 listings</span>
+              </div>
+            </div>
+          </a>
+
+          <!-- Placeholder: your marketplace here -->
+          <div class="placeholder-card">
+            <div class="p-title">&lt;-- your community --&gt;</div>
+            <div class="p-sub">
+              This could be your watch group, your sneaker circle, your
+              trading-card club.
+            </div>
+            <a href="/create" class="btn btn-outline" style="margin-top: 16px"
+              >Start one →</a
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═════ FINAL CTA ═════ -->
+    <section class="block" style="padding: 48px 0 0">
+      <div class="container">
+        <div class="final-cta">
+          <h2>Ready when you are.</h2>
+          <p>
+            One account. Join the communities you love. Build one of your own
+            when you're ready.
+          </p>
+          <div class="hero-cta">
+            <a href="/login" class="btn btn-blue btn-lg">
+              Create your account
+              <svg
+                class="icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M5 12h14"></path>
+                <path d="m12 5 7 7-7 7"></path>
+              </svg>
+            </a>
+            <a href="/explore" class="btn btn-outline btn-lg">Browse first</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═════ FOOTER ═════ -->
+    <footer>
+      <div class="container foot-inner">
+        <div class="brand" style="font-size: 14px">
+          <span
+            class="brand-mark"
+            style="width: 22px; height: 22px"
+            aria-hidden="true"
+          >
+            <svg viewBox="0 0 44 44" fill="none">
+              <path
+                d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+                stroke="currentColor"
+                stroke-width="2.6"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+                stroke="currentColor"
+                stroke-width="2.4"
+                stroke-linecap="round"
+              />
+              <path
+                d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+              <circle cx="22" cy="22" r="3.8" fill="var(--blue)" />
+              <circle cx="22" cy="10" r="2.8" fill="currentColor" />
+              <circle cx="32.4" cy="28" r="2.8" fill="currentColor" />
+              <circle cx="11.6" cy="28" r="2.8" fill="currentColor" />
+            </svg>
+          </span>
+          <span>Shouks © 2026</span>
+        </div>
+        <div class="foot-links">
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+          <a href="/data-deletion">Help</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

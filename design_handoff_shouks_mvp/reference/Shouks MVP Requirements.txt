@@ -1,0 +1,610 @@
+
+MVP Requirements
+Shouk
+User stories and acceptance criteria
+organized by feature area.
+v2.0 — March 2026
+DRAFT — For Internal Use
+
+Introduction
+This document translates the Shouk Product Spec (v1.0) into actionable requirements for design and development. It reflects detailed decisions made during flow-by-flow review of every feature area. Each requirement is presented as a user story with acceptance criteria that define what “done” looks like for the MVP.
+Personas: Marketplace Creator (MC), Marketplace Admin (MA), Marketplace Member (MM). Where a story applies to multiple personas, the primary actor is listed.
+Design philosophy: Shouk does not prescribe how a creator should build their marketplace. The platform’s job is to make every configuration option intuitive and accessible. Flexibility and comprehensiveness are core to the product’s identity.
+Priority convention: All stories in this document are MVP scope unless explicitly marked as post-V1.
+1. Marketplace Creation & Configuration
+This feature area covers everything a creator does to stand up a new marketplace: identity, branding, listing schema, membership rules, and monetization. The creation flow should feel fast and empowering — a creator running a WhatsApp group today should be able to set up a Shouk marketplace in under 10 minutes.
+1.1 Marketplace Setup
+MC-1  Create a new marketplace
+As a
+Marketplace Creator
+I want to
+complete a setup flow that walks me through naming, branding, and configuring my marketplace
+So that
+I can launch a functional marketplace in minutes without technical expertise.
+Acceptance Criteria
+Creator can enter a marketplace name (3–100 characters, unique across the platform).
+Creator can provide a description (up to 500 characters) and select a category from a predefined list (e.g., Watches, Trading Cards, Vehicles, Apparel, Other).
+Creator can upload a logo (PNG/JPG, max 2 MB, minimum 200×200 px) and select a primary color from a palette or enter a hex code.
+A unique URL slug is auto-generated from the marketplace name. Creator can edit the slug (lowercase alphanumeric and hyphens only, 3–60 characters).
+Creator can preview the marketplace’s appearance before publishing.
+On publish, the marketplace is live and accessible at its URL. No listings or members exist yet beyond the creator.
+The marketplace name and URL slug are not editable after publishing.
+Notes
+The category list should be extensible. For V1, hardcode 8–10 categories and include “Other” with a free-text field.
+
+1.2 Listing Schema Builder
+The schema builder is the most consequential part of marketplace setup. It defines the structure every listing must follow, which in turn drives the entire search and filtering experience. The builder must be intuitive enough that a non-technical creator can define a comprehensive schema in 5 minutes.
+MC-2  Define the listing schema for my marketplace
+As a
+Marketplace Creator
+I want to
+build a custom form that defines what information listings in my marketplace should include
+So that
+all listings follow a consistent structure, enabling search, filtering, and comparison.
+Acceptance Criteria
+The schema builder opens with three pre-populated recommended fields: Title (Short Text), Price (Currency), and Images (Image Upload). These are suggestions, not locked — the creator can delete, reorder, or toggle any of them between required and optional.
+Creator can add, reorder, and remove fields via a drag-and-drop or list-based interface.
+Supported field types: Short Text, Long Text, Number, Currency (with currency selector), Single Select (dropdown), Multi-Select, Date, and Image Upload.
+For Select and Multi-Select fields, the creator defines the list of options.
+Each field can be marked as required or optional.
+Creator can set a display name and optional helper text for each field.
+For Image Upload fields, creator can configure a minimum and maximum number of images (default: min 1, max 10) and maximum file size (default: 5 MB per image).
+Creator can preview the listing form as a member would see it.
+The schema supports up to 25 custom fields.
+Notes
+No starter templates for V1. The pre-populated recommended fields (Title, Price, Images) give creators a starting point without prescribing structure. Category-based templates and AI-powered schema generation are future enhancements.
+
+MC-3  Edit the listing schema after launch
+As a
+Marketplace Creator
+I want to
+modify the listing schema after my marketplace has active listings
+So that
+I can evolve the schema as the community’s needs change without breaking existing listings.
+Acceptance Criteria
+Creator can add new optional fields at any time. Existing listings show the new field as empty.
+Creator can add new required fields. Existing listings are unaffected; the requirement applies only to new listings going forward.
+Creator can edit field names, helper text, and select/multi-select options. Changes apply immediately to the listing form and search filters.
+Creator can reorder fields. The new order is reflected in the listing form and detail view.
+Creator cannot delete a field if active listings use it. They can archive it (hidden from the creation form but preserved on existing listings and in search).
+Schema changes after the marketplace has active listings display a warning. A confirmation dialog explains the impact of each change before it’s saved.
+
+1.3 Membership Rules
+Membership rules determine who can join a marketplace and how. Every marketplace requires at least some gatekeeping — there is no open join mode. The creator selects exactly one entry method and configures identity verification requirements on top of it.
+MC-4  Configure the entry method for my marketplace
+As a
+Marketplace Creator
+I want to
+choose how new members join my marketplace
+So that
+I control the quality and trust level of my community from day one.
+Acceptance Criteria
+Creator selects exactly one of three entry methods: Application, Invite Link/Code, or Referral.
+Application: prospective members submit an application form with custom questions defined by the creator (see MC-5). Admins review and approve or reject.
+Invite Link/Code: members join via a unique invite link or alphanumeric code. Creator configures who can generate invites (admin-only or all members). Creator optionally sets a per-member invite cap. Invite links have configurable expiration (1 day, 7 days, 14 days, 30 days, never) and usage limits (single use, 10 uses, 25 uses, 50 uses, unlimited).
+Referral: any existing member can generate a referral link tied to their account. The referred person’s profile internally tracks who referred them (visible to admins, not displayed publicly). Creator configures whether referrals are auto-approved or require admin review. No per-member referral cap.
+Creator can change the entry method at any time. Changes apply to new members only; existing members are unaffected.
+
+MC-5  Define custom application questions
+As a
+Marketplace Creator
+I want to
+build an application form that prospective members must complete when applying to join
+So that
+I can gather the information I need to evaluate whether an applicant belongs in my community.
+Acceptance Criteria
+Creator can add any number of custom questions to the application form (no cap).
+Question field types match the schema builder: Short Text, Long Text, Number, Single Select (dropdown), Multi-Select, Date.
+Each question can be marked as required or optional.
+Creator can set a display name and helper text for each question.
+Application answers are visible only to the creator and admins. They are never displayed on the member’s profile or visible to other members.
+Creator can edit the application form at any time. Changes apply to new applications only; previously submitted applications retain their original questions and answers.
+Notes
+Application questions use the same field type components as the schema builder. One component, two use cases.
+
+MC-6  Configure identity verification requirements
+As a
+Marketplace Creator
+I want to
+choose which identity verification methods my marketplace requires
+So that
+every member’s identity is confirmed to a standard I trust, regardless of how they entered the marketplace.
+Acceptance Criteria
+Creator selects one or more verification providers from the available list: Facebook, Instagram, LinkedIn, X/Twitter, Google, and Phone (SMS).
+At least one provider must be selected. This is a platform-level requirement; no marketplace can operate without identity verification.
+Every member must complete all selected verifications before their application is processed, their invite is finalized, or their referral is accepted. The entry method determines how you find the door; verification determines whether you’re allowed through.
+Verification is binary: the account is linked via OAuth (or the phone number is verified via SMS), confirmed as valid, and displayed on the member’s profile. No additional metadata (follower count, account age) is surfaced in V1.
+A social account can only be linked to one Shouk account. If a member tries to link an account already tied to another Shouk user, the linkage is blocked with a clear error message.
+Verification is one-time for V1. Once a social account is linked or a phone number is verified, it remains verified. Periodic re-verification is a future enhancement.
+Creator can change verification requirements at any time. Changes apply to new members only; existing members are not required to re-verify.
+
+1.4 Community Migration
+Many Shouk creators will be migrating existing communities from WhatsApp, Facebook, or other platforms. Shouk provides two migration tools to reduce friction for both the creator and their existing members.
+MC-7  Migrate existing members via bulk invite
+As a
+Marketplace Creator
+I want to
+upload a list of my existing community members so they can join my Shouk marketplace with a streamlined experience
+So that
+my vetted members don’t have to go through the full application or referral process from scratch.
+Acceptance Criteria
+Creator uploads a CSV file containing member contact information. The CSV supports mixed identifier types: each row can contain an email address, a phone number, or both.
+Shouk validates the CSV and shows a preview: total rows, valid entries, duplicates, and errors. Creator confirms before sending.
+Each valid entry generates a unique, single-use invite link tied to that specific email or phone number.
+Invite links are sent via email (for email entries) or SMS (for phone entries). Shouk handles delivery.
+When a recipient clicks their invite link and creates a Shouk account, the platform verifies that their signup email or phone matches the one the invite was sent to. If it matches, they are confirmed as a pre-vetted member. If it doesn’t match, the link does not grant access.
+Pre-vetted members skip the marketplace’s entry method (application, invite, referral) but must still complete all identity verification requirements.
+Creator sets an expiration for the bulk invite batch (7, 14, or 30 days).
+Creator sees a migration dashboard showing: invites sent, accepted, pending, expired, and failed matches.
+Notes
+This is the high-security migration path. Use for communities where the creator has organized member data and wants tight matching.
+
+MC-8  Migrate existing members via migration code
+As a
+Marketplace Creator
+I want to
+generate a simple code I can share in my existing group so members can join quickly
+So that
+I can migrate a small, tight-knit community without needing a spreadsheet of contact info.
+Acceptance Criteria
+Creator generates a migration code — a short, shareable alphanumeric string.
+Creator sets a usage cap (e.g., 25, 50, 100, 200, 500 uses) and an expiration (7, 14, or 30 days).
+Members who use the code skip the marketplace’s entry method but must still complete all identity verification requirements.
+Creator can monitor usage: how many times the code has been used, how many remain, and who has joined using it.
+Creator can deactivate the code early at any time.
+Once the cap is hit or the code expires, it becomes inactive. Any attempt to use it shows a clear “Code expired or no longer valid” message.
+Notes
+This is the low-friction migration path. Best for smaller communities where the creator trusts the people who have access to the code. Less precise than bulk invite — the creator cannot verify who specifically used the code.
+
+1.5 Monetization
+Monetization is optional and simple for V1: a marketplace is either free to join or has a flat membership fee. No tiers, no permission gating — every member has equal access. This mirrors how these communities monetize today (a flat fee to join a WhatsApp group or Discord server).
+Shouk’s own revenue model (hosting fees, revenue share, a la carte features) is not in scope for the initial MVP. POC marketplaces run free.
+MC-9  Set up a membership fee for my marketplace
+As a
+Marketplace Creator
+I want to
+charge a membership fee so I can generate revenue from my community
+So that
+I can sustain and grow my marketplace while being compensated for the value I provide.
+Acceptance Criteria
+Creator chooses whether the marketplace is free or paid. This can be set during initial setup or added later.
+If paid, creator sets a price for one or both billing cadences: monthly and/or annual. If both are offered, the creator sets each price independently (annual is typically discounted but this is not enforced).
+Payment processing is handled via Stripe. Creator connects a Stripe account during monetization setup.
+All paying members have identical access and capabilities. There is no tier-based permission gating in V1.
+If a member’s payment fails, they receive email notifications at day 1, day 5, and day 7 of the grace period. After 7 days, their membership is suspended (listings hidden, access removed) until payment is resolved.
+Creator sees a revenue summary: total active paying members, monthly revenue, and churn rate.
+Notes
+Tiered pricing with permission gating is a future enhancement. Per-listing fees and promoted listings are also post-V1.
+
+MC-10  Add or change the membership fee on an existing marketplace
+As a
+Marketplace Creator
+I want to
+introduce a fee to a previously free marketplace, or change the fee amount
+So that
+I can evolve my monetization strategy as the community grows.
+Acceptance Criteria
+Creator can add a membership fee to a previously free marketplace at any time.
+When adding a fee, creator chooses how to handle existing free members: grandfather them (they retain free access indefinitely) or set a grace period after which they must pay to maintain access.
+Creator can change the fee amount at any time. Changes apply to new subscribers and at the next billing cycle for existing subscribers.
+Creator can remove the fee entirely, making the marketplace free. All existing paid subscriptions are canceled and members retain access.
+
+
+
+2. Membership & Identity
+This feature area covers how members create accounts, join marketplaces, verify their identity, and manage their profiles. A Shouk account is platform-level; marketplace memberships are per-marketplace.
+2.1 Account Creation
+MM-1  Create a Shouk account
+As a
+Marketplace Member
+I want to
+create a Shouk account so I can join one or more marketplaces
+So that
+I have a single identity across the platform that I can use to participate in multiple communities.
+Acceptance Criteria
+User can sign up with email and password or via Google OAuth.
+Email verification is required before the user can join any marketplace.
+User sets a display name (2–50 characters) and optionally uploads a profile photo.
+After account creation, the user is prompted to link verified social accounts and/or phone number. This can be deferred but is required before joining any marketplace that mandates those verification methods.
+Account creation takes no more than 3 steps (credentials → email verification → profile basics).
+Notes
+Shouk accounts are platform-level. Marketplace-specific profiles are created when a user joins a marketplace.
+
+2.2 Joining a Marketplace
+MM-2  Join a marketplace via application
+As a
+Marketplace Member
+I want to
+apply to a marketplace that requires an application
+So that
+I can demonstrate why I belong in the community.
+Acceptance Criteria
+Member navigates to the marketplace’s landing page and clicks “Apply to Join.”
+If the marketplace’s identity verification requirements are not yet met, the member is prompted to complete them first. The application form is not accessible until all verifications are linked.
+Member fills out the custom application form and submits.
+Member sees a “Pending Review” status on the marketplace. They receive a notification when approved or rejected.
+If rejected, the member can reapply immediately. The new application displays the member’s prior application history (dates applied, dates rejected, rejection reasons) to admins.
+
+MM-3  Join a marketplace via invite link or code
+As a
+Marketplace Member
+I want to
+use an invite link or code to join a marketplace
+So that
+I can quickly join a marketplace I’ve been invited to.
+Acceptance Criteria
+Member clicks an invite link or enters a code on the marketplace’s landing page.
+If the link/code is valid and has remaining uses, the member proceeds to identity verification (if not already completed).
+After verification, the member is added to the marketplace immediately. A marketplace-specific profile is created.
+If the link/code is expired, at capacity, or invalid, the member sees a clear error message with guidance (e.g., “Contact the marketplace admin for a new invite”).
+
+MM-4  Join a marketplace via referral
+As a
+Marketplace Member
+I want to
+join a marketplace that a current member has referred me to
+So that
+I can join a community endorsed by someone I know.
+Acceptance Criteria
+Member clicks a referral link generated by an existing member.
+The referral link is tied to the referring member’s account. Admins can see who referred the new member, but this is not displayed publicly.
+Member completes identity verification if not already done.
+If the marketplace is configured for auto-approved referrals, the member is added immediately. If admin review is required, the referral enters the application queue with the referrer’s name visible to admins.
+The referred member’s experience is identical regardless of approval mode — they either land in the marketplace or see “Pending Review.”
+
+2.3 Identity Verification
+MM-5  Link social accounts for identity verification
+As a
+Marketplace Member
+I want to
+connect my social accounts to my Shouk profile
+So that
+I can meet the verification requirements of marketplaces I want to join.
+Acceptance Criteria
+Member can initiate an OAuth flow for any of the six supported providers: Facebook, Instagram, LinkedIn, X/Twitter, Google, and Phone (SMS).
+On successful OAuth, the linked account’s display name and profile URL are stored and shown on the member’s marketplace profile(s) with a verified badge.
+A social account can only be linked to one Shouk account. Attempting to link an account already tied to another user displays a clear error: “This account is already associated with another Shouk user.”
+Member can unlink a social account at any time. If a marketplace they belong to requires that verification method, they receive a warning that unlinking may affect their membership status.
+For phone verification: member enters a mobile number and receives a 6-digit SMS code. Code expires after 10 minutes. New code available after 60 seconds. After 3 failed attempts, locked out for 15 minutes.
+Linked social profiles and verified phone numbers are visible to other members within the same marketplace.
+Notes
+Use a third-party SMS verification service (e.g., Twilio Verify). OAuth integrations needed for V1: Facebook, Instagram, LinkedIn, X/Twitter, Google.
+
+2.4 Member Profiles
+MM-6  View and edit my marketplace profile
+As a
+Marketplace Member
+I want to
+customize my profile within each marketplace I belong to
+So that
+other members can learn about me and reach me through my linked accounts.
+Acceptance Criteria
+Each marketplace membership has a profile displaying: display name, profile photo, verified accounts (social + phone), join date, number of active listings, and a brief bio (up to 250 characters, optional).
+Member can edit their bio and profile photo per marketplace. Display name and verified accounts sync from the platform-level Shouk account.
+The profile shows the member’s active and sold/closed listings within that marketplace.
+Contact information (linked social handles, phone number) is displayed to other members of the same marketplace.
+
+
+
+3. Listings & Discovery
+This feature area covers how members create, browse, search, and engage with listings. This is where Shouk must dramatically outperform WhatsApp and Facebook — the entire value proposition depends on structured data enabling a search and discovery experience that group chats cannot match.
+3.1 Listing Creation
+MM-7  Create a listing
+As a
+Marketplace Member
+I want to
+post an item using the marketplace’s structured listing form
+So that
+my listing is complete, consistent, and discoverable by other members.
+Acceptance Criteria
+Member is presented with the structured form defined by the marketplace creator.
+All required fields must be completed before the listing can be submitted.
+Image uploads support drag-and-drop and file picker. Images display in upload order (no reordering). Supported formats: JPG, PNG, WebP. Images are resized and optimized server-side.
+If the schema includes a required Image Upload field with a minimum count, the listing cannot be submitted until the minimum is met. Failed uploads show a clear error with a retry option. Successful uploads are never lost — only the failed ones need to be retried.
+The listing form auto-saves progress as a draft. If a member loses connectivity, closes the browser, or their session expires, their work is preserved and accessible from a “My Drafts” section.
+Drafts are private and visible only to the member. Admins cannot see drafts.
+On submission, the listing is immediately live and searchable (unless the marketplace has enabled listing moderation, in which case it enters a review queue).
+Member receives a confirmation with a direct link to their published listing.
+Currency fields auto-format with commas and two decimal places.
+
+MM-8  Edit, close, or delete my listing
+As a
+Marketplace Member
+I want to
+update the details of a listing I’ve posted or mark it as no longer available
+So that
+my listings stay accurate and I can signal when an item is sold or withdrawn.
+Acceptance Criteria
+Only active listings can be edited. Sold and Closed listings cannot be modified.
+Member can edit any field on an active listing: price, description, images, and all schema fields. This allows sellers to respond to market dynamics (e.g., price drops, condition changes) without deleting and relisting.
+Changes take effect immediately. If listing moderation is enabled, edits re-enter the moderation queue and the listing reverts to “Pending Review” until approved.
+After a listing is edited, it displays an “Edited” label with a timestamp (e.g., “Edited Mar 15, 2026 at 2:34 PM”) visible to all members. This provides transparency that the listing has been modified since it was originally posted.
+The edited timestamp updates each time the listing is modified. Only the most recent edit timestamp is displayed. Full edit history (what changed and when) is not visible to members in V1 but is logged internally.
+Member can mark a listing as “Sold” or “Closed.” Sold/Closed listings are no longer surfaced in default search results but remain viewable via direct link and on the member’s profile.
+Member can delete a listing entirely. Deletion is permanent after a confirmation dialog.
+Active auction listings cannot be edited once a bid has been placed. Auctions with zero bids can be edited or canceled by the seller.
+Notes
+Listing status lifecycle: Draft → Pending Review (if moderation enabled) → Active → Sold/Closed. Deleted is a terminal state. Editing is only available in the Active state. Full edit history with diff-level detail is a future enhancement; for V1, only the most recent edited timestamp is shown publicly.
+
+3.2 Search & Filtering
+MM-9  Search and filter listings
+As a
+Marketplace Member
+I want to
+find listings that match specific criteria using the schema fields as filters
+So that
+I can quickly discover items I’m interested in without scrolling through irrelevant results.
+Acceptance Criteria
+A search bar supports free-text keyword search across all text fields (title, description, short text, long text).
+Every schema field defined by the creator is available as a filter: dropdowns for Select fields, checkboxes for Multi-Select, range sliders for Number and Currency, date pickers for Date fields.
+Filters can be combined (AND logic). Active filters are displayed as removable chips/tags.
+Default sort order is newest first (most recently posted). Additional sort options: Price (low to high, high to low) and Relevance (default when a keyword search is active).
+Results display in a card grid (default) or list view. Each card shows the first uploaded image as the hero, title, price, and up to 3 additional schema fields configured by the creator as “card preview fields.”
+Search results load within 500ms for marketplaces with up to 50,000 listings.
+Empty state shows a clear message when no results match and suggests broadening filters.
+Notes
+Search infrastructure should use an indexing service (e.g., Algolia, Meilisearch, or Elasticsearch). Dynamic schemas mean indexes must be created/updated when creators modify their schema.
+
+3.3 Saved Searches & Alerts
+MM-10  Save a search and receive alerts
+As a
+Marketplace Member
+I want to
+save a combination of filters and get notified when new listings match
+So that
+I never miss an item I’m looking for, even when I’m not actively browsing.
+Acceptance Criteria
+After applying filters, a “Save Search” button appears. Member names the saved search (e.g., “Rolex Submariner under $10k”).
+Member can save up to 10 searches per marketplace.
+When a new listing matches a saved search—whether fixed-price or auction—the member receives a push notification (via PWA/native shell) and an optional email notification.
+Notification frequency options: Instant (each new match), Daily Digest, or Weekly Digest. Default is Instant.
+Member can view, edit, and delete saved searches from their profile or a dedicated “My Alerts” page.
+Saved searches respect all filter types including ranges and multi-selects.
+Instant notifications are delivered within 2 minutes of a matching listing being published.
+Notes
+Daily and weekly digests are batched and sent at a consistent time (configurable by the member).
+
+3.4 Listing Engagement
+MM-11  See engagement on my listing
+As a
+Marketplace Member
+I want to
+see how much interest my listing is getting
+So that
+I can gauge demand and adjust my pricing or description accordingly.
+Acceptance Criteria
+Each listing displays a view count visible only to the listing owner.
+Members can “Save” (bookmark) a listing. The save count is visible to the listing owner.
+The listing owner sees a simple engagement summary: total views, total saves, and a views-over-time sparkline (daily for the last 30 days).
+Saved listings appear in a “My Saves” section on the member’s profile for quick access.
+
+3.5 Auctions
+Auctions are a common format in niche marketplaces. Shouk treats auctions as a listing type alongside fixed-price listings, not a separate system. The same schema, search, and moderation infrastructure applies.
+MC-13  Enable auctions for a marketplace
+As a
+Marketplace Creator
+I want to
+enable auction-style listings in my marketplace and configure auction rules
+So that
+my community can use competitive bidding to determine fair market value for items.
+Acceptance Criteria
+Creator can enable or disable auctions in marketplace settings. Default is off.
+When enabled, members see both “Fixed Price” and “Auction” as listing type options when creating a new listing.
+Creator configures whether anti-snipe is on or off. When on, the auction clock extends by 5 minutes if a bid is placed in the final 5 minutes before close.
+Auction listings use the same schema fields as fixed-price listings. The same search filters, moderation rules, and saved search alerts apply to both listing types.
+
+MM-12  Create an auction listing
+As a
+Marketplace Member
+I want to
+list an item as an auction so buyers can compete to purchase it
+So that
+I can let the market determine the fair price for my item.
+Acceptance Criteria
+When creating a listing, seller selects “Auction” as the listing type.
+Seller sets a starting price, minimum bid increment, and a custom duration (any timeframe they choose).
+Seller can optionally set a reserve price. The reserve is hidden from bidders. The listing displays “Reserve not yet met” until bidding reaches the reserve, at which point it changes to “Reserve met.”
+The auction listing fills in the same schema fields as a fixed-price listing. All required fields must be completed.
+Auction listings appear in search results alongside fixed-price listings. They are visually distinguished with an “Auction” badge, current high bid, and time remaining.
+Auto-save and draft functionality works identically to fixed-price listings.
+
+MM-13  Place a bid and monitor an auction
+As a
+Marketplace Member
+I want to
+bid on an auction listing and track its progress in real time
+So that
+I can compete for items I want and stay informed about auction activity.
+Acceptance Criteria
+The auction detail page displays: item details (all schema fields), current high bid, total number of bids, time remaining (live countdown), full bid history with bidder display names and timestamps, and reserve status (“Reserve not yet met” or “Reserve met”).
+Member enters a bid amount. The bid must meet or exceed the current high bid plus the minimum increment. Invalid bids display a clear error.
+Bidding is manual only. No auto-bidding or proxy bids.
+All bids and bidder identities are visible to all marketplace members. Bid history is displayed in reverse chronological order.
+If anti-snipe is enabled and a bid is placed in the final 5 minutes, the auction clock extends by 5 minutes from the time of the bid. Extensions can occur multiple times.
+When the auction ends: if the reserve is met (or no reserve was set), the highest bidder wins. The winner and seller receive push and email notifications. The listing status changes to “Won.”
+If the reserve is not met, the auction closes with no winner. The listing status changes to “Closed — Reserve Not Met.” The seller can relist the item as a new auction or fixed-price listing.
+If no bids are placed, the auction closes with no winner. The seller can relist.
+Payment and exchange of goods happen off-platform, consistent with Shouk’s approach. The auction determines the winner and price; the parties handle the rest.
+Notes
+Auto-bidding (proxy bids) is a future enhancement. The bid history and countdown timer require real-time updates via WebSocket or polling.
+
+
+
+4. Admin & Moderation Tools
+This feature area covers how creators and admins manage members, moderate listings, and monitor marketplace activity. Admin tools must be practical for small teams — most POC marketplaces will have 1–3 admins.
+4.1 Application Review
+MA-1  Review and approve membership applications
+As a
+Marketplace Admin
+I want to
+review pending applications and approve or reject them with context
+So that
+I can maintain the quality and trust of my community.
+Acceptance Criteria
+Admins see a queue of pending applications sorted by submission date (oldest first).
+Each application shows: the applicant’s display name, verified accounts and phone number, responses to custom application questions, and any existing Shouk activity (other marketplaces they belong to, account age).
+If the applicant has applied before, their full application history is displayed: prior application dates, rejection dates, rejection reasons, and which admin handled each prior application.
+Admin can approve, reject, or request more information from the applicant.
+Rejection requires selecting a reason from a predefined list (e.g., “Insufficient verification,” “Does not meet criteria,” “Other”) with an optional custom message.
+Approved applicants receive a notification and can immediately access the marketplace. Rejected applicants receive a notification with the reason.
+Bulk actions: admin can select multiple applications and approve or reject them in one action.
+Application queue shows a count badge in the admin navigation.
+No assignment or claim mechanism — any admin can act on any application. Once acted on, it leaves the queue.
+Notes
+Rejected applicants can reapply immediately for V1. A creator-configurable cooldown period is a future enhancement.
+
+4.2 Member Management
+MA-2  Manage existing members
+As a
+Marketplace Admin
+I want to
+view, search, and take action on the current membership roster
+So that
+I can maintain a healthy community as it grows.
+Acceptance Criteria
+Admin sees a searchable, sortable member list with columns: display name, join date, number of active listings, last active date, and referrer (if applicable).
+Admin can view any member’s full marketplace profile including their verified accounts.
+Admin can suspend a member. Creator configures whether suspensions are timed (admin sets duration, auto-reinstated on expiry) or indefinite (admin manually lifts). During suspension, the member’s listings are hidden but not deleted. Access is removed until reinstatement.
+Admin can ban a member. Bans are permanent. All of the banned member’s listings are fully removed from the marketplace — they no longer appear in search, on the member’s profile, or via direct link.
+Suspension and ban actions require a reason (free text). The member is notified with the reason.
+Banning a member from one marketplace does not affect their membership in other Shouk marketplaces. Each marketplace is completely isolated.
+
+4.3 Listing Moderation
+MA-3  Moderate listings before they go live
+As a
+Marketplace Admin
+I want to
+optionally review new and edited listings before they’re published
+So that
+I can enforce quality standards and community rules.
+Acceptance Criteria
+Creator can enable or disable pre-publication moderation in marketplace settings. Default is off (listings go live immediately).
+When enabled, new and edited listings enter a moderation queue instead of going live.
+Each queued listing shows the full listing content, the submitting member’s profile, and any previous moderation actions on their listings.
+Admin can approve (listing goes live), reject (listing is returned to the member with feedback), or edit the listing directly (with changes visible to the member).
+Members see a “Pending Review” status on queued listings. They receive a notification on approval or rejection.
+Moderation queue shows a count badge in the admin navigation.
+No assignment mechanism — any admin can act on any queued listing.
+Notes
+Creator-defined moderation guidelines for admins are a future enhancement. For V1, admins use their own judgment.
+
+MA-4  Handle reported and flagged listings
+As a
+Marketplace Admin
+I want to
+review listings that have been reported by other members
+So that
+I can respond to community concerns and remove problematic content.
+Acceptance Criteria
+Any member can report a listing by selecting a reason: Spam, Misleading Information, Prohibited Item, Duplicate, or Other (with free text).
+Reports surface in a dedicated “Flagged Content” queue in the admin dashboard.
+Each flagged listing shows: the listing content, the reporter’s identity and reason, and the number of unique reports.
+A listing that reaches 3 unique reports is automatically hidden from search results until an admin reviews it. The listing owner is notified that their listing is under review.
+Admin can dismiss the report (listing is reinstated to search if it was auto-hidden), remove the listing, or suspend/ban the listing’s owner.
+The reporter receives a generic notification that their report was reviewed.
+A listing with 3+ reports is highlighted at the top of the flagged content queue.
+Notes
+The auto-hide threshold of 3 reports is a sensible default. Making this configurable per-marketplace is a future enhancement.
+
+4.4 Role Management
+MC-11  Assign admin roles and permissions
+As a
+Marketplace Creator
+I want to
+delegate moderation and management tasks to trusted members
+So that
+the marketplace can scale with more hands on deck.
+Acceptance Criteria
+Creator can promote any member to Admin. Admins have access to all moderation and member management tools by default.
+Creator can assign a more limited Moderator role with configurable permissions: can moderate listings (approve/reject/edit), can manage members (approve/reject applications, suspend), or both.
+Creator is the only role that can change marketplace settings (schema, membership rules, monetization, roles). This cannot be delegated in V1.
+Creator can demote an admin or moderator back to a regular member at any time.
+A marketplace can have up to 10 admins/moderators in V1.
+Notes
+Granular per-action permissions are a future enhancement.
+
+4.5 Activity Overview
+MA-5  View marketplace activity and health metrics
+As a
+Marketplace Admin
+I want to
+see a dashboard of key activity in my marketplace
+So that
+I understand how the marketplace is performing and where to focus my attention.
+Acceptance Criteria
+The admin dashboard displays: total members (with trend vs. prior 30 days), new member applications pending, active listings count, new listings in the last 7 and 30 days, flagged content queue count, and revenue summary (if monetization is enabled).
+All metrics refresh on page load (not real-time in V1).
+Clicking on any metric navigates to the relevant detail view (e.g., clicking “Pending Applications” goes to the application queue).
+Dashboard is accessible to the creator and all admins.
+Notes
+This is an overview dashboard, not a full analytics suite. Deeper analytics are post-V1.
+
+
+
+5. Marketplace Lifecycle
+This section covers edge cases and lifecycle events for the marketplace itself.
+MC-12  Deactivate or permanently delete my marketplace
+As a
+Marketplace Creator
+I want to
+take my marketplace offline temporarily or shut it down permanently
+So that
+I have full control over my marketplace’s existence.
+Acceptance Criteria
+Creator can deactivate a marketplace. Deactivation hides the marketplace from public view — it is no longer accessible via its URL, listings are not searchable, and no new members can join. Existing members see a “This marketplace is currently inactive” message. All data is retained.
+Creator can reactivate a deactivated marketplace at any time. All data, members, and listings are restored to their prior state.
+Creator can permanently delete a marketplace. Deletion requires typing the marketplace name as confirmation. All data (listings, member profiles within that marketplace, application history, revenue data) is permanently removed after a 30-day grace period. During the grace period, the creator can cancel the deletion.
+Members are notified when a marketplace is deactivated or scheduled for deletion.
+If the marketplace has active paying members, the creator must acknowledge that all subscriptions will be canceled before proceeding with deactivation or deletion.
+
+
+
+6. Non-Functional Requirements
+These requirements apply across all feature areas and define the quality bar for the MVP.
+6.1 Performance
+Page load (first meaningful paint): under 2 seconds on 4G connections.
+Search results: under 500ms for marketplaces with up to 50,000 listings.
+Image upload and optimization: under 5 seconds per image for files up to 5 MB.
+Alert notifications (instant mode): delivered within 2 minutes of a matching listing being published.
+Auto-save on listing forms: every 10 seconds or on field blur, whichever comes first.
+6.2 Responsiveness & Mobile
+All screens must be fully functional on viewports from 375px (iPhone SE) to desktop (1440px+).
+Touch targets must be at least 44×44 px on mobile.
+The PWA/Capacitor shell must support push notifications on iOS and Android.
+Home screen installation prompt should appear after the second visit.
+6.3 Security & Privacy
+All data in transit over HTTPS. Passwords hashed with bcrypt (minimum 12 rounds).
+OAuth tokens stored securely server-side; never exposed to the client.
+One social account per Shouk user. Duplicate linkage attempts are blocked.
+Rate limiting on authentication endpoints: 10 attempts per 15 minutes per IP.
+Rate limiting on SMS verification: 3 failed attempts triggers a 15-minute lockout.
+GDPR and CCPA considerations: members can export their data and request account deletion.
+Application answers are stored securely and visible only to marketplace admins. They are never exposed to other members.
+6.4 Accessibility
+WCAG 2.1 AA compliance for all public-facing pages.
+Keyboard navigation support for all interactive elements.
+Sufficient color contrast ratios (4.5:1 for normal text, 3:1 for large text).
+6.5 Data & Storage
+Image storage via a CDN-backed object store (e.g., S3 + CloudFront).
+Listing data and schema definitions stored in a relational database with JSON support (e.g., PostgreSQL with JSONB).
+Search indexes must stay in sync with the primary database within 30 seconds of a write.
+Marketplace isolation: a ban or suspension in one marketplace has no effect on membership in others.
+
+7. Key Design Decisions
+The following decisions were made during detailed flow review and are documented here for reference. They represent intentional choices, not oversights.
+No open join. Every marketplace requires at least one identity verification method. There is no mode where anyone can join without some form of vetting.
+No prescriptive templates. The schema builder does not offer pre-built templates for V1. Recommended default fields (Title, Price, Images) are editable and deletable. The creator defines their marketplace from a blank canvas with sensible suggestions.
+Single entry method. The creator selects exactly one entry method (Application, Invite, or Referral). Combining methods adds UX complexity without clear V1 value.
+Binary verification. Linked accounts are confirmed as valid via OAuth. No metadata (follower count, account age) is surfaced in V1.
+One-time verification. Linked accounts are not periodically re-checked in V1. This is a future enhancement.
+Duplicate account blocking. A social account can only be linked to one Shouk user. This prevents alt accounts and identity spoofing at the platform level.
+Flat membership fee. No tiers, no permission gating. Every member has equal access. Tiered pricing is a future enhancement.
+Marketplace isolation. A ban in one marketplace has no effect on the member’s standing in other marketplaces. Cross-marketplace reputation is a future consideration.
+No listing auto-expiration. Listings stay active until the member manually closes them.
+No image reordering. Images display in upload order. Members upload their best photo first.
+Auto-save on listing forms. Partial listing progress is automatically preserved as a draft to prevent data loss.
+Auto-hide on reports. Listings with 3+ unique reports are automatically hidden from search until an admin reviews them.
+Rejected applicants can reapply immediately. Admins see full application history including prior rejections. Creator-configurable cooldown periods are a future enhancement.
+Marketplace name and slug locked after publish. This prevents broken links and brand confusion.
+Shouk revenue model deferred. POC marketplaces run free. Hosting fees, revenue share, and à la carte features are not in scope for the initial MVP.
+Auctions are a listing type, not a separate system. Auction listings use the same schema, search, moderation, and alert infrastructure as fixed-price listings. Manual bids only; auto-bidding is a future enhancement.

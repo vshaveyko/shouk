@@ -1,0 +1,1688 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Shouks — Flow 1 · Auth & onboarding</title>
+
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44' fill='none'><path d='M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z' stroke='%230f1a2e' stroke-width='3' stroke-linejoin='round'/><circle cx='22' cy='22' r='5' fill='%234a7aff'/><circle cx='22' cy='10' r='3.2' fill='%230f1a2e'/><circle cx='32.4' cy='28' r='3.2' fill='%230f1a2e'/><circle cx='11.6' cy='28' r='3.2' fill='%230f1a2e'/></svg>"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Instrument+Serif&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: oklch(0.985 0.004 230);
+        --bg-soft: oklch(0.97 0.005 235);
+        --surface: #ffffff;
+        --ink: oklch(0.18 0.02 240);
+        --ink-soft: oklch(0.36 0.015 240);
+        --muted: oklch(0.56 0.012 240);
+        --line: oklch(0.92 0.006 240);
+        --line-soft: oklch(0.95 0.004 240);
+        --blue: oklch(0.62 0.17 242);
+        --blue-ink: oklch(0.42 0.15 244);
+        --blue-soft: oklch(0.62 0.17 242 / 0.08);
+        --hover: oklch(0.96 0.005 240);
+        --success: oklch(0.62 0.15 155);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: var(--bg-soft);
+        color: var(--ink);
+        font-family: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        font-feature-settings: "ss01", "cv11";
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      button {
+        font: inherit;
+        color: inherit;
+        background: none;
+        border: 0;
+        cursor: pointer;
+      }
+
+      /* ─── Flow shell ─── */
+      .flow-header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(255, 255, 255, 0.82);
+        backdrop-filter: saturate(1.4) blur(14px);
+        -webkit-backdrop-filter: saturate(1.4) blur(14px);
+        border-bottom: 1px solid var(--line);
+      }
+      .flow-inner {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 12px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      .flow-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+      .flow-title .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        font-size: 15px;
+        letter-spacing: -0.01em;
+      }
+      .flow-title .brand svg {
+        width: 22px;
+        height: 22px;
+        color: var(--ink);
+      }
+      .flow-title .divider {
+        width: 1px;
+        height: 18px;
+        background: var(--line);
+      }
+      .flow-title .label {
+        font-family: ui-monospace, monospace;
+        font-size: 11px;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+      .steps {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .step-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        font-size: 12.5px;
+        color: var(--ink-soft);
+        border: 1px solid transparent;
+        transition:
+          background 120ms,
+          color 120ms,
+          border-color 120ms;
+      }
+      .step-btn:hover {
+        background: var(--hover);
+        color: var(--ink);
+      }
+      .step-btn .num {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        display: inline-grid;
+        place-items: center;
+        background: var(--line);
+        color: var(--muted);
+        font-family: ui-monospace, monospace;
+        font-size: 10px;
+        font-weight: 600;
+      }
+      .step-btn.active {
+        background: var(--ink);
+        color: #fff;
+        border-color: var(--ink);
+      }
+      .step-btn.active .num {
+        background: var(--blue);
+        color: #fff;
+      }
+      .step-btn.done .num {
+        background: var(--success);
+        color: #fff;
+      }
+      .flow-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .flow-actions .ghost {
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        color: var(--ink-soft);
+      }
+      .flow-actions .ghost:hover {
+        background: var(--hover);
+        color: var(--ink);
+      }
+      .flow-actions .primary {
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        background: var(--ink);
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .flow-actions .primary:hover {
+        background: oklch(0.24 0.03 240);
+      }
+      .flow-actions .primary[disabled] {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      /* ─── Stage + screen ─── */
+      .stage {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 28px 24px 64px;
+      }
+      .screen-caption {
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+        margin-bottom: 16px;
+      }
+      .screen-caption .cap-num {
+        font-family: ui-monospace, monospace;
+        font-size: 11px;
+        color: var(--muted);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .screen-caption h2 {
+        margin: 0;
+        font-size: 20px;
+        letter-spacing: -0.02em;
+        font-weight: 600;
+      }
+      .screen-caption .sub {
+        font-size: 13.5px;
+        color: var(--ink-soft);
+      }
+
+      .screen-frame {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow:
+          0 1px 0 oklch(0.9 0.008 240 / 0.6),
+          0 24px 64px -32px oklch(0.1 0.03 240 / 0.25);
+      }
+      .screen-frame .browser-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--line);
+        background: var(--bg-soft);
+      }
+      .browser-bar .dots {
+        display: inline-flex;
+        gap: 6px;
+      }
+      .browser-bar .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: oklch(0.88 0.008 240);
+      }
+      .browser-bar .url {
+        flex: 1;
+        height: 26px;
+        border-radius: 7px;
+        background: #fff;
+        border: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        padding: 0 10px;
+        font-family: ui-monospace, monospace;
+        font-size: 11.5px;
+        color: var(--muted);
+        gap: 8px;
+      }
+      .browser-bar .url .lock {
+        width: 11px;
+        height: 11px;
+        color: var(--muted);
+      }
+
+      .app {
+        min-height: 720px;
+        background: var(--bg-soft);
+      }
+
+      /* ─── Shared Shouks nav (logged-in) ─── */
+      .navbar {
+        height: 60px;
+        background: rgba(255, 255, 255, 0.92);
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        padding: 0 24px;
+        gap: 24px;
+      }
+      .navbar .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        font-size: 16px;
+        letter-spacing: -0.01em;
+      }
+      .navbar .brand svg {
+        width: 24px;
+        height: 24px;
+        color: var(--ink);
+      }
+      .navbar .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-left: 12px;
+      }
+      .navbar .nav-links a {
+        padding: 7px 12px;
+        border-radius: 7px;
+        font-size: 14px;
+        color: var(--ink-soft);
+      }
+      .navbar .nav-links a.active {
+        color: var(--ink);
+        background: var(--hover);
+      }
+      .navbar .spacer {
+        flex: 1;
+      }
+      .navbar .search {
+        width: 320px;
+        height: 36px;
+        border-radius: 9px;
+        background: var(--bg-soft);
+        border: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .navbar .search svg {
+        width: 14px;
+        height: 14px;
+      }
+      .navbar .nav-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        display: grid;
+        place-items: center;
+        color: var(--ink-soft);
+      }
+      .navbar .nav-icon:hover {
+        background: var(--hover);
+        color: var(--ink);
+      }
+      .navbar .avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          oklch(0.7 0.15 25),
+          oklch(0.55 0.15 20)
+        );
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-weight: 600;
+        font-size: 12px;
+      }
+
+      /* =========================================================
+     SCREEN 1A — OAuth handoff (landing page + OAuth card)
+     ========================================================= */
+      .lp {
+        padding: 56px 24px 96px;
+        background:
+          radial-gradient(
+            1200px 400px at 50% -100px,
+            oklch(0.62 0.17 242 / 0.06),
+            transparent 60%
+          ),
+          var(--bg-soft);
+        min-height: 720px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .lp .wordmark {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        margin-bottom: 40px;
+      }
+      .lp .wordmark svg {
+        width: 28px;
+        height: 28px;
+        color: var(--ink);
+      }
+
+      .auth-card {
+        width: 420px;
+        max-width: 100%;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 32px;
+        box-shadow:
+          0 1px 0 oklch(0.9 0.008 240 / 0.5),
+          0 20px 48px -24px oklch(0.1 0.03 240 / 0.2);
+      }
+      .auth-card h1 {
+        font-family: "Instrument Serif", serif;
+        font-weight: 400;
+        font-size: 32px;
+        letter-spacing: -0.01em;
+        margin: 0 0 6px;
+        line-height: 1.1;
+      }
+      .auth-card .lede {
+        color: var(--ink-soft);
+        font-size: 14px;
+        line-height: 1.55;
+        margin: 0 0 24px;
+      }
+      .oauth-btn {
+        width: 100%;
+        height: 44px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--ink);
+        transition:
+          background 120ms,
+          border-color 120ms;
+        margin-bottom: 10px;
+      }
+      .oauth-btn:hover {
+        background: var(--hover);
+        border-color: oklch(0.86 0.008 240);
+      }
+      .oauth-btn:last-of-type {
+        margin-bottom: 0;
+      }
+      .oauth-btn svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .auth-legal {
+        margin-top: 22px;
+        font-size: 11.5px;
+        color: var(--muted);
+        text-align: center;
+        line-height: 1.6;
+      }
+      .auth-legal a {
+        color: var(--ink-soft);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+
+      /* Google handoff overlay */
+      .handoff {
+        position: absolute;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.86);
+        backdrop-filter: blur(6px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 220ms;
+      }
+      .handoff.on {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .handoff .spinner {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 2.5px solid var(--line);
+        border-top-color: var(--blue);
+        animation: spin 900ms linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .handoff .handoff-text {
+        font-size: 14px;
+        color: var(--ink-soft);
+      }
+      .handoff .handoff-text b {
+        color: var(--ink);
+        font-weight: 600;
+      }
+
+      /* Container for 1A so handoff can be positioned */
+      .screen-1a {
+        position: relative;
+      }
+
+      /* =========================================================
+     SCREEN 1B — New-user setup (lightweight)
+     ========================================================= */
+      .setup {
+        min-height: 720px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 56px 24px 64px;
+        background: var(--bg-soft);
+      }
+      .setup .wordmark {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        font-size: 15px;
+        margin-bottom: 28px;
+        color: var(--ink-soft);
+      }
+      .setup .wordmark svg {
+        width: 20px;
+        height: 20px;
+        color: var(--ink);
+      }
+
+      .setup-card {
+        width: 520px;
+        max-width: 100%;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 36px 36px 28px;
+        box-shadow:
+          0 1px 0 oklch(0.9 0.008 240 / 0.5),
+          0 20px 48px -24px oklch(0.1 0.03 240 / 0.18);
+      }
+      .setup-card h1 {
+        font-family: "Instrument Serif", serif;
+        font-weight: 400;
+        font-size: 30px;
+        letter-spacing: -0.01em;
+        margin: 0 0 6px;
+        line-height: 1.15;
+      }
+      .setup-card .lede {
+        color: var(--ink-soft);
+        font-size: 14px;
+        margin: 0 0 28px;
+      }
+
+      .setup-progress {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 28px;
+      }
+      .setup-progress .seg {
+        flex: 1;
+        height: 4px;
+        border-radius: 999px;
+        background: var(--line);
+      }
+      .setup-progress .seg.on {
+        background: var(--ink);
+      }
+
+      .avatar-up {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 28px;
+      }
+      .avatar-up .av {
+        width: 84px;
+        height: 84px;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          oklch(0.7 0.15 25),
+          oklch(0.55 0.15 20)
+        );
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-weight: 600;
+        font-size: 26px;
+        border: 2px solid var(--line);
+        position: relative;
+        cursor: pointer;
+      }
+      .avatar-up .av:hover::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.18);
+      }
+      .avatar-up .av-cam {
+        position: absolute;
+        right: -2px;
+        bottom: -2px;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: var(--ink);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        border: 2px solid #fff;
+      }
+      .avatar-up .av-cam svg {
+        width: 14px;
+        height: 14px;
+      }
+      .avatar-up .hint {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 16px;
+      }
+      .field label {
+        font-size: 12.5px;
+        color: var(--ink-soft);
+        font-weight: 500;
+      }
+      .field .req {
+        color: oklch(0.58 0.2 25);
+      }
+      .field input {
+        height: 42px;
+        border-radius: 9px;
+        border: 1px solid var(--line);
+        padding: 0 12px;
+        font: inherit;
+        font-size: 14px;
+        color: var(--ink);
+        background: #fff;
+        outline: none;
+        transition:
+          border-color 120ms,
+          box-shadow 120ms;
+      }
+      .field input:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 3px oklch(0.62 0.17 242 / 0.15);
+      }
+      .field input:disabled {
+        background: var(--bg-soft);
+        color: var(--ink-soft);
+        cursor: not-allowed;
+      }
+      .field .helper {
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+      .field.row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .field.row > div {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .setup-cta {
+        width: 100%;
+        height: 44px;
+        border-radius: 10px;
+        background: var(--ink);
+        color: #fff;
+        font-size: 14px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .setup-cta:hover {
+        background: oklch(0.24 0.03 240);
+      }
+      .setup-skip {
+        display: block;
+        width: 100%;
+        text-align: center;
+        margin-top: 14px;
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+      .setup-skip:hover {
+        color: var(--ink);
+      }
+
+      /* =========================================================
+     SCREEN 1C — Home dashboard (first-time empty-ish)
+     ========================================================= */
+      .dash {
+        padding: 32px 32px 64px;
+      }
+      .dash .welcome {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 26px;
+      }
+      .dash .welcome .kicker {
+        font-size: 12.5px;
+        color: var(--muted);
+        margin-bottom: 4px;
+      }
+      .dash .welcome h1 {
+        margin: 0;
+        font-size: 24px;
+        letter-spacing: -0.02em;
+        font-weight: 600;
+      }
+      .dash .btn-primary {
+        height: 36px;
+        padding: 0 14px;
+        border-radius: 9px;
+        background: var(--ink);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .dash .btn-primary:hover {
+        background: oklch(0.24 0.03 240);
+      }
+      .dash .btn-primary svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      /* Empty marketplaces block */
+      .empty-card {
+        background: var(--surface);
+        border: 1px dashed var(--line);
+        border-radius: 16px;
+        padding: 40px 32px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+        margin-bottom: 32px;
+      }
+      .empty-col h3 {
+        margin: 0 0 6px;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+      .empty-col p {
+        margin: 0 0 14px;
+        font-size: 13.5px;
+        color: var(--ink-soft);
+        line-height: 1.55;
+      }
+      .empty-col .col-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        background: var(--blue-soft);
+        color: var(--blue-ink);
+        display: grid;
+        place-items: center;
+        margin-bottom: 14px;
+      }
+      .empty-col .col-icon svg {
+        width: 18px;
+        height: 18px;
+      }
+      .empty-col .btn {
+        height: 34px;
+        padding: 0 12px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .btn-dark {
+        background: var(--ink);
+        color: #fff;
+      }
+      .btn-dark:hover {
+        background: oklch(0.24 0.03 240);
+      }
+      .btn-outline {
+        background: transparent;
+        border: 1px solid var(--line);
+        color: var(--ink);
+      }
+      .btn-outline:hover {
+        background: var(--hover);
+      }
+
+      /* Discover grid on dashboard */
+      .discover {
+        margin-top: 8px;
+      }
+      .discover-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+      .discover-head .kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--blue-ink);
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+      .discover-head .kicker svg {
+        width: 12px;
+        height: 12px;
+      }
+      .discover-head h2 {
+        margin: 0;
+        font-size: 18px;
+        letter-spacing: -0.01em;
+        font-weight: 600;
+      }
+      .discover-head p {
+        margin: 2px 0 0;
+        font-size: 13px;
+        color: var(--ink-soft);
+      }
+
+      .mp-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
+      .mp-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        overflow: hidden;
+        cursor: pointer;
+        transition:
+          transform 160ms,
+          box-shadow 160ms;
+      }
+      .mp-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 32px -20px oklch(0.1 0.03 240 / 0.25);
+      }
+      .mp-cover {
+        height: 104px;
+        position: relative;
+        overflow: hidden;
+      }
+      .mp-cover::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to top,
+          rgba(0, 0, 0, 0.45),
+          transparent 55%
+        );
+      }
+      .mp-badge {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        z-index: 1;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 3px 7px;
+        border-radius: 5px;
+        background: oklch(0.62 0.15 155);
+        color: #fff;
+        letter-spacing: 0.02em;
+      }
+      .mp-meta {
+        padding: 12px 14px 14px;
+      }
+      .mp-meta .title {
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+      .mp-meta .cat {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .mp-meta .stats {
+        display: flex;
+        gap: 10px;
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 8px;
+      }
+      .mp-meta .stats span::before {
+        content: "";
+        display: inline-block;
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: currentColor;
+        margin-right: 8px;
+        vertical-align: middle;
+        opacity: 0.5;
+      }
+      .mp-meta .stats span:first-child::before {
+        display: none;
+      }
+
+      /* ─── Footnote / mocknote strip ─── */
+      .mocknote {
+        max-width: 1280px;
+        margin: 28px auto 0;
+        padding: 0 24px;
+        font-size: 12.5px;
+        color: var(--muted);
+        line-height: 1.55;
+        display: flex;
+        gap: 12px;
+      }
+      .mocknote .tag {
+        font-family: ui-monospace, monospace;
+        font-size: 10.5px;
+        color: var(--blue-ink);
+        font-weight: 600;
+        background: var(--blue-soft);
+        padding: 2px 8px;
+        border-radius: 5px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        flex: none;
+        height: max-content;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="flow-header">
+      <div class="flow-inner">
+        <div class="flow-title">
+          <span class="brand">
+            <svg viewBox="0 0 44 44" fill="none">
+              <path
+                d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+                stroke="currentColor"
+                stroke-width="2.4"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+                stroke="currentColor"
+                stroke-width="2.4"
+                stroke-linecap="round"
+              />
+              <path
+                d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+              <circle cx="22" cy="22" r="3.4" fill="var(--blue)" />
+              <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+              <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+              <circle cx="11.6" cy="28" r="2.4" fill="currentColor" />
+            </svg>
+            Shouks
+          </span>
+          <span class="divider"></span>
+          <span class="label">Flow 1 · Auth &amp; onboarding</span>
+        </div>
+
+        <div class="steps" id="steps">
+          <button class="step-btn active" data-step="1a">
+            <span class="num">1</span> OAuth handoff
+          </button>
+          <button class="step-btn" data-step="1b">
+            <span class="num">2</span> New-user setup
+          </button>
+          <button class="step-btn" data-step="1c">
+            <span class="num">3</span> Dashboard
+          </button>
+        </div>
+
+        <div class="flow-actions">
+          <button class="ghost" id="prev">← Prev</button>
+          <button class="primary" id="next">Next <span>→</span></button>
+        </div>
+      </div>
+    </header>
+
+    <main class="stage">
+      <!-- ─── 1A ─── -->
+      <section class="screen" data-screen="1a">
+        <div class="screen-caption">
+          <span class="cap-num">01 / 03</span>
+          <h2>OAuth handoff</h2>
+          <span class="sub"
+            >Single CTA. Google handles sign-up vs sign-in invisibly.</span
+          >
+        </div>
+        <div class="screen-frame screen-1a">
+          <div class="browser-bar">
+            <div class="dots">
+              <span class="dot"></span><span class="dot"></span
+              ><span class="dot"></span>
+            </div>
+            <div class="url">
+              <svg
+                class="lock"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="11" width="18" height="11" rx="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              shouks.com / continue
+            </div>
+          </div>
+          <div class="app">
+            <div class="lp">
+              <div class="wordmark">
+                <svg viewBox="0 0 44 44" fill="none">
+                  <path
+                    d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+                    stroke="currentColor"
+                    stroke-width="2.4"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+                    stroke="currentColor"
+                    stroke-width="2.4"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  />
+                  <circle cx="22" cy="22" r="3.4" fill="var(--blue)" />
+                  <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+                  <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+                  <circle cx="11.6" cy="28" r="2.4" fill="currentColor" />
+                </svg>
+                Shouks
+              </div>
+
+              <div class="auth-card">
+                <h1>Continue to Shouks</h1>
+                <p class="lede">
+                  One account for joining marketplaces and running your own. New
+                  here? You'll be signed up automatically.
+                </p>
+
+                <button class="oauth-btn" id="googleBtn">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      fill="#4285F4"
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"
+                    />
+                    <path
+                      fill="#EA4335"
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                    />
+                  </svg>
+                  Continue with Google
+                </button>
+                <button class="oauth-btn">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      fill="#1877F2"
+                      d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.883v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"
+                    />
+                  </svg>
+                  Continue with Facebook
+                </button>
+                <button class="oauth-btn">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <defs>
+                      <radialGradient id="ig-grad" cx="30%" cy="107%" r="150%">
+                        <stop offset="0%" stop-color="#fdf497" />
+                        <stop offset="5%" stop-color="#fdf497" />
+                        <stop offset="45%" stop-color="#fd5949" />
+                        <stop offset="60%" stop-color="#d6249f" />
+                        <stop offset="90%" stop-color="#285AEB" />
+                      </radialGradient>
+                    </defs>
+                    <rect
+                      width="24"
+                      height="24"
+                      rx="5.5"
+                      fill="url(#ig-grad)"
+                    />
+                    <path
+                      fill="white"
+                      d="M12 7.2A4.8 4.8 0 1 0 12 16.8 4.8 4.8 0 0 0 12 7.2zm0 7.92A3.12 3.12 0 1 1 12 8.88 3.12 3.12 0 0 1 12 15.12zM17.04 7.08a1.12 1.12 0 1 1-2.24 0 1.12 1.12 0 0 1 2.24 0z"
+                    />
+                    <path
+                      fill="white"
+                      d="M16.2 2H7.8A5.8 5.8 0 0 0 2 7.8v8.4A5.8 5.8 0 0 0 7.8 22h8.4A5.8 5.8 0 0 0 22 16.2V7.8A5.8 5.8 0 0 0 16.2 2zm4.12 14.2a4.12 4.12 0 0 1-4.12 4.12H7.8a4.12 4.12 0 0 1-4.12-4.12V7.8A4.12 4.12 0 0 1 7.8 3.68h8.4A4.12 4.12 0 0 1 20.32 7.8v8.4z"
+                    />
+                  </svg>
+                  Continue with Instagram
+                </button>
+
+                <p class="auth-legal">
+                  By continuing you agree to our <a href="#">Terms</a> and
+                  <a href="#">Privacy Policy</a>.
+                </p>
+              </div>
+            </div>
+
+            <!-- Handoff overlay -->
+            <div class="handoff" id="handoff">
+              <div class="spinner"></div>
+              <div class="handoff-text">Redirecting to <b>Google</b>…</div>
+            </div>
+          </div>
+        </div>
+        <div class="mocknote">
+          <span class="tag">Notes</span>
+          <span
+            >Clicking <em>Continue with Google</em> shows a brief handoff state,
+            then returns to our app. New accounts drop into screen 2; returning
+            users skip straight to screen 3.</span
+          >
+        </div>
+      </section>
+
+      <!-- ─── 1B ─── -->
+      <section class="screen" data-screen="1b" hidden>
+        <div class="screen-caption">
+          <span class="cap-num">02 / 03</span>
+          <h2>New-user setup</h2>
+          <span class="sub"
+            >Lightweight. Name, phone, avatar — no role picker.</span
+          >
+        </div>
+        <div class="screen-frame">
+          <div class="browser-bar">
+            <div class="dots">
+              <span class="dot"></span><span class="dot"></span
+              ><span class="dot"></span>
+            </div>
+            <div class="url">
+              <svg
+                class="lock"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="11" width="18" height="11" rx="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              shouks.com / welcome
+            </div>
+          </div>
+          <div class="app">
+            <div class="setup">
+              <div class="wordmark">
+                <svg viewBox="0 0 44 44" fill="none">
+                  <path
+                    d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+                    stroke="currentColor"
+                    stroke-width="2.4"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+                    stroke="currentColor"
+                    stroke-width="2.4"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  />
+                  <circle cx="22" cy="22" r="3.4" fill="var(--blue)" />
+                  <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+                  <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+                  <circle cx="11.6" cy="28" r="2.4" fill="currentColor" />
+                </svg>
+                Shouks
+              </div>
+
+              <div class="setup-card">
+                <div class="setup-progress">
+                  <div class="seg on"></div>
+                  <div class="seg"></div>
+                </div>
+
+                <h1>Welcome, Jane.</h1>
+                <p class="lede">
+                  Set up your profile — this is what other members see when you
+                  list, bid, or message.
+                </p>
+
+                <div class="avatar-up">
+                  <div class="av">
+                    J
+                    <div class="av-cam">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path
+                          d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z"
+                        />
+                        <circle cx="12" cy="13" r="3.5" />
+                      </svg>
+                    </div>
+                  </div>
+                  <span class="hint">Add a profile photo</span>
+                </div>
+
+                <div class="field row">
+                  <div>
+                    <label>First name <span class="req">*</span></label>
+                    <input value="Jane" />
+                  </div>
+                  <div>
+                    <label>Last name</label>
+                    <input value="Chen" />
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>Email</label>
+                  <input value="jane.chen@gmail.com" disabled />
+                  <span class="helper">From your Google account</span>
+                </div>
+
+                <div class="field">
+                  <label>Phone number</label>
+                  <input placeholder="+1 (555) 000-0000" />
+                  <span class="helper"
+                    >Used for WhatsApp alerts on marketplaces that support
+                    them.</span
+                  >
+                </div>
+
+                <button class="setup-cta" id="continueSetup">Continue →</button>
+                <a href="#" class="setup-skip">I'll finish this later</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mocknote">
+          <span class="tag">Notes</span>
+          <span
+            >Name &amp; email are prefilled from Google. Everything else is
+            optional. No "are you a creator or member" fork — that distinction
+            doesn't exist in the product.</span
+          >
+        </div>
+      </section>
+
+      <!-- ─── 1C ─── -->
+      <section class="screen" data-screen="1c" hidden>
+        <div class="screen-caption">
+          <span class="cap-num">03 / 03</span>
+          <h2>Home dashboard — first visit</h2>
+          <span class="sub"
+            >Empty state that invites both paths without forking. Create a
+            marketplace or join one — same screen.</span
+          >
+        </div>
+        <div class="screen-frame">
+          <div class="browser-bar">
+            <div class="dots">
+              <span class="dot"></span><span class="dot"></span
+              ><span class="dot"></span>
+            </div>
+            <div class="url">
+              <svg
+                class="lock"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="11" width="18" height="11" rx="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              shouks.com /
+            </div>
+          </div>
+          <div class="app" style="background: var(--bg-soft)">
+            <!-- Navbar -->
+            <div class="navbar">
+              <a class="brand" href="#">
+                <svg viewBox="0 0 44 44" fill="none">
+                  <path
+                    d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+                    stroke="currentColor"
+                    stroke-width="2.4"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+                    stroke="currentColor"
+                    stroke-width="2.4"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  />
+                  <circle cx="22" cy="22" r="3.4" fill="var(--blue)" />
+                  <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+                  <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+                  <circle cx="11.6" cy="28" r="2.4" fill="currentColor" />
+                </svg>
+                Shouks
+              </a>
+              <nav class="nav-links">
+                <a href="#" class="active">Home</a>
+                <a href="#">Explore</a>
+                <a href="#">Messages</a>
+              </nav>
+              <div class="spacer"></div>
+              <div class="search">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.3-4.3" />
+                </svg>
+                Search marketplaces, listings…
+              </div>
+              <button class="nav-icon" aria-label="Notifications">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  width="18"
+                  height="18"
+                >
+                  <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                  <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                </svg>
+              </button>
+              <div class="avatar">J</div>
+            </div>
+
+            <div class="dash">
+              <div class="welcome">
+                <div>
+                  <div class="kicker">Welcome, Jane</div>
+                  <h1>Your marketplaces</h1>
+                </div>
+                <button class="btn-primary">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                  Create a marketplace
+                </button>
+              </div>
+
+              <div class="empty-card">
+                <div class="empty-col">
+                  <div class="col-icon">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M3 9 4.5 4h15L21 9" />
+                      <path d="M4 9v11h16V9" />
+                      <path d="M8 9a2 2 0 0 1-4 0" />
+                      <path d="M12 9a2 2 0 0 1-4 0" />
+                      <path d="M16 9a2 2 0 0 1-4 0" />
+                      <path d="M20 9a2 2 0 0 1-4 0" />
+                    </svg>
+                  </div>
+                  <h3>Run your own market.</h3>
+                  <p>
+                    Spin up a curated space for your community — set the rules,
+                    invite members, and get structured listings in minutes.
+                  </p>
+                  <button class="btn btn-dark">Create a marketplace →</button>
+                </div>
+                <div class="empty-col">
+                  <div class="col-icon">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="9" cy="8" r="3" />
+                      <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" />
+                      <circle cx="17" cy="7" r="2.4" />
+                      <path
+                        d="M13.5 14.5c1-1 2.2-1.5 3.5-1.5 2.5 0 4.5 2 4.5 4.5"
+                      />
+                    </svg>
+                  </div>
+                  <h3>Join one that exists.</h3>
+                  <p>
+                    Browse public communities already running on Shouks —
+                    Ferrari collectors, vintage denim, graded cards, and more.
+                  </p>
+                  <button class="btn btn-outline">
+                    Explore marketplaces →
+                  </button>
+                </div>
+              </div>
+
+              <div class="discover">
+                <div class="discover-head">
+                  <div>
+                    <div class="kicker">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M2 12h20" />
+                        <path d="M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20Z" />
+                      </svg>
+                      Discover
+                    </div>
+                    <h2>Public marketplaces</h2>
+                    <p>Communities accepting new members right now.</p>
+                  </div>
+                </div>
+
+                <div class="mp-grid">
+                  <!-- 4 cards -->
+                  <div class="mp-card">
+                    <div
+                      class="mp-cover"
+                      style="
+                        background: linear-gradient(
+                          135deg,
+                          oklch(0.55 0.17 25),
+                          oklch(0.3 0.1 25)
+                        );
+                      "
+                    >
+                      <span class="mp-badge">Public</span>
+                    </div>
+                    <div class="mp-meta">
+                      <div class="title">Ferrari Frenzy</div>
+                      <div class="cat">Collector vehicles</div>
+                      <div class="stats">
+                        <span>1,240 members</span><span>328 listings</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mp-card">
+                    <div
+                      class="mp-cover"
+                      style="
+                        background: linear-gradient(
+                          135deg,
+                          oklch(0.5 0.1 250),
+                          oklch(0.25 0.06 250)
+                        );
+                      "
+                    >
+                      <span class="mp-badge">Public</span>
+                    </div>
+                    <div class="mp-meta">
+                      <div class="title">Gooners United</div>
+                      <div class="cat">Football memorabilia</div>
+                      <div class="stats">
+                        <span>2,103 members</span><span>512 listings</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mp-card">
+                    <div
+                      class="mp-cover"
+                      style="
+                        background: linear-gradient(
+                          135deg,
+                          oklch(0.55 0.11 110),
+                          oklch(0.3 0.08 110)
+                        );
+                      "
+                    >
+                      <span class="mp-badge">Public</span>
+                    </div>
+                    <div class="mp-meta">
+                      <div class="title">Heritage Denim</div>
+                      <div class="cat">Vintage &amp; selvedge</div>
+                      <div class="stats">
+                        <span>684 members</span><span>192 listings</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mp-card">
+                    <div
+                      class="mp-cover"
+                      style="
+                        background: linear-gradient(
+                          135deg,
+                          oklch(0.6 0.14 60),
+                          oklch(0.3 0.08 60)
+                        );
+                      "
+                    >
+                      <span class="mp-badge">Public</span>
+                    </div>
+                    <div class="mp-meta">
+                      <div class="title">Graded &amp; Holo</div>
+                      <div class="cat">Trading cards</div>
+                      <div class="stats">
+                        <span>3,457 members</span><span>1,104 listings</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mocknote">
+          <span class="tag">Notes</span>
+          <span
+            >First-visit empty state deliberately shows <em>both</em> paths —
+            create and join — as equal-weight cards. After the user
+            joins/creates something, this empty block disappears and the layout
+            matches the authenticated dashboard you already have.</span
+          >
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const steps = ["1a", "1b", "1c"];
+      let cur = 0;
+
+      // Restore last
+      try {
+        const s = localStorage.getItem("shouks.flow1.step");
+        if (s) cur = Math.max(0, steps.indexOf(s));
+      } catch {}
+
+      const screens = document.querySelectorAll(".screen");
+      const stepBtns = document.querySelectorAll(".step-btn");
+      const prev = document.getElementById("prev");
+      const next = document.getElementById("next");
+
+      function render() {
+        screens.forEach(s => {
+          s.hidden = s.dataset.screen !== steps[cur];
+        });
+        stepBtns.forEach((b, i) => {
+          b.classList.toggle("active", i === cur);
+          b.classList.toggle("done", i < cur);
+        });
+        prev.disabled = cur === 0;
+        next.disabled = cur === steps.length - 1;
+        try {
+          localStorage.setItem("shouks.flow1.step", steps[cur]);
+        } catch {}
+        window.scrollTo({ top: 0, behavior: "instant" });
+      }
+
+      prev.addEventListener("click", () => {
+        if (cur > 0) {
+          cur--;
+          render();
+        }
+      });
+      next.addEventListener("click", () => {
+        if (cur < steps.length - 1) {
+          cur++;
+          render();
+        }
+      });
+      stepBtns.forEach((b, i) =>
+        b.addEventListener("click", () => {
+          cur = i;
+          render();
+        })
+      );
+
+      document.addEventListener("keydown", e => {
+        if (e.target.matches("input, textarea")) return;
+        if (e.key === "ArrowRight") next.click();
+        if (e.key === "ArrowLeft") prev.click();
+      });
+
+      // Google handoff fake
+      const gbtn = document.getElementById("googleBtn");
+      const handoff = document.getElementById("handoff");
+      gbtn?.addEventListener("click", e => {
+        e.preventDefault();
+        handoff.classList.add("on");
+        setTimeout(() => {
+          handoff.classList.remove("on");
+          cur = 1;
+          render();
+        }, 1100);
+      });
+
+      document
+        .getElementById("continueSetup")
+        ?.addEventListener("click", () => {
+          cur = 2;
+          render();
+        });
+
+      render();
+    </script>
+  </body>
+</html>

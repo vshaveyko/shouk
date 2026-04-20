@@ -1,0 +1,5014 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Shouks — Create a marketplace</title>
+
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><path d='M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z' fill='%2314212D' stroke='%2314212D' stroke-width='2.4' stroke-linejoin='round'/><circle cx='22' cy='22' r='3.4' fill='%234DB7E8'/><circle cx='22' cy='10' r='2.4' fill='%23fff'/><circle cx='32.4' cy='28' r='2.4' fill='%23fff'/><circle cx='11.6' cy='28' r='2.4' fill='%23fff'/></svg>"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        /* Palette — white/paper + graphite + Riviera Blue */
+        --bg: #ffffff;
+        --bg-soft: oklch(0.975 0.003 230);
+        --bg-panel: oklch(0.96 0.004 230);
+        --surface: #ffffff;
+        --line: oklch(0.9 0.005 230);
+        --line-soft: oklch(0.93 0.004 230);
+        --ink: oklch(0.2 0.02 240);
+        --ink-soft: oklch(0.38 0.02 240);
+        --muted: oklch(0.55 0.015 240);
+        --hover: oklch(0.95 0.005 230);
+
+        /* Riviera Blue — Porsche-inspired accent */
+        --blue: oklch(0.66 0.16 230);
+        --blue-ink: oklch(0.5 0.15 232);
+        --blue-soft: oklch(0.96 0.03 230);
+        --blue-softer: oklch(0.98 0.015 230);
+
+        /* States */
+        --success: oklch(0.58 0.12 155);
+        --warn: oklch(0.7 0.13 75);
+        --danger: oklch(0.55 0.18 25);
+
+        --r-sm: 6px;
+        --r: 10px;
+        --r-lg: 14px;
+        --shadow-sm: 0 1px 2px oklch(0.2 0.02 240 / 0.04);
+        --shadow:
+          0 1px 2px oklch(0.2 0.02 240 / 0.04),
+          0 2px 10px -6px oklch(0.2 0.02 240 / 0.08);
+        --shadow-lg: 0 8px 32px -12px oklch(0.2 0.02 240 / 0.15);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Inter Tight", system-ui, sans-serif;
+        background: var(--bg-panel);
+        color: var(--ink);
+        font-size: 13.5px;
+        line-height: 1.5;
+        letter-spacing: -0.005em;
+        -webkit-font-smoothing: antialiased;
+      }
+      button {
+        font: inherit;
+        color: inherit;
+        background: none;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        margin: 0;
+        font-weight: 500;
+        letter-spacing: -0.015em;
+        color: var(--ink);
+      }
+      input,
+      textarea,
+      select {
+        font: inherit;
+        color: inherit;
+      }
+
+      /* ===== Flow nav ===== */
+      .flow-nav {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: saturate(180%) blur(8px);
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 20px;
+      }
+      .flow-nav .fn-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .flow-nav .fn-title svg {
+        width: 20px;
+        height: 20px;
+        color: var(--ink);
+      }
+      .flow-nav .fn-title .slash {
+        color: var(--muted);
+        font-weight: 400;
+      }
+      .flow-nav .fn-title .flow {
+        color: var(--muted);
+        font-weight: 400;
+      }
+      .flow-nav .fn-steps {
+        display: flex;
+        gap: 4px;
+        margin-left: 16px;
+      }
+      .flow-nav .step-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 11px;
+        border-radius: 7px;
+        font-size: 12.5px;
+        color: var(--muted);
+        font-weight: 500;
+        border: 1px solid transparent;
+        white-space: nowrap;
+        flex: none;
+      }
+      .flow-nav .fn-steps {
+        flex-wrap: nowrap;
+      }
+      .flow-nav .fn-title {
+        white-space: nowrap;
+        flex: none;
+      }
+      .flow-nav .fn-actions button {
+        white-space: nowrap;
+      }
+      .flow-nav .step-btn .num {
+        display: inline-grid;
+        place-items: center;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--bg-soft);
+        border: 1px solid var(--line);
+        font-size: 10.5px;
+        font-weight: 600;
+        color: var(--muted);
+      }
+      .flow-nav .step-btn:hover {
+        color: var(--ink);
+        background: var(--hover);
+      }
+      .flow-nav .step-btn.active {
+        background: var(--ink);
+        color: #fff;
+      }
+      .flow-nav .step-btn.active .num {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: transparent;
+        color: #fff;
+      }
+      .flow-nav .step-btn.done .num {
+        background: var(--blue);
+        border-color: var(--blue);
+        color: #fff;
+      }
+      .flow-nav .spacer {
+        flex: 1;
+      }
+      .flow-nav .fn-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .flow-nav .fn-kb {
+        font-size: 11px;
+        color: var(--muted);
+        background: var(--bg-soft);
+        padding: 4px 8px;
+        border-radius: 5px;
+        border: 1px solid var(--line-soft);
+        font-family: ui-monospace, monospace;
+      }
+
+      /* ===== Browser frame ===== */
+      .screen-caption {
+        max-width: 1360px;
+        margin: 24px auto 10px;
+        padding: 0 20px;
+        display: flex;
+        align-items: baseline;
+        gap: 16px;
+      }
+      .screen-caption .cap-num {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        font-weight: 600;
+        font-family: ui-monospace, monospace;
+      }
+      .screen-caption h2 {
+        font-family: "Instrument Serif", serif;
+        font-weight: 400;
+        font-size: 22px;
+        letter-spacing: -0.005em;
+        color: var(--ink);
+        white-space: nowrap;
+        flex: none;
+      }
+      .screen-caption .sub {
+        font-size: 13px;
+        color: var(--muted);
+        margin-left: 6px;
+        max-width: 720px;
+      }
+      .screen-frame {
+        max-width: 1360px;
+        margin: 0 auto 20px;
+        padding: 0 20px;
+      }
+      .browser-bar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-bottom: 0;
+        border-radius: 12px 12px 0 0;
+        padding: 10px 14px;
+      }
+      .browser-bar .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .browser-bar .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--line);
+      }
+      .browser-bar .dots .dot:nth-child(1) {
+        background: oklch(0.75 0.12 25);
+      }
+      .browser-bar .dots .dot:nth-child(2) {
+        background: oklch(0.8 0.12 75);
+      }
+      .browser-bar .dots .dot:nth-child(3) {
+        background: oklch(0.75 0.12 150);
+      }
+      .browser-bar .url {
+        flex: 1;
+        height: 28px;
+        border-radius: 7px;
+        background: var(--bg-soft);
+        border: 1px solid var(--line-soft);
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        font-family: ui-monospace, monospace;
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+
+      .app {
+        background: var(--bg-soft);
+        border: 1px solid var(--line);
+        border-top: 0;
+        border-radius: 0 0 12px 12px;
+        overflow: hidden;
+        min-height: 820px;
+      }
+
+      .navbar {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 12px 22px;
+        background: #fff;
+        border-bottom: 1px solid var(--line);
+      }
+      .navbar .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        font-size: 15px;
+      }
+      .navbar .brand svg {
+        width: 22px;
+        height: 22px;
+        color: var(--ink);
+      }
+      .navbar .nav-links {
+        display: flex;
+        gap: 2px;
+      }
+      .navbar .nav-links a {
+        padding: 7px 12px;
+        border-radius: 7px;
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .navbar .nav-links a:hover,
+      .navbar .nav-links a.active {
+        color: var(--ink);
+        background: var(--hover);
+      }
+      .navbar .spacer {
+        flex: 1;
+      }
+      .navbar .avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--blue), oklch(0.42 0.13 232));
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        display: grid;
+        place-items: center;
+      }
+
+      /* ===== Wizard layout ===== */
+      .wiz-wrap {
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr) 340px;
+        max-width: 1280px;
+        margin: 0 auto;
+      }
+      .wiz-steps {
+        border-right: 1px solid var(--line);
+        padding: 32px 18px;
+        background: #fff;
+        min-height: 760px;
+      }
+      .wiz-steps .label {
+        font-size: 10px;
+        color: var(--muted);
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 0 12px 12px;
+      }
+      .wiz-step {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        position: relative;
+        cursor: pointer;
+      }
+      .wiz-step::before {
+        content: "";
+        position: absolute;
+        left: 24px;
+        top: 32px;
+        bottom: -8px;
+        width: 1px;
+        background: var(--line);
+      }
+      .wiz-step:last-child::before {
+        display: none;
+      }
+      .wiz-step .ball {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: #fff;
+        border: 1.5px solid var(--line);
+        display: grid;
+        place-items: center;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--muted);
+        flex: none;
+        position: relative;
+        z-index: 2;
+      }
+      .wiz-step .ball svg {
+        width: 12px;
+        height: 12px;
+        stroke-width: 3;
+      }
+      .wiz-step > div:last-child {
+        min-width: 0;
+      }
+      .wiz-step .t {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--ink-soft);
+        margin-top: 3px;
+        letter-spacing: -0.005em;
+        white-space: nowrap;
+        line-height: 1.2;
+      }
+      .wiz-step .s {
+        font-size: 11.5px;
+        color: var(--muted);
+        margin-top: 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.3;
+      }
+      .wiz-step.active {
+        background: var(--bg-soft);
+      }
+      .wiz-step.active .ball {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: #fff;
+      }
+      .wiz-step.active .t {
+        color: var(--ink);
+        font-weight: 600;
+      }
+      .wiz-step.done .ball {
+        background: var(--blue);
+        border-color: var(--blue);
+        color: #fff;
+      }
+      .wiz-step.done .t {
+        color: var(--ink);
+      }
+      .wiz-step:hover:not(.active) {
+        background: var(--bg-soft);
+      }
+
+      /* ===== Wizard body ===== */
+      .wiz-body {
+        padding: 40px 44px 32px;
+        min-height: 760px;
+        display: flex;
+        flex-direction: column;
+      }
+      .wiz-panel {
+        display: none;
+        flex: 1;
+      }
+      .wiz-panel.active {
+        display: block;
+      }
+
+      .wiz-head {
+        margin-bottom: 28px;
+      }
+      .wiz-head h1 {
+        font-family: "Instrument Serif", serif;
+        font-weight: 400;
+        font-size: 32px;
+        letter-spacing: -0.01em;
+        line-height: 1.1;
+        margin-bottom: 8px;
+      }
+      .wiz-head .sub {
+        font-size: 13.5px;
+        color: var(--muted);
+        max-width: 560px;
+      }
+
+      .field {
+        margin-bottom: 22px;
+      }
+      .field > label {
+        display: block;
+        font-size: 12.5px;
+        font-weight: 500;
+        color: var(--ink);
+        margin-bottom: 7px;
+      }
+      .field > label .req {
+        color: var(--blue-ink);
+      }
+      .field > label .opt {
+        color: var(--muted);
+        font-weight: 400;
+        font-size: 11.5px;
+        margin-left: 4px;
+      }
+
+      .input,
+      .textarea {
+        width: 100%;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 13.5px;
+        color: var(--ink);
+        transition:
+          border-color 0.12s,
+          box-shadow 0.12s;
+      }
+      .input:hover,
+      .textarea:hover {
+        border-color: oklch(0.85 0.01 230);
+      }
+      .input:focus,
+      .textarea:focus {
+        outline: 0;
+        border-color: var(--blue);
+        box-shadow: 0 0 0 3px oklch(0.66 0.16 230 / 0.15);
+      }
+      .textarea {
+        resize: none;
+        min-height: 84px;
+        font-family: inherit;
+        line-height: 1.5;
+      }
+      .input.with-prefix {
+        border-radius: 0 8px 8px 0;
+      }
+
+      .input-row {
+        display: flex;
+        align-items: stretch;
+      }
+      .input-row .prefix {
+        display: inline-flex;
+        align-items: center;
+        padding: 0 12px;
+        background: var(--bg-soft);
+        border: 1px solid var(--line);
+        border-right: 0;
+        border-radius: 8px 0 0 8px;
+        font-family: ui-monospace, monospace;
+        font-size: 12px;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+
+      .help {
+        font-size: 11.5px;
+        color: var(--muted);
+        margin-top: 6px;
+      }
+      .help.warn {
+        color: oklch(0.48 0.15 40);
+      }
+
+      .char-count {
+        font-size: 11px;
+        color: var(--muted);
+        text-align: right;
+        margin-top: 4px;
+      }
+
+      /* chips */
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .chip {
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: #fff;
+        border: 1px solid var(--line);
+        font-size: 12.5px;
+        font-weight: 500;
+        color: var(--muted);
+        cursor: pointer;
+        transition: all 0.12s;
+      }
+      .chip:hover {
+        border-color: oklch(0.85 0.01 230);
+        color: var(--ink);
+      }
+      .chip.on {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: #fff;
+      }
+
+      /* color + logo */
+      .color-logo-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+      }
+      .color-pick {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .color-pick .sw {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        border: 1px solid var(--line);
+        cursor: pointer;
+        box-shadow: inset 0 0 0 2px #fff;
+      }
+      .color-pick .input {
+        max-width: 128px;
+        font-family: ui-monospace, monospace;
+        font-size: 12.5px;
+      }
+      .color-swatches {
+        display: flex;
+        gap: 6px;
+        margin-top: 8px;
+      }
+      .color-swatches button {
+        width: 22px;
+        height: 22px;
+        border-radius: 5px;
+        border: 1px solid oklch(0.8 0.02 230 / 0.5);
+      }
+
+      .logo-drop {
+        border: 1.5px dashed var(--line);
+        border-radius: 12px;
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        background: #fff;
+        cursor: pointer;
+        transition: border-color 0.15s;
+      }
+      .logo-drop:hover {
+        border-color: var(--blue);
+        background: var(--blue-softer);
+      }
+      .logo-drop .ic {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: var(--bg-soft);
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+      }
+      .logo-drop .ic svg {
+        width: 20px;
+        height: 20px;
+      }
+      .logo-drop .t {
+        font-size: 12.5px;
+        color: var(--ink-soft);
+        font-weight: 500;
+      }
+      .logo-drop .s {
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      /* ===== Step 2: fields builder ===== */
+      .info-callout {
+        display: flex;
+        gap: 10px;
+        padding: 11px 14px;
+        background: var(--blue-softer);
+        border: 1px solid var(--blue-soft);
+        border-radius: 10px;
+        margin-bottom: 20px;
+      }
+      .info-callout svg {
+        width: 14px;
+        height: 14px;
+        color: var(--blue-ink);
+        flex: none;
+        margin-top: 2px;
+      }
+      .info-callout .txt {
+        font-size: 12.5px;
+        color: var(--blue-ink);
+        line-height: 1.5;
+      }
+
+      .section-label {
+        font-size: 10.5px;
+        color: var(--muted);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin: 20px 0 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .fld-row {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 8px;
+        display: grid;
+        grid-template-columns: 14px 1fr auto;
+        align-items: center;
+        gap: 12px;
+      }
+      .fld-row.locked {
+        opacity: 0.85;
+        background: var(--bg-soft);
+      }
+      .fld-row .drag {
+        color: var(--muted);
+        cursor: grab;
+      }
+      .fld-row .drag svg {
+        width: 14px;
+        height: 14px;
+      }
+      .fld-row .locked-spacer {
+        width: 14px;
+      }
+      .fld-main {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr auto;
+        gap: 10px;
+        align-items: center;
+      }
+      .fld-main .input {
+        padding: 7px 10px;
+        font-size: 12.5px;
+      }
+      .fld-main .select {
+        padding: 7px 10px;
+        font-size: 12.5px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        color: var(--ink-soft);
+        min-width: 140px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+      }
+      .fld-main .select svg {
+        width: 12px;
+        height: 12px;
+        color: var(--muted);
+        margin-left: auto;
+      }
+      .fld-main .tag-default {
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 7px;
+        border-radius: 4px;
+        background: var(--bg-panel);
+        color: var(--muted);
+        letter-spacing: 0.04em;
+      }
+      .fld-actions {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .mini-check {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .mini-check input {
+        width: 13px;
+        height: 13px;
+        accent-color: var(--blue);
+      }
+      .icon-btn {
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        border: 1px solid transparent;
+      }
+      .icon-btn:hover {
+        background: oklch(0.95 0.04 25);
+        color: oklch(0.48 0.15 25);
+      }
+      .icon-btn svg {
+        width: 13px;
+        height: 13px;
+      }
+
+      .fld-sub {
+        grid-column: 2 / -1;
+        display: flex;
+        gap: 14px;
+        padding-top: 2px;
+        align-items: center;
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+      .fld-sub .switch {
+        width: 28px;
+        height: 16px;
+        border-radius: 9px;
+        background: var(--line);
+        position: relative;
+        cursor: pointer;
+        flex: none;
+      }
+      .fld-sub .switch::after {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 1px 2px oklch(0 0 0 / 0.2);
+        transition: left 0.15s;
+      }
+      .fld-sub .switch.on {
+        background: var(--blue);
+      }
+      .fld-sub .switch.on::after {
+        left: 14px;
+      }
+
+      .add-field {
+        width: 100%;
+        padding: 11px;
+        border-radius: 10px;
+        border: 1.5px dashed var(--line);
+        background: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 12.5px;
+        color: var(--muted);
+        font-weight: 500;
+        transition: all 0.12s;
+      }
+      .add-field:hover {
+        border-color: var(--blue);
+        color: var(--blue-ink);
+        background: var(--blue-softer);
+      }
+      .add-field svg {
+        width: 13px;
+        height: 13px;
+      }
+
+      .fld-count {
+        font-size: 11.5px;
+        color: var(--muted);
+        text-align: right;
+        margin-top: 6px;
+      }
+
+      /* ===== Option picker (step 2 nested) ===== */
+      .options-area {
+        grid-column: 2 / -1;
+        background: var(--bg-soft);
+        border-radius: 7px;
+        padding: 10px 12px;
+        margin-top: 4px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+      }
+      .opt-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 5px 3px 9px;
+        border-radius: 999px;
+        background: #fff;
+        border: 1px solid var(--line);
+        font-size: 11.5px;
+        color: var(--ink);
+      }
+      .opt-pill button {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+      }
+      .opt-pill button:hover {
+        background: oklch(0.95 0.04 25);
+        color: oklch(0.48 0.15 25);
+      }
+      .opt-pill svg {
+        width: 9px;
+        height: 9px;
+        stroke-width: 3;
+      }
+      .opt-input-row {
+        display: inline-flex;
+        gap: 4px;
+        align-items: center;
+      }
+      .opt-input-row input {
+        padding: 4px 8px;
+        font-size: 11.5px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        width: 110px;
+      }
+      .opt-input-row input:focus {
+        outline: 0;
+        border-color: var(--blue);
+      }
+      .opt-input-row button {
+        padding: 4px 8px;
+        border-radius: 5px;
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--blue-ink);
+      }
+
+      /* ===== Step 3: radio cards ===== */
+      .radio-card {
+        display: grid;
+        grid-template-columns: 22px 1fr auto;
+        gap: 12px;
+        padding: 14px 16px;
+        margin-bottom: 8px;
+        background: #fff;
+        border: 1.5px solid var(--line);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.12s;
+        align-items: start;
+        text-align: left;
+        width: 100%;
+      }
+      .radio-card:hover {
+        border-color: oklch(0.85 0.01 230);
+      }
+      .radio-card.on {
+        border-color: var(--ink);
+        box-shadow: inset 0 0 0 1px var(--ink);
+      }
+      .radio-card .rc-ball {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 2px solid var(--line);
+        background: #fff;
+        display: grid;
+        place-items: center;
+        margin-top: 1px;
+      }
+      .radio-card.on .rc-ball {
+        border-color: var(--ink);
+      }
+      .radio-card.on .rc-ball::after {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--ink);
+      }
+      .radio-card .rc-t {
+        font-size: 13.5px;
+        font-weight: 600;
+        letter-spacing: -0.005em;
+        margin-bottom: 2px;
+      }
+      .radio-card .rc-s {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.45;
+        max-width: 520px;
+      }
+      .radio-card .rc-tag {
+        font-size: 10px;
+        font-weight: 600;
+        padding: 3px 7px;
+        border-radius: 4px;
+        background: var(--bg-soft);
+        color: var(--muted);
+        letter-spacing: 0.04em;
+      }
+      .radio-card.on .rc-tag {
+        background: var(--ink);
+        color: #fff;
+      }
+
+      /* verifications grid */
+      .verif-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+      }
+      .verif-chip {
+        display: flex;
+        gap: 10px;
+        padding: 10px 12px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        align-items: center;
+        cursor: pointer;
+      }
+      .verif-chip:hover {
+        border-color: oklch(0.85 0.01 230);
+      }
+      .verif-chip.on {
+        border-color: var(--blue);
+        background: var(--blue-softer);
+      }
+      .verif-chip .cb {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        border: 1.5px solid var(--line);
+        background: #fff;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        flex: none;
+      }
+      .verif-chip.on .cb {
+        background: var(--blue);
+        border-color: var(--blue);
+      }
+      .verif-chip .cb svg {
+        width: 10px;
+        height: 10px;
+        stroke-width: 3;
+        opacity: 0;
+      }
+      .verif-chip.on .cb svg {
+        opacity: 1;
+      }
+      .verif-chip .vi-ic {
+        width: 18px;
+        height: 18px;
+        color: var(--ink-soft);
+        flex: none;
+      }
+      .verif-chip .vi-t {
+        font-size: 12.5px;
+        font-weight: 500;
+      }
+
+      .q-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 8px;
+      }
+      .q-card .q-row {
+        display: flex;
+        gap: 10px;
+      }
+      .q-card .q-row .input {
+        padding: 7px 10px;
+        font-size: 12.5px;
+      }
+      .q-card .q-meta {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 10px;
+        margin-top: 10px;
+        border-top: 1px solid var(--line-soft);
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+      .q-card .rm {
+        color: var(--muted);
+        font-size: 11.5px;
+      }
+      .q-card .rm:hover {
+        color: oklch(0.48 0.15 25);
+      }
+
+      /* ===== Step 4 ===== */
+      .m-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 16px 18px;
+        margin-bottom: 14px;
+      }
+      .m-card-hd {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        gap: 16px;
+      }
+      .m-card-hd h3 {
+        font-size: 14px;
+        margin: 0 0 3px;
+        font-weight: 600;
+      }
+      .m-card-hd .s {
+        font-size: 12.5px;
+        color: var(--muted);
+        max-width: 520px;
+      }
+      .m-switch {
+        width: 36px;
+        height: 20px;
+        border-radius: 11px;
+        background: var(--line);
+        position: relative;
+        cursor: pointer;
+        flex: none;
+      }
+      .m-switch::after {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 1px 2px oklch(0 0 0 / 0.2);
+        transition: left 0.15s;
+      }
+      .m-switch.on {
+        background: var(--blue);
+      }
+      .m-switch.on::after {
+        left: 18px;
+      }
+
+      .m-body {
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px solid var(--line-soft);
+        display: none;
+      }
+      .m-card.on .m-body {
+        display: block;
+      }
+
+      .billing-toggle {
+        display: inline-flex;
+        background: var(--bg-soft);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 3px;
+        gap: 2px;
+        margin-bottom: 12px;
+      }
+      .billing-toggle button {
+        padding: 5px 12px;
+        border-radius: 5px;
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .billing-toggle button.on {
+        background: #fff;
+        color: var(--ink);
+        box-shadow: 0 1px 2px oklch(0 0 0 / 0.06);
+      }
+
+      .fee-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+      .fee-row .label {
+        width: 70px;
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+      .fee-row .currency {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .fee-row .input {
+        max-width: 100px;
+      }
+      .fee-row .suffix {
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+
+      .poc-note {
+        padding: 11px 14px;
+        background: var(--bg-soft);
+        border: 1px solid var(--line-soft);
+        border-radius: 10px;
+        font-size: 11.5px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      .poc-note b {
+        color: var(--ink-soft);
+        font-weight: 600;
+      }
+
+      /* ===== Step 5 Review ===== */
+      .rev-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        margin-bottom: 12px;
+        overflow: hidden;
+      }
+      .rev-hd {
+        padding: 13px 18px 11px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--bg-soft);
+        border-bottom: 1px solid var(--line-soft);
+      }
+      .rev-hd h3 {
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .rev-hd .edit {
+        font-size: 12px;
+        color: var(--blue-ink);
+        font-weight: 500;
+      }
+      .rev-body {
+        padding: 14px 18px;
+        font-size: 13px;
+      }
+      .rev-body .kv {
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        gap: 12px;
+        padding: 6px 0;
+      }
+      .rev-body .kv .k {
+        color: var(--muted);
+        font-size: 12.5px;
+      }
+      .rev-body .kv .v {
+        color: var(--ink);
+        font-weight: 500;
+      }
+      .rev-body .kv .v.mono {
+        font-family: ui-monospace, monospace;
+        font-size: 12.5px;
+        font-weight: 400;
+        color: var(--ink-soft);
+      }
+      .rev-id {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+      }
+      .rev-id .logo {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        background: linear-gradient(
+          135deg,
+          oklch(0.55 0.14 25),
+          oklch(0.3 0.1 25)
+        );
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-family: "Instrument Serif", serif;
+        font-size: 22px;
+        flex: none;
+      }
+      .rev-id .n {
+        font-family: "Instrument Serif", serif;
+        font-size: 22px;
+        font-weight: 400;
+        letter-spacing: -0.005em;
+        line-height: 1.1;
+      }
+      .rev-id .d {
+        font-size: 12.5px;
+        color: var(--muted);
+        margin-top: 3px;
+      }
+      .rev-id .cat {
+        display: inline-flex;
+        gap: 4px;
+        align-items: center;
+        margin-top: 6px;
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .rev-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+      .rev-badge {
+        font-size: 11.5px;
+        padding: 3px 9px;
+        border-radius: 999px;
+        background: var(--bg-soft);
+        border: 1px solid var(--line);
+        color: var(--ink-soft);
+        white-space: nowrap;
+      }
+      .rev-badge.required {
+        background: var(--ink);
+        color: #fff;
+        border-color: var(--ink);
+      }
+      .rev-badge.filter {
+        background: var(--blue-softer);
+        color: var(--blue-ink);
+        border-color: var(--blue-soft);
+      }
+
+      /* ===== Wiz footer ===== */
+      .wiz-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 22px;
+        margin-top: 24px;
+        border-top: 1px solid var(--line);
+        gap: 12px;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 9px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: -0.005em;
+        transition: all 0.12s;
+        border: 1px solid transparent;
+      }
+      .btn svg {
+        width: 13px;
+        height: 13px;
+      }
+      .btn-outline {
+        background: #fff;
+        color: var(--ink);
+        border-color: var(--line);
+      }
+      .btn-outline:hover {
+        background: var(--hover);
+        border-color: oklch(0.85 0.01 230);
+      }
+      .btn-dark {
+        background: var(--ink);
+        color: #fff;
+      }
+      .btn-dark:hover {
+        background: oklch(0.28 0.03 240);
+      }
+      .btn-primary {
+        background: var(--blue);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: var(--blue-ink);
+      }
+      .btn-ghost {
+        color: var(--muted);
+      }
+      .btn-ghost:hover {
+        color: var(--ink);
+        background: var(--hover);
+      }
+
+      /* ===== Preview pane ===== */
+      .preview {
+        border-left: 1px solid var(--line);
+        padding: 32px 26px;
+        background: #fff;
+        position: relative;
+      }
+      .preview .pv-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 10px;
+        color: var(--muted);
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 14px;
+      }
+      .preview .pv-label svg {
+        width: 10px;
+        height: 10px;
+      }
+      .pv-frame {
+        background: var(--bg-soft);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 14px;
+        box-shadow: var(--shadow);
+      }
+      .pv-mini-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 0 12px;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 12px;
+      }
+      .pv-mini-header .mp-thumb {
+        width: 28px;
+        height: 28px;
+        border-radius: 7px;
+        background: linear-gradient(
+          135deg,
+          oklch(0.55 0.14 25),
+          oklch(0.3 0.1 25)
+        );
+        color: #fff;
+        font-family: "Instrument Serif", serif;
+        font-size: 14px;
+        display: grid;
+        place-items: center;
+      }
+      .pv-mini-header > div:not(.mp-thumb) {
+        min-width: 0;
+        flex: 1;
+      }
+      .pv-mini-header .mp-n {
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: -0.005em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .pv-mini-header .mp-u {
+        font-family: ui-monospace, monospace;
+        font-size: 10.5px;
+        color: var(--muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .pv-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px;
+      }
+      .pv-title {
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        letter-spacing: -0.005em;
+      }
+      .pv-field {
+        margin-bottom: 10px;
+      }
+      .pv-field .fl {
+        font-size: 10.5px;
+        color: var(--muted);
+        font-weight: 500;
+        margin-bottom: 4px;
+        display: flex;
+        gap: 4px;
+        align-items: center;
+      }
+      .pv-field .fl .req {
+        color: var(--blue-ink);
+      }
+      .pv-field .fl .tip {
+        color: var(--muted);
+        font-weight: 400;
+        font-size: 10px;
+        margin-left: 6px;
+      }
+      .pv-field .fake-input {
+        height: 24px;
+        background: var(--bg-soft);
+        border-radius: 5px;
+        border: 1px solid var(--line-soft);
+      }
+      .pv-field .fake-ta {
+        height: 44px;
+        background: var(--bg-soft);
+        border-radius: 5px;
+        border: 1px solid var(--line-soft);
+      }
+      .pv-field .fake-num {
+        height: 24px;
+        width: 96px;
+        background: var(--bg-soft);
+        border-radius: 5px;
+        border: 1px solid var(--line-soft);
+      }
+      .pv-field .fake-upload {
+        height: 48px;
+        background: var(--bg-soft);
+        border-radius: 5px;
+        border: 1px dashed var(--line);
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        font-size: 10px;
+      }
+      .pv-field .fake-opts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+      .pv-field .fake-opt {
+        font-size: 10.5px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: #fff;
+        border: 1px solid var(--line);
+        color: var(--muted);
+      }
+      .pv-field .fake-switch {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 10.5px;
+        color: var(--muted);
+      }
+      .pv-field .fake-switch::before {
+        content: "";
+        width: 22px;
+        height: 12px;
+        border-radius: 7px;
+        background: var(--line);
+      }
+
+      /* ===== Success screen ===== */
+      .success-wrap {
+        max-width: 860px;
+        margin: 60px auto;
+        padding: 0 24px;
+        text-align: center;
+      }
+      .success-wrap .seal {
+        width: 88px;
+        height: 88px;
+        border-radius: 50%;
+        background: var(--blue-softer);
+        display: grid;
+        place-items: center;
+        margin: 0 auto 26px;
+        position: relative;
+      }
+      .success-wrap .seal::after {
+        content: "";
+        position: absolute;
+        inset: -6px;
+        border-radius: 50%;
+        border: 2px solid var(--blue-soft);
+      }
+      .success-wrap .seal svg {
+        width: 40px;
+        height: 40px;
+        color: var(--blue);
+        stroke-width: 2.5;
+      }
+      .success-wrap h1 {
+        font-family: "Instrument Serif", serif;
+        font-weight: 400;
+        font-size: 40px;
+        line-height: 1.1;
+        letter-spacing: -0.01em;
+        margin-bottom: 12px;
+      }
+      .success-wrap h1 em {
+        font-style: italic;
+        color: var(--blue-ink);
+      }
+      .success-wrap .lead {
+        font-size: 14px;
+        color: var(--muted);
+        max-width: 540px;
+        margin: 0 auto 32px;
+      }
+
+      .sx-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 22px 26px;
+        text-align: left;
+        margin-bottom: 16px;
+      }
+      .sx-card h3 {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 10px;
+      }
+      .sx-link {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        padding: 10px 14px;
+        background: var(--bg-soft);
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        font-family: ui-monospace, monospace;
+        font-size: 13px;
+      }
+      .sx-link .url {
+        flex: 1;
+        color: var(--ink);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .sx-link button {
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-size: 11.5px;
+        color: var(--ink);
+        font-weight: 500;
+        background: #fff;
+        border: 1px solid var(--line);
+        font-family: "Inter Tight", sans-serif;
+      }
+      .sx-link button:hover {
+        background: var(--hover);
+      }
+
+      .sx-next {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 12px;
+        margin-top: 6px;
+      }
+      .sx-next a {
+        display: block;
+        padding: 18px;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        transition: all 0.15s;
+      }
+      .sx-next a:hover {
+        border-color: var(--blue);
+        box-shadow: var(--shadow);
+      }
+      .sx-next .nx-ic {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: var(--blue-softer);
+        color: var(--blue-ink);
+        display: grid;
+        place-items: center;
+        margin-bottom: 10px;
+      }
+      .sx-next .nx-ic svg {
+        width: 16px;
+        height: 16px;
+      }
+      .sx-next .nx-t {
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 3px;
+        letter-spacing: -0.005em;
+      }
+      .sx-next .nx-s {
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+
+      /* ===== Misc ===== */
+      .divider {
+        height: 1px;
+        background: var(--line);
+        margin: 24px 0;
+      }
+      .mocknote {
+        max-width: 1360px;
+        margin: -12px auto 32px;
+        padding: 0 20px;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      .mocknote .tag {
+        padding: 2px 7px;
+        border-radius: 4px;
+        background: var(--bg-soft);
+        border: 1px solid var(--line-soft);
+        font-weight: 600;
+        color: var(--ink-soft);
+        font-size: 10.5px;
+        letter-spacing: 0.04em;
+        flex: none;
+      }
+      .mocknote b {
+        color: var(--ink-soft);
+        font-weight: 600;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Top flow nav -->
+    <div class="flow-nav">
+      <div class="fn-title">
+        <svg viewBox="0 0 44 44" fill="none">
+          <path
+            d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+            stroke="currentColor"
+            stroke-width="2.4"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+            stroke="currentColor"
+            stroke-width="2.4"
+            stroke-linecap="round"
+          />
+          <path
+            d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
+          <circle cx="22" cy="22" r="3.4" fill="var(--blue)" />
+          <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+          <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+          <circle cx="11.6" cy="28" r="2.4" fill="currentColor" />
+        </svg>
+        <b>Shouks</b>
+        <span class="slash">/</span>
+        <span class="flow">Flow 02 · Create a marketplace</span>
+      </div>
+      <div class="fn-steps">
+        <button class="step-btn active" data-step="2a">
+          <span class="num">1</span> Identity
+        </button>
+        <button class="step-btn" data-step="2b">
+          <span class="num">2</span> Listing fields
+        </button>
+        <button class="step-btn" data-step="2c">
+          <span class="num">3</span> Membership
+        </button>
+        <button class="step-btn" data-step="2d">
+          <span class="num">4</span> Monetization
+        </button>
+        <button class="step-btn" data-step="2e">
+          <span class="num">5</span> Review
+        </button>
+        <button class="step-btn" data-step="2f">
+          <span class="num">6</span> Published
+        </button>
+      </div>
+      <div class="spacer"></div>
+      <div class="fn-actions">
+        <span class="fn-kb">← →</span>
+      </div>
+    </div>
+
+    <!-- ================= 2A · IDENTITY ================= -->
+    <section class="screen" data-screen="2a">
+      <div class="screen-caption">
+        <span class="cap-num">01 / 06</span>
+        <h2>Identity</h2>
+        <span class="sub"
+          >Name, URL, description, category, brand color, logo. Name &amp; URL
+          can't change after publish.</span
+        >
+      </div>
+      <div class="screen-frame">
+        <div class="browser-bar">
+          <div class="dots">
+            <span class="dot"></span><span class="dot"></span
+            ><span class="dot"></span>
+          </div>
+          <div class="url">shouks.com / new-marketplace / identity</div>
+        </div>
+        <div class="app">
+          <div class="navbar">
+            <a class="brand" href="#"
+              ><svg viewBox="0 0 44 44" fill="none">
+                <path
+                  d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+                <circle cx="22" cy="22" r="3.4" fill="var(--blue)" />
+                <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+                <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+                <circle cx="11.6" cy="28" r="2.4" fill="currentColor" /></svg
+              >Shouks</a
+            >
+            <nav class="nav-links">
+              <a href="#">Explore</a><a href="#">Messages</a>
+            </nav>
+            <div class="spacer"></div>
+            <button class="btn btn-ghost">Save &amp; exit</button>
+            <div class="avatar">J</div>
+          </div>
+
+          <div class="wiz-wrap">
+            <!-- Steps rail -->
+            <div class="wiz-steps">
+              <div class="label">Create a marketplace</div>
+              <div class="wiz-step active">
+                <div class="ball">1</div>
+                <div>
+                  <div class="t">Identity</div>
+                  <div class="s">Name, slug, brand</div>
+                </div>
+              </div>
+              <div class="wiz-step">
+                <div class="ball">2</div>
+                <div>
+                  <div class="t">Listing fields</div>
+                  <div class="s">Schema builder</div>
+                </div>
+              </div>
+              <div class="wiz-step">
+                <div class="ball">3</div>
+                <div>
+                  <div class="t">Membership</div>
+                  <div class="s">Who can join</div>
+                </div>
+              </div>
+              <div class="wiz-step">
+                <div class="ball">4</div>
+                <div>
+                  <div class="t">Monetization</div>
+                  <div class="s">Membership fees</div>
+                </div>
+              </div>
+              <div class="wiz-step">
+                <div class="ball">5</div>
+                <div>
+                  <div class="t">Review</div>
+                  <div class="s">Publish</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Body -->
+            <div class="wiz-body">
+              <div class="wiz-head">
+                <h1>Let's name your marketplace.</h1>
+                <div class="sub">
+                  Start with the basics. Everything here except name &amp; URL
+                  can be changed later.
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Marketplace name <span class="req">*</span></label>
+                <input
+                  class="input"
+                  value="Air-Cooled Ferraris"
+                  placeholder="e.g., Chrono Collective"
+                />
+                <div class="help">
+                  3–100 characters. This is what shows on your page and in the
+                  browse directory.
+                </div>
+              </div>
+
+              <div class="field">
+                <label>URL <span class="req">*</span></label>
+                <div class="input-row">
+                  <span class="prefix">shouks.com /</span>
+                  <input
+                    class="input with-prefix"
+                    value="air-cooled-ferraris"
+                  />
+                </div>
+                <div class="help warn">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    width="11"
+                    height="11"
+                    style="vertical-align: -1px; margin-right: 2px"
+                  >
+                    <path d="M12 9v4M12 17h.01" />
+                    <circle cx="12" cy="12" r="10" /></svg
+                  >Cannot be changed after publishing. Lowercase letters,
+                  numbers, and hyphens only.
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Description <span class="opt">Optional</span></label>
+                <textarea
+                  class="textarea"
+                  placeholder="Tell people what your marketplace is about…"
+                >
+A members-only community for owners and enthusiasts of pre-1998 Ferraris. Verified sellers, structured service histories, no brokers.</textarea
+                >
+                <div class="char-count">172 / 500</div>
+              </div>
+
+              <div class="field">
+                <label>Category <span class="req">*</span></label>
+                <div class="chip-row">
+                  <button class="chip">Watches</button>
+                  <button class="chip">Trading cards</button>
+                  <button class="chip on">Vehicles</button>
+                  <button class="chip">Apparel</button>
+                  <button class="chip">Sneakers</button>
+                  <button class="chip">Electronics</button>
+                  <button class="chip">Art &amp; collectibles</button>
+                  <button class="chip">Jewelry</button>
+                  <button class="chip">Home &amp; design</button>
+                  <button class="chip">Memorabilia</button>
+                  <button class="chip">Other…</button>
+                </div>
+              </div>
+
+              <div class="color-logo-row">
+                <div class="field">
+                  <label>Brand color <span class="opt">Optional</span></label>
+                  <div class="color-pick">
+                    <div
+                      class="sw"
+                      style="background: oklch(0.55 0.17 25)"
+                    ></div>
+                    <input
+                      class="input"
+                      value="#B8361E"
+                      style="max-width: 128px"
+                    />
+                  </div>
+                  <div class="color-swatches">
+                    <button style="background: oklch(0.55 0.17 25)"></button>
+                    <button style="background: oklch(0.66 0.16 230)"></button>
+                    <button style="background: oklch(0.22 0.05 240)"></button>
+                    <button style="background: oklch(0.6 0.14 105)"></button>
+                    <button style="background: oklch(0.55 0.14 280)"></button>
+                    <button style="background: oklch(0.55 0.14 60)"></button>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>Logo <span class="opt">Optional</span></label>
+                  <div class="logo-drop">
+                    <div class="ic">
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <path d="M17 8 12 3 7 8" />
+                        <path d="M12 3v12" />
+                      </svg>
+                    </div>
+                    <div class="t">Click to upload or drag &amp; drop</div>
+                    <div class="s">
+                      PNG, JPG, up to 2MB. Square format recommended.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="wiz-footer">
+                <button class="btn btn-ghost">← Cancel</button>
+                <div>
+                  <button class="btn btn-dark" data-goto="2b">
+                    Continue to listing fields
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Preview pane -->
+            <aside class="preview">
+              <div class="pv-label">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
+                </svg>
+                Preview
+              </div>
+              <div class="pv-frame">
+                <div class="pv-mini-header">
+                  <div
+                    class="mp-thumb"
+                    style="
+                      background: linear-gradient(
+                        135deg,
+                        oklch(0.55 0.17 25),
+                        oklch(0.3 0.1 25)
+                      );
+                    "
+                  >
+                    A
+                  </div>
+                  <div style="min-width: 0">
+                    <div class="mp-n">Air-Cooled Ferraris</div>
+                    <div class="mp-u">shouks.com/air-cooled-ferraris</div>
+                  </div>
+                </div>
+                <div
+                  class="pv-card"
+                  style="
+                    background: linear-gradient(
+                      135deg,
+                      oklch(0.55 0.17 25 / 0.08),
+                      oklch(0.3 0.1 25 / 0.04)
+                    );
+                    border-color: oklch(0.55 0.17 25 / 0.2);
+                    padding: 18px;
+                  "
+                >
+                  <div
+                    style="
+                      font-family: &quot;Instrument Serif&quot;, serif;
+                      font-size: 22px;
+                      letter-spacing: -0.005em;
+                      line-height: 1.1;
+                      margin-bottom: 6px;
+                    "
+                  >
+                    Air-Cooled Ferraris
+                  </div>
+                  <div
+                    style="
+                      font-size: 11.5px;
+                      color: var(--muted);
+                      margin-bottom: 12px;
+                      display: flex;
+                      gap: 8px;
+                      align-items: center;
+                    "
+                  >
+                    <span
+                      style="
+                        padding: 2px 7px;
+                        background: #fff;
+                        border: 1px solid var(--line);
+                        border-radius: 4px;
+                        font-weight: 600;
+                        color: var(--ink-soft);
+                        font-size: 10.5px;
+                      "
+                      >VEHICLES</span
+                    >
+                    <span>·</span><span>0 members</span>
+                  </div>
+                  <div
+                    style="
+                      font-size: 11.5px;
+                      color: var(--ink-soft);
+                      line-height: 1.5;
+                    "
+                  >
+                    A members-only community for owners and enthusiasts of
+                    pre-1998 Ferraris…
+                  </div>
+                </div>
+                <div
+                  style="
+                    font-size: 10.5px;
+                    color: var(--muted);
+                    text-align: center;
+                    margin-top: 10px;
+                  "
+                >
+                  Your marketplace card — shown in Explore and shared links
+                </div>
+              </div>
+
+              <div
+                style="
+                  margin-top: 24px;
+                  padding-top: 20px;
+                  border-top: 1px solid var(--line-soft);
+                "
+              >
+                <div class="pv-label">Checklist</div>
+                <div
+                  style="
+                    font-size: 12.5px;
+                    color: var(--ink-soft);
+                    line-height: 1.9;
+                  "
+                >
+                  <div>
+                    <span style="color: var(--blue); margin-right: 6px">✓</span>
+                    Name set
+                  </div>
+                  <div>
+                    <span style="color: var(--blue); margin-right: 6px">✓</span>
+                    URL confirmed
+                  </div>
+                  <div>
+                    <span style="color: var(--blue); margin-right: 6px">✓</span>
+                    Description added
+                  </div>
+                  <div>
+                    <span style="color: var(--blue); margin-right: 6px">✓</span>
+                    Category selected
+                  </div>
+                  <div>
+                    <span style="color: var(--muted); margin-right: 6px"
+                      >○</span
+                    >
+                    Logo (recommended)
+                  </div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+      <div class="mocknote">
+        <span class="tag">Notes</span
+        ><span
+          >Identity pane with live preview of the marketplace card. The
+          right-hand preview updates as the owner types. <b>Color</b> &amp;
+          <b>logo</b> are optional but strongly signaled — a good marketplace
+          card is the difference between "published and found" vs "published and
+          empty."</span
+        >
+      </div>
+    </section>
+
+    <!-- ================= 2B · LISTING FIELDS ================= -->
+    <section class="screen" data-screen="2b" hidden>
+      <div class="screen-caption">
+        <span class="cap-num">02 / 06</span>
+        <h2>Listing fields</h2>
+        <span class="sub"
+          >The schema every listing in this marketplace will follow — Shouks's
+          differentiator. 3 defaults, up to 22 custom.</span
+        >
+      </div>
+      <div class="screen-frame">
+        <div class="browser-bar">
+          <div class="dots">
+            <span class="dot"></span><span class="dot"></span
+            ><span class="dot"></span>
+          </div>
+          <div class="url">shouks.com / new-marketplace / listing-fields</div>
+        </div>
+        <div class="app">
+          <div class="navbar">
+            <a class="brand" href="#"
+              ><svg viewBox="0 0 44 44" fill="none">
+                <path
+                  d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+                <circle cx="22" cy="22" r="3.4" fill="var(--blue)" />
+                <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+                <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+                <circle cx="11.6" cy="28" r="2.4" fill="currentColor" /></svg
+              >Shouks</a
+            >
+            <nav class="nav-links">
+              <a href="#">Explore</a><a href="#">Messages</a>
+            </nav>
+            <div class="spacer"></div>
+            <button class="btn btn-ghost">Save &amp; exit</button>
+            <div class="avatar">J</div>
+          </div>
+
+          <div class="wiz-wrap">
+            <div class="wiz-steps">
+              <div class="label">Create a marketplace</div>
+              <div class="wiz-step done">
+                <div class="ball">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="t">Identity</div>
+                  <div class="s">Air-Cooled Ferraris</div>
+                </div>
+              </div>
+              <div class="wiz-step active">
+                <div class="ball">2</div>
+                <div>
+                  <div class="t">Listing fields</div>
+                  <div class="s">Schema builder</div>
+                </div>
+              </div>
+              <div class="wiz-step">
+                <div class="ball">3</div>
+                <div>
+                  <div class="t">Membership</div>
+                  <div class="s">Who can join</div>
+                </div>
+              </div>
+              <div class="wiz-step">
+                <div class="ball">4</div>
+                <div>
+                  <div class="t">Monetization</div>
+                  <div class="s">Membership fees</div>
+                </div>
+              </div>
+              <div class="wiz-step">
+                <div class="ball">5</div>
+                <div>
+                  <div class="t">Review</div>
+                  <div class="s">Publish</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="wiz-body">
+              <div class="wiz-head">
+                <h1>What does a listing need?</h1>
+                <div class="sub">
+                  Every listing in <b>Air-Cooled Ferraris</b> will follow this
+                  schema. Title, price, and images are always included — add the
+                  structured fields that matter for your category.
+                </div>
+              </div>
+
+              <div class="info-callout">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 8v4M12 16h.01" />
+                </svg>
+                <div class="txt">
+                  A well-designed schema is the single best investment you can
+                  make. Buyers filter and search by these fields — more
+                  structure means better discovery and fewer lowball questions.
+                </div>
+              </div>
+
+              <div class="section-label">Default fields</div>
+              <div class="fld-row locked">
+                <div class="locked-spacer"></div>
+                <div class="fld-main">
+                  <input class="input" value="Title" readonly />
+                  <button class="select">
+                    Short text
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </button>
+                  <span class="tag-default">DEFAULT</span>
+                </div>
+                <div class="fld-actions"></div>
+              </div>
+              <div class="fld-row locked">
+                <div class="locked-spacer"></div>
+                <div class="fld-main">
+                  <input class="input" value="Price" readonly />
+                  <button class="select">
+                    Currency
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </button>
+                  <span class="tag-default">DEFAULT</span>
+                </div>
+                <div class="fld-actions"></div>
+              </div>
+              <div class="fld-row locked">
+                <div class="locked-spacer"></div>
+                <div class="fld-main">
+                  <input class="input" value="Images" readonly />
+                  <button class="select">
+                    Image upload
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </button>
+                  <span class="tag-default">DEFAULT</span>
+                </div>
+                <div class="fld-actions"></div>
+              </div>
+
+              <div class="section-label">
+                <span style="white-space: nowrap">Custom fields</span
+                ><span
+                  style="
+                    color: var(--ink-soft);
+                    font-weight: 500;
+                    text-transform: none;
+                    letter-spacing: 0;
+                    white-space: nowrap;
+                  "
+                  >· drag to reorder</span
+                >
+              </div>
+
+              <div class="fld-row">
+                <div class="drag">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="9" cy="5" r="1" />
+                    <circle cx="9" cy="12" r="1" />
+                    <circle cx="9" cy="19" r="1" />
+                    <circle cx="15" cy="5" r="1" />
+                    <circle cx="15" cy="12" r="1" />
+                    <circle cx="15" cy="19" r="1" />
+                  </svg>
+                </div>
+                <div class="fld-main">
+                  <input class="input" value="Model year" />
+                  <button class="select">
+                    Number
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </button>
+                  <label class="mini-check"
+                    ><input type="checkbox" checked /> Required</label
+                  >
+                </div>
+                <div class="fld-actions">
+                  <button class="icon-btn" title="Remove">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <div class="fld-sub">
+                  <span>Seller tip:</span
+                  ><input
+                    class="input"
+                    style="
+                      flex: 1;
+                      max-width: 380px;
+                      padding: 5px 9px;
+                      font-size: 11.5px;
+                    "
+                    value="Use the year stamped on the chassis plate — not the reg/title year"
+                  />
+                  <span class="switch on" style="margin-left: auto"></span
+                  ><span>Show as filter</span>
+                </div>
+              </div>
+
+              <div class="fld-row">
+                <div class="drag">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="9" cy="5" r="1" />
+                    <circle cx="9" cy="12" r="1" />
+                    <circle cx="9" cy="19" r="1" />
+                    <circle cx="15" cy="5" r="1" />
+                    <circle cx="15" cy="12" r="1" />
+                    <circle cx="15" cy="19" r="1" />
+                  </svg>
+                </div>
+                <div class="fld-main">
+                  <input class="input" value="Model" />
+                  <button class="select">
+                    Single select
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </button>
+                  <label class="mini-check"
+                    ><input type="checkbox" checked /> Required</label
+                  >
+                </div>
+                <div class="fld-actions">
+                  <button class="icon-btn">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <div class="options-area">
+                  <span class="opt-pill"
+                    >246 GT/GTS
+                    <button>
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                      >
+                        <path d="M18 6 6 18M6 6l12 12" />
+                      </svg></button
+                  ></span>
+                  <span class="opt-pill"
+                    >308 GTB/GTS
+                    <button>
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                      >
+                        <path d="M18 6 6 18M6 6l12 12" />
+                      </svg></button
+                  ></span>
+                  <span class="opt-pill"
+                    >328 GTB/GTS
+                    <button>
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                      >
+                        <path d="M18 6 6 18M6 6l12 12" />
+                      </svg></button
+                  ></span>
+                  <span class="opt-pill"
+                    >348 TB/TS
+                    <button>
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                      >
+                        <path d="M18 6 6 18M6 6l12 12" />
+                      </svg></button
+                  ></span>
+                  <span class="opt-pill"
+                    >512 BB/TR
+                    <button>
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                      >
+                        <path d="M18 6 6 18M6 6l12 12" />
+                      </svg></button
+                  ></span>
+                  <span class="opt-pill"
+                    >F355
+                    <button>
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                      >
+                        <path d="M18 6 6 18M6 6l12 12" />
+                      </svg></button
+                  ></span>
+                  <span class="opt-pill"
+                    >F40 / F50
+                    <button>
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                      >
+                        <path d="M18 6 6 18M6 6l12 12" />
+                      </svg></button
+                  ></span>
+                  <div class="opt-input-row">
+                    <input placeholder="Add option…" />
+                    <button>+ Add</button>
+                  </div>
+                </div>
+                <div class="fld-sub">
+                  <span class="switch on" style="margin-left: auto"></span
+                  ><span>Show as filter</span>
+                </div>
+              </div>
+
+              <div class="fld-row">
+                <div class="drag">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="9" cy="5" r="1" />
+                    <circle cx="9" cy="12" r="1" />
+                    <circle cx="9" cy="19" r="1" />
+                    <circle cx="15" cy="5" r="1" />
+                    <circle cx="15" cy="12" r="1" />
+                    <circle cx="15" cy="19" r="1" />
+                  </svg>
+                </div>
+                <div class="fld-main">
+                  <input class="input" value="Transmission" />
+                  <button class="select">
+                    Single select
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </button>
+                  <label class="mini-check"
+                    ><input type="checkbox" checked /> Required</label
+                  >
+                </div>
+                <div class="fld-actions">
+                  <button class="icon-btn">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <div class="options-area">
+                  <span class="opt-pill"
+                    >5-speed manual
+                    <button>
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                      >
+                        <path d="M18 6 6 18M6 6l12 12" />
+                      </svg></button
+                  ></span>
+                  <span class="opt-pill"
+                    >6-speed manual
+                    <button>
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                      >
+                        <path d="M18 6 6 18M6 6l12 12" />
+                      </svg></button
+                  ></span>
+                  <span class="opt-pill"
+                    >F1 paddle
+                    <button>
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                      >
+                        <path d="M18 6 6 18M6 6l12 12" />
+                      </svg></button
+                  ></span>
+                  <div class="opt-input-row">
+                    <input placeholder="Add option…" />
+                    <button>+ Add</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="fld-row">
+                <div class="drag">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="9" cy="5" r="1" />
+                    <circle cx="9" cy="12" r="1" />
+                    <circle cx="9" cy="19" r="1" />
+                    <circle cx="15" cy="5" r="1" />
+                    <circle cx="15" cy="12" r="1" />
+                    <circle cx="15" cy="19" r="1" />
+                  </svg>
+                </div>
+                <div class="fld-main">
+                  <input class="input" value="Mileage (km)" />
+                  <button class="select">
+                    Number
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </button>
+                  <label class="mini-check"
+                    ><input type="checkbox" checked /> Required</label
+                  >
+                </div>
+                <div class="fld-actions">
+                  <button class="icon-btn">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <div class="fld-sub">
+                  <span>Seller tip:</span
+                  ><input
+                    class="input"
+                    style="
+                      flex: 1;
+                      max-width: 380px;
+                      padding: 5px 9px;
+                      font-size: 11.5px;
+                    "
+                    value="Odometer at time of listing. Note km vs mi in description if needed."
+                  />
+                  <span class="switch on" style="margin-left: auto"></span
+                  ><span>Show as filter</span>
+                </div>
+              </div>
+
+              <div class="fld-row">
+                <div class="drag">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="9" cy="5" r="1" />
+                    <circle cx="9" cy="12" r="1" />
+                    <circle cx="9" cy="19" r="1" />
+                    <circle cx="15" cy="5" r="1" />
+                    <circle cx="15" cy="12" r="1" />
+                    <circle cx="15" cy="19" r="1" />
+                  </svg>
+                </div>
+                <div class="fld-main">
+                  <input class="input" value="Service history" />
+                  <button class="select">
+                    Long text
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </button>
+                  <label class="mini-check"
+                    ><input type="checkbox" checked /> Required</label
+                  >
+                </div>
+                <div class="fld-actions">
+                  <button class="icon-btn">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <div class="fld-sub">
+                  <span>Seller tip:</span
+                  ><input
+                    class="input"
+                    style="
+                      flex: 1;
+                      max-width: 380px;
+                      padding: 5px 9px;
+                      font-size: 11.5px;
+                    "
+                    value="List major services, belts, valve adjustments, with dates &amp; mileage"
+                  />
+                  <span class="switch" style="margin-left: auto"></span
+                  ><span>Show as filter</span>
+                </div>
+              </div>
+
+              <div class="fld-row">
+                <div class="drag">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="9" cy="5" r="1" />
+                    <circle cx="9" cy="12" r="1" />
+                    <circle cx="9" cy="19" r="1" />
+                    <circle cx="15" cy="5" r="1" />
+                    <circle cx="15" cy="12" r="1" />
+                    <circle cx="15" cy="19" r="1" />
+                  </svg>
+                </div>
+                <div class="fld-main">
+                  <input class="input" value="Matching numbers" />
+                  <button class="select">
+                    Yes / No
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </button>
+                  <label class="mini-check"
+                    ><input type="checkbox" /> Required</label
+                  >
+                </div>
+                <div class="fld-actions">
+                  <button class="icon-btn">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <div class="fld-sub">
+                  <span class="switch on" style="margin-left: auto"></span
+                  ><span>Show as filter</span>
+                </div>
+              </div>
+
+              <button class="add-field" style="margin-top: 12px">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M12 5v14M5 12h14" /></svg
+                >Add field
+              </button>
+              <div class="fld-count">9 of 25 fields used</div>
+
+              <!-- Listing rules (auctions moved here) -->
+              <div class="section-label" style="margin-top: 32px">
+                <span style="white-space: nowrap">Listing rules</span
+                ><span
+                  style="
+                    color: var(--ink-soft);
+                    font-weight: 500;
+                    text-transform: none;
+                    letter-spacing: 0;
+                    white-space: nowrap;
+                  "
+                  >· optional</span
+                >
+              </div>
+              <div class="m-card on" style="margin-bottom: 0">
+                <div class="m-card-hd">
+                  <div>
+                    <h3>Enable auctions</h3>
+                    <div class="s">
+                      Members can list items as auctions alongside fixed-price
+                      listings. Buyers bid; the highest bid at close wins.
+                    </div>
+                  </div>
+                  <div class="m-switch on"></div>
+                </div>
+                <div class="m-body">
+                  <div
+                    style="
+                      display: flex;
+                      justify-content: space-between;
+                      align-items: flex-start;
+                      gap: 16px;
+                    "
+                  >
+                    <div>
+                      <h3
+                        style="
+                          font-size: 13px;
+                          font-weight: 600;
+                          margin: 0 0 3px;
+                        "
+                      >
+                        Anti-snipe protection
+                      </h3>
+                      <div
+                        style="
+                          font-size: 12px;
+                          color: var(--muted);
+                          max-width: 440px;
+                        "
+                      >
+                        When a bid is placed in the last 2 minutes, the auction
+                        extends by 2 minutes. Prevents last-second sniping and
+                        gives legitimate bidders a fair chance to respond.
+                      </div>
+                    </div>
+                    <div class="m-switch on"></div>
+                  </div>
+                  <div
+                    style="
+                      margin-top: 14px;
+                      padding-top: 14px;
+                      border-top: 1px solid var(--line-soft);
+                      display: flex;
+                      justify-content: space-between;
+                      align-items: flex-start;
+                      gap: 16px;
+                    "
+                  >
+                    <div>
+                      <h3
+                        style="
+                          font-size: 13px;
+                          font-weight: 600;
+                          margin: 0 0 3px;
+                        "
+                      >
+                        Reserve prices
+                      </h3>
+                      <div
+                        style="
+                          font-size: 12px;
+                          color: var(--muted);
+                          max-width: 440px;
+                        "
+                      >
+                        Allow sellers to set a hidden minimum. If bids don't
+                        reach it, the auction ends without a sale.
+                      </div>
+                    </div>
+                    <div class="m-switch on"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="wiz-footer">
+                <button class="btn btn-outline" data-goto="2a">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                  </svg>
+                  Back
+                </button>
+                <button class="btn btn-dark" data-goto="2c">
+                  Continue to membership
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Preview pane for step 2 -->
+            <aside class="preview">
+              <div class="pv-label">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
+                </svg>
+                Seller's create-listing form
+              </div>
+              <div class="pv-frame">
+                <div class="pv-card">
+                  <div class="pv-title">New listing · Air-Cooled Ferraris</div>
+                  <div class="pv-field">
+                    <div class="fl">Title <span class="req">*</span></div>
+                    <div class="fake-input"></div>
+                  </div>
+                  <div class="pv-field">
+                    <div class="fl">Price <span class="req">*</span></div>
+                    <div class="fake-num"></div>
+                  </div>
+                  <div class="pv-field">
+                    <div class="fl">Images <span class="req">*</span></div>
+                    <div class="fake-upload">+ Upload</div>
+                  </div>
+                  <div class="pv-field">
+                    <div class="fl">
+                      Model year <span class="req">*</span>
+                      <span class="tip">Year stamped on chassis plate…</span>
+                    </div>
+                    <div class="fake-num"></div>
+                  </div>
+                  <div class="pv-field">
+                    <div class="fl">Model <span class="req">*</span></div>
+                    <div class="fake-opts">
+                      <span class="fake-opt">246 GT/GTS</span>
+                      <span class="fake-opt">308 GTB/GTS</span>
+                      <span class="fake-opt">328 GTB/GTS</span>
+                      <span class="fake-opt">348 TB/TS</span>
+                      <span class="fake-opt">+3 more</span>
+                    </div>
+                  </div>
+                  <div class="pv-field">
+                    <div class="fl">
+                      Transmission <span class="req">*</span>
+                    </div>
+                    <div class="fake-opts">
+                      <span class="fake-opt">5-speed manual</span>
+                      <span class="fake-opt">6-speed manual</span>
+                      <span class="fake-opt">F1 paddle</span>
+                    </div>
+                  </div>
+                  <div class="pv-field">
+                    <div class="fl">
+                      Mileage (km) <span class="req">*</span>
+                    </div>
+                    <div class="fake-num"></div>
+                  </div>
+                  <div class="pv-field">
+                    <div class="fl">
+                      Service history <span class="req">*</span>
+                    </div>
+                    <div class="fake-ta"></div>
+                  </div>
+                  <div class="pv-field">
+                    <div class="fl">Matching numbers</div>
+                    <div class="fake-switch"></div>
+                  </div>
+                </div>
+              </div>
+              <div
+                style="
+                  margin-top: 14px;
+                  padding: 12px;
+                  background: var(--blue-softer);
+                  border: 1px solid var(--blue-soft);
+                  border-radius: 10px;
+                "
+              >
+                <div
+                  style="
+                    font-size: 11px;
+                    font-weight: 600;
+                    color: var(--blue-ink);
+                    letter-spacing: 0.04em;
+                    text-transform: uppercase;
+                    margin-bottom: 4px;
+                  "
+                >
+                  Filter preview
+                </div>
+                <div
+                  style="
+                    font-size: 11.5px;
+                    color: var(--ink-soft);
+                    line-height: 1.5;
+                  "
+                >
+                  Buyers will be able to filter by
+                  <b>Model year · Model · Mileage · Matching numbers</b> in the
+                  browse view.
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+      <div class="mocknote">
+        <span class="tag">Notes</span
+        ><span
+          >The right pane shows what a seller sees when creating a listing —
+          updated live as the owner edits fields. Drag handles appear on custom
+          fields only; defaults are locked. Multi-select options live inline,
+          not in a modal, so the owner stays in flow. The small
+          <b>Filter preview</b> hints at how filter toggles translate to browse
+          UX.</span
+        >
+      </div>
+    </section>
+
+    <!-- ================= 2C · MEMBERSHIP ================= -->
+    <section class="screen" data-screen="2c" hidden>
+      <div class="screen-caption">
+        <span class="cap-num">03 / 06</span>
+        <h2>Membership</h2>
+        <span class="sub"
+          >Visibility, entry method, and verifications. Gatekeeping is what
+          separates a curated community from a free-for-all.</span
+        >
+      </div>
+      <div class="screen-frame">
+        <div class="browser-bar">
+          <div class="dots">
+            <span class="dot"></span><span class="dot"></span
+            ><span class="dot"></span>
+          </div>
+          <div class="url">shouks.com / new-marketplace / membership</div>
+        </div>
+        <div class="app">
+          <div class="navbar">
+            <a class="brand" href="#"
+              ><svg viewBox="0 0 44 44" fill="none">
+                <path
+                  d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+                <circle cx="22" cy="22" r="3.4" fill="var(--blue)" />
+                <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+                <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+                <circle cx="11.6" cy="28" r="2.4" fill="currentColor" /></svg
+              >Shouks</a
+            >
+            <nav class="nav-links">
+              <a href="#">Explore</a><a href="#">Messages</a>
+            </nav>
+            <div class="spacer"></div>
+            <button class="btn btn-ghost">Save &amp; exit</button>
+            <div class="avatar">J</div>
+          </div>
+
+          <div class="wiz-wrap">
+            <div class="wiz-steps">
+              <div class="label">Create a marketplace</div>
+              <div class="wiz-step done">
+                <div class="ball">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="t">Identity</div>
+                  <div class="s">Air-Cooled Ferraris</div>
+                </div>
+              </div>
+              <div class="wiz-step done">
+                <div class="ball">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="t">Listing fields</div>
+                  <div class="s">9 fields</div>
+                </div>
+              </div>
+              <div class="wiz-step active">
+                <div class="ball">3</div>
+                <div>
+                  <div class="t">Membership</div>
+                  <div class="s">Who can join</div>
+                </div>
+              </div>
+              <div class="wiz-step">
+                <div class="ball">4</div>
+                <div>
+                  <div class="t">Monetization</div>
+                  <div class="s">Membership fees</div>
+                </div>
+              </div>
+              <div class="wiz-step">
+                <div class="ball">5</div>
+                <div>
+                  <div class="t">Review</div>
+                  <div class="s">Publish</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="wiz-body">
+              <div class="wiz-head">
+                <h1>Who belongs here?</h1>
+                <div class="sub">
+                  Choose how members find and join your marketplace. All
+                  settings can be changed later (changes apply to new members
+                  only).
+                </div>
+              </div>
+
+              <div class="section-label">Visibility</div>
+              <button class="radio-card">
+                <div class="rc-ball"></div>
+                <div>
+                  <div class="rc-t">Public</div>
+                  <div class="rc-s">
+                    Anyone can discover the marketplace and browse listings.
+                    Best for open communities and merchants who want organic
+                    traffic.
+                  </div>
+                </div>
+                <span class="rc-tag">OPEN</span>
+              </button>
+              <button class="radio-card on">
+                <div class="rc-ball"></div>
+                <div>
+                  <div class="rc-t">Closed</div>
+                  <div class="rc-s">
+                    Marketplace is listed publicly, but only members can browse
+                    listings. Non-members see a "Request to join" page. Best for
+                    most curated communities.
+                  </div>
+                </div>
+                <span class="rc-tag">GATED</span>
+              </button>
+              <button class="radio-card">
+                <div class="rc-ball"></div>
+                <div>
+                  <div class="rc-t">Private</div>
+                  <div class="rc-s">
+                    Hidden from Explore and search. Only direct invite links
+                    lead to the marketplace. Best for small trusted groups and
+                    beta launches.
+                  </div>
+                </div>
+                <span class="rc-tag">HIDDEN</span>
+              </button>
+
+              <div class="section-label" style="margin-top: 28px">
+                Entry method
+              </div>
+              <button class="radio-card">
+                <div class="rc-ball"></div>
+                <div>
+                  <div class="rc-t">Open — anyone can join</div>
+                  <div class="rc-s">
+                    No approval required. Members complete identity verification
+                    and join instantly.
+                  </div>
+                </div>
+              </button>
+              <button class="radio-card on">
+                <div class="rc-ball"></div>
+                <div>
+                  <div class="rc-t">Application</div>
+                  <div class="rc-s">
+                    Prospective members answer questions you define. You review
+                    and approve or reject each one.
+                  </div>
+                </div>
+              </button>
+              <button class="radio-card">
+                <div class="rc-ball"></div>
+                <div>
+                  <div class="rc-t">Invite link or code</div>
+                  <div class="rc-s">
+                    Generate short-lived links or alphanumeric codes. Set a max
+                    uses and expiration date per code.
+                  </div>
+                </div>
+              </button>
+              <button class="radio-card">
+                <div class="rc-ball"></div>
+                <div>
+                  <div class="rc-t">Referral</div>
+                  <div class="rc-s">
+                    Existing members generate referral links tied to their
+                    account. Optionally auto-approve referrals.
+                  </div>
+                </div>
+              </button>
+
+              <!-- Application questions (visible because "Application" selected) -->
+              <div
+                style="
+                  margin-top: 20px;
+                  padding: 18px;
+                  background: var(--bg-soft);
+                  border-radius: 12px;
+                  border: 1px solid var(--line-soft);
+                "
+              >
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 12px;
+                  "
+                >
+                  <div>
+                    <h3
+                      style="font-size: 13px; font-weight: 600; margin: 0 0 2px"
+                    >
+                      Application questions
+                    </h3>
+                    <div style="font-size: 11.5px; color: var(--muted)">
+                      Answers are visible only to admins. Never displayed on
+                      profiles.
+                    </div>
+                  </div>
+                  <button
+                    class="btn btn-outline"
+                    style="padding: 6px 12px; font-size: 12px"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M12 5v14M5 12h14" /></svg
+                    >Add question
+                  </button>
+                </div>
+
+                <div class="q-card">
+                  <div class="q-row">
+                    <input
+                      class="input"
+                      style="flex: 1"
+                      value="How long have you owned / been collecting Ferraris?"
+                    />
+                    <button
+                      class="select"
+                      style="
+                        padding: 7px 10px;
+                        font-size: 12.5px;
+                        background: #fff;
+                        border: 1px solid var(--line);
+                        border-radius: 7px;
+                        color: var(--ink-soft);
+                        min-width: 140px;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
+                      "
+                    >
+                      Short text
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        style="width: 12px; height: 12px; margin-left: auto"
+                      >
+                        <path d="m6 9 6 6 6-6" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="q-meta">
+                    <label class="mini-check"
+                      ><input type="checkbox" checked /> Required</label
+                    >
+                    <button class="rm">Remove</button>
+                  </div>
+                </div>
+
+                <div class="q-card">
+                  <div class="q-row">
+                    <input
+                      class="input"
+                      style="flex: 1"
+                      value="Tell us about your current or most memorable Ferrari. Photos welcome via a link."
+                    />
+                    <button
+                      class="select"
+                      style="
+                        padding: 7px 10px;
+                        font-size: 12.5px;
+                        background: #fff;
+                        border: 1px solid var(--line);
+                        border-radius: 7px;
+                        color: var(--ink-soft);
+                        min-width: 140px;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
+                      "
+                    >
+                      Long text
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        style="width: 12px; height: 12px; margin-left: auto"
+                      >
+                        <path d="m6 9 6 6 6-6" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="q-meta">
+                    <label class="mini-check"
+                      ><input type="checkbox" checked /> Required</label
+                    >
+                    <button class="rm">Remove</button>
+                  </div>
+                </div>
+
+                <div class="q-card">
+                  <div class="q-row">
+                    <input
+                      class="input"
+                      style="flex: 1"
+                      value="Are you primarily a collector, seller, or both?"
+                    />
+                    <button
+                      class="select"
+                      style="
+                        padding: 7px 10px;
+                        font-size: 12.5px;
+                        background: #fff;
+                        border: 1px solid var(--line);
+                        border-radius: 7px;
+                        color: var(--ink-soft);
+                        min-width: 140px;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
+                      "
+                    >
+                      Single select
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        style="width: 12px; height: 12px; margin-left: auto"
+                      >
+                        <path d="m6 9 6 6 6-6" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div
+                    style="
+                      padding-top: 8px;
+                      display: flex;
+                      flex-wrap: wrap;
+                      gap: 5px;
+                    "
+                  >
+                    <span class="opt-pill"
+                      >Collector
+                      <button>
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                        >
+                          <path d="M18 6 6 18M6 6l12 12" />
+                        </svg></button
+                    ></span>
+                    <span class="opt-pill"
+                      >Seller / dealer
+                      <button>
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                        >
+                          <path d="M18 6 6 18M6 6l12 12" />
+                        </svg></button
+                    ></span>
+                    <span class="opt-pill"
+                      >Both
+                      <button>
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                        >
+                          <path d="M18 6 6 18M6 6l12 12" />
+                        </svg></button
+                    ></span>
+                    <span class="opt-pill"
+                      >Just a fan
+                      <button>
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                        >
+                          <path d="M18 6 6 18M6 6l12 12" />
+                        </svg></button
+                    ></span>
+                  </div>
+                  <div class="q-meta">
+                    <label class="mini-check"
+                      ><input type="checkbox" /> Required</label
+                    >
+                    <button class="rm">Remove</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="section-label" style="margin-top: 28px">
+                Identity verification
+                <span style="color: var(--blue-ink); margin-left: 4px">*</span>
+              </div>
+              <div
+                style="
+                  font-size: 11.5px;
+                  color: var(--muted);
+                  margin: -6px 0 10px;
+                "
+              >
+                Members must complete every verification you select before they
+                can post a listing. One method minimum.
+              </div>
+              <div class="verif-grid">
+                <label class="verif-chip on">
+                  <span class="cb"
+                    ><svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M20 6 9 17l-5-5" /></svg
+                  ></span>
+                  <svg class="vi-ic" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                      d="M22 12a10 10 0 1 0-11.6 9.87v-7H8v-2.87h2.4V9.4c0-2.37 1.42-3.68 3.59-3.68 1.04 0 2.13.19 2.13.19v2.34h-1.2c-1.18 0-1.55.73-1.55 1.48v1.78h2.64L15.6 14h-2.23v7A10 10 0 0 0 22 12z"
+                    />
+                  </svg>
+                  <span class="vi-t">Facebook</span>
+                </label>
+                <label class="verif-chip on">
+                  <span class="cb"
+                    ><svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M20 6 9 17l-5-5" /></svg
+                  ></span>
+                  <svg
+                    class="vi-ic"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect x="2" y="2" width="20" height="20" rx="5" />
+                    <circle cx="12" cy="12" r="4" />
+                    <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" />
+                  </svg>
+                  <span class="vi-t">Instagram</span>
+                </label>
+                <label class="verif-chip">
+                  <span class="cb"
+                    ><svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M20 6 9 17l-5-5" /></svg
+                  ></span>
+                  <svg class="vi-ic" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                      d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S.02 4.88.02 3.5 1.13 1 2.5 1s2.48 1.12 2.48 2.5zM0 24h5V8H0v16zm7.98-16H13v2.4c.7-1.3 2.4-2.6 5-2.6C23 7.8 24 10.2 24 14.4V24h-5v-8.4c0-2-.02-4.6-2.8-4.6-2.8 0-3.2 2.2-3.2 4.5V24H8V8z"
+                    />
+                  </svg>
+                  <span class="vi-t">LinkedIn</span>
+                </label>
+                <label class="verif-chip">
+                  <span class="cb"
+                    ><svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M20 6 9 17l-5-5" /></svg
+                  ></span>
+                  <svg class="vi-ic" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                      d="M18.9 1.15H22l-6.8 7.77L23.2 22.8h-6.27l-4.91-6.42L6.4 22.8H3.3l7.26-8.3L1.6 1.15h6.42l4.44 5.87 5.43-5.87z"
+                    />
+                  </svg>
+                  <span class="vi-t">X / Twitter</span>
+                </label>
+                <label class="verif-chip on">
+                  <span class="cb"
+                    ><svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M20 6 9 17l-5-5" /></svg
+                  ></span>
+                  <svg class="vi-ic" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    />
+                    <path
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A10.997 10.997 0 0 0 12 23z"
+                    />
+                    <path
+                      d="M5.84 14.09a6.6 6.6 0 0 1 0-4.18V7.07H2.18a10.997 10.997 0 0 0 0 9.86l3.66-2.84z"
+                    />
+                    <path
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                    />
+                  </svg>
+                  <span class="vi-t">Google</span>
+                </label>
+                <label class="verif-chip on">
+                  <span class="cb"
+                    ><svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M20 6 9 17l-5-5" /></svg
+                  ></span>
+                  <svg
+                    class="vi-ic"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect x="6" y="2" width="12" height="20" rx="2" />
+                    <circle cx="12" cy="18" r="1" />
+                  </svg>
+                  <span class="vi-t">Phone (SMS)</span>
+                </label>
+              </div>
+              <div class="help" style="margin-top: 10px">
+                Each social account can only link to one Shouks account.
+                Duplicate linkage is blocked.
+              </div>
+
+              <div class="wiz-footer">
+                <button class="btn btn-outline" data-goto="2b">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                  </svg>
+                  Back
+                </button>
+                <button class="btn btn-dark" data-goto="2d">
+                  Continue to monetization
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <aside class="preview">
+              <div class="pv-label">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
+                </svg>
+                What a visitor sees
+              </div>
+              <div class="pv-frame">
+                <div class="pv-mini-header">
+                  <div
+                    class="mp-thumb"
+                    style="
+                      background: linear-gradient(
+                        135deg,
+                        oklch(0.55 0.17 25),
+                        oklch(0.3 0.1 25)
+                      );
+                    "
+                  >
+                    A
+                  </div>
+                  <div style="min-width: 0">
+                    <div class="mp-n">Air-Cooled Ferraris</div>
+                    <div class="mp-u">shouks.com/air-cooled-ferraris</div>
+                  </div>
+                </div>
+                <div
+                  class="pv-card"
+                  style="text-align: center; padding: 22px 18px"
+                >
+                  <div
+                    style="
+                      width: 36px;
+                      height: 36px;
+                      border-radius: 10px;
+                      background: var(--bg-soft);
+                      display: grid;
+                      place-items: center;
+                      margin: 0 auto 10px;
+                      color: var(--muted);
+                    "
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      width="18"
+                      height="18"
+                    >
+                      <rect x="3" y="11" width="18" height="11" rx="2" />
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                  </div>
+                  <div
+                    style="
+                      font-family: &quot;Instrument Serif&quot;, serif;
+                      font-size: 17px;
+                      margin-bottom: 4px;
+                    "
+                  >
+                    Members only
+                  </div>
+                  <div
+                    style="
+                      font-size: 11.5px;
+                      color: var(--muted);
+                      margin-bottom: 14px;
+                      line-height: 1.5;
+                    "
+                  >
+                    This marketplace is gated. Apply to join and browse
+                    listings.
+                  </div>
+                  <button
+                    style="
+                      padding: 8px 20px;
+                      background: var(--ink);
+                      color: #fff;
+                      border-radius: 7px;
+                      font-size: 12px;
+                      font-weight: 500;
+                      white-space: nowrap;
+                    "
+                  >
+                    Request to join
+                  </button>
+                  <div
+                    style="
+                      font-size: 10px;
+                      color: var(--muted);
+                      margin-top: 10px;
+                    "
+                  >
+                    Requires: FB · IG · Google · Phone
+                  </div>
+                </div>
+              </div>
+
+              <div
+                style="
+                  margin-top: 20px;
+                  padding: 12px;
+                  background: var(--blue-softer);
+                  border: 1px solid var(--blue-soft);
+                  border-radius: 10px;
+                "
+              >
+                <div
+                  style="
+                    font-size: 11px;
+                    font-weight: 600;
+                    color: var(--blue-ink);
+                    letter-spacing: 0.04em;
+                    text-transform: uppercase;
+                    margin-bottom: 4px;
+                  "
+                >
+                  Outcome
+                </div>
+                <div
+                  style="
+                    font-size: 11.5px;
+                    color: var(--ink-soft);
+                    line-height: 1.5;
+                  "
+                >
+                  Visitors see the marketplace card in Explore but must apply
+                  before viewing listings. Every applicant answers your 3
+                  questions and completes 4 verifications. You approve each one
+                  by hand.
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+      <div class="mocknote">
+        <span class="tag">Notes</span
+        ><span
+          >Radio cards use written descriptions — no iconography — because the
+          distinctions are about <i>policy</i>, not aesthetics. Application
+          questions conditionally appear when "Application" is selected.
+          Verifications are shown as a checkable grid with brand glyphs since
+          users recognize them instantly.</span
+        >
+      </div>
+    </section>
+
+    <!-- ================= 2D · MONETIZATION ================= -->
+    <section class="screen" data-screen="2d" hidden>
+      <div class="screen-caption">
+        <span class="cap-num">04 / 06</span>
+        <h2>Monetization</h2>
+        <span class="sub"
+          >Optional membership fee. Off by default. Paying members don't get
+          extra permissions — one flat fee for everyone.</span
+        >
+      </div>
+      <div class="screen-frame">
+        <div class="browser-bar">
+          <div class="dots">
+            <span class="dot"></span><span class="dot"></span
+            ><span class="dot"></span>
+          </div>
+          <div class="url">shouks.com / new-marketplace / monetization</div>
+        </div>
+        <div class="app">
+          <div class="navbar">
+            <a class="brand" href="#"
+              ><svg viewBox="0 0 44 44" fill="none">
+                <path
+                  d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+                <circle cx="22" cy="22" r="3.4" fill="var(--blue)" />
+                <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+                <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+                <circle cx="11.6" cy="28" r="2.4" fill="currentColor" /></svg
+              >Shouks</a
+            >
+            <nav class="nav-links">
+              <a href="#">Explore</a><a href="#">Messages</a>
+            </nav>
+            <div class="spacer"></div>
+            <button class="btn btn-ghost">Save &amp; exit</button>
+            <div class="avatar">J</div>
+          </div>
+
+          <div class="wiz-wrap">
+            <div class="wiz-steps">
+              <div class="label">Create a marketplace</div>
+              <div class="wiz-step done">
+                <div class="ball">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="t">Identity</div>
+                  <div class="s">Air-Cooled Ferraris</div>
+                </div>
+              </div>
+              <div class="wiz-step done">
+                <div class="ball">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="t">Listing fields</div>
+                  <div class="s">9 fields</div>
+                </div>
+              </div>
+              <div class="wiz-step done">
+                <div class="ball">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="t">Membership</div>
+                  <div class="s">Closed · Application</div>
+                </div>
+              </div>
+              <div class="wiz-step active">
+                <div class="ball">4</div>
+                <div>
+                  <div class="t">Monetization</div>
+                  <div class="s">Membership fees</div>
+                </div>
+              </div>
+              <div class="wiz-step">
+                <div class="ball">5</div>
+                <div>
+                  <div class="t">Review</div>
+                  <div class="s">Publish</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="wiz-body">
+              <div class="wiz-head">
+                <h1>How does the marketplace sustain itself?</h1>
+                <div class="sub">
+                  Optional. Skip if you're launching as a free community — you
+                  can always turn this on later.
+                </div>
+              </div>
+
+              <div class="info-callout">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 8v4M12 16h.01" />
+                </svg>
+                <div class="txt">
+                  If you charge a fee, all paying members have identical access.
+                  Shouks doesn't support permission tiers in v1 — a "pro member"
+                  toggle would muddy the community model.
+                </div>
+              </div>
+
+              <div class="m-card on">
+                <div class="m-card-hd">
+                  <div>
+                    <h3>Charge a membership fee</h3>
+                    <div class="s">
+                      One flat fee for everyone. Collected directly by Shouks's
+                      payment processor and deposited to your connected payout
+                      account.
+                    </div>
+                  </div>
+                  <div class="m-switch on"></div>
+                </div>
+                <div class="m-body">
+                  <div class="billing-toggle">
+                    <button>Annual only</button>
+                    <button class="on">Monthly &amp; annual</button>
+                    <button>Monthly only</button>
+                  </div>
+                  <div class="fee-row">
+                    <span class="label">Monthly</span>
+                    <span class="currency">$</span>
+                    <input class="input" value="10" />
+                    <span class="suffix">/ month</span>
+                  </div>
+                  <div class="fee-row">
+                    <span class="label">Annual</span>
+                    <span class="currency">$</span>
+                    <input class="input" value="96" />
+                    <span class="suffix"
+                      >/ year
+                      <span
+                        style="
+                          color: var(--blue-ink);
+                          margin-left: 6px;
+                          font-size: 11.5px;
+                        "
+                        >= 20% off monthly</span
+                      ></span
+                    >
+                  </div>
+                  <div class="help">
+                    Members can toggle between billing periods in their account
+                    settings.
+                  </div>
+                </div>
+              </div>
+
+              <div class="poc-note">
+                <b>POC note:</b> Shouks's own hosting fees and revenue share are
+                not in scope for this initial MVP. POC marketplaces run free on
+                the platform — owners keep 100% of membership revenue.
+              </div>
+
+              <div class="wiz-footer">
+                <button class="btn btn-outline" data-goto="2c">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                  </svg>
+                  Back
+                </button>
+                <button class="btn btn-dark" data-goto="2e">
+                  Continue to review
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <aside class="preview">
+              <div class="pv-label">Revenue model</div>
+              <div class="pv-frame">
+                <div class="pv-card" style="padding: 16px">
+                  <div
+                    style="
+                      display: flex;
+                      justify-content: space-between;
+                      padding: 8px 0;
+                      border-bottom: 1px solid var(--line-soft);
+                    "
+                  >
+                    <span style="font-size: 11.5px; color: var(--muted)"
+                      >Members (est.)</span
+                    >
+                    <span style="font-size: 13px; font-weight: 600"
+                      >— / pending launch</span
+                    >
+                  </div>
+                  <div
+                    style="
+                      display: flex;
+                      justify-content: space-between;
+                      padding: 8px 0;
+                      border-bottom: 1px solid var(--line-soft);
+                    "
+                  >
+                    <span style="font-size: 11.5px; color: var(--muted)"
+                      >Annual fee</span
+                    >
+                    <span
+                      style="
+                        font-size: 13px;
+                        font-weight: 600;
+                        font-variant-numeric: tabular-nums;
+                      "
+                      >$96</span
+                    >
+                  </div>
+                  <div
+                    style="
+                      display: flex;
+                      justify-content: space-between;
+                      padding: 8px 0;
+                    "
+                  >
+                    <span style="font-size: 11.5px; color: var(--muted)"
+                      >Your payout</span
+                    >
+                    <span
+                      style="
+                        font-size: 13px;
+                        font-weight: 600;
+                        color: var(--success);
+                        font-variant-numeric: tabular-nums;
+                      "
+                      >100%</span
+                    >
+                  </div>
+                </div>
+                <div
+                  style="
+                    margin-top: 12px;
+                    padding: 10px 12px;
+                    background: oklch(0.96 0.04 150);
+                    border: 1px solid oklch(0.88 0.06 150);
+                    border-radius: 8px;
+                    font-size: 11px;
+                    color: oklch(0.35 0.12 150);
+                    line-height: 1.5;
+                  "
+                >
+                  During POC, Shouks charges 0% platform fee. Standard payment
+                  processing (2.9% + 30¢) still applies.
+                </div>
+              </div>
+
+              <div class="pv-label" style="margin-top: 28px">
+                Launch checklist
+              </div>
+              <div
+                style="
+                  font-size: 12.5px;
+                  color: var(--ink-soft);
+                  line-height: 1.9;
+                "
+              >
+                <div>
+                  <span style="color: var(--blue); margin-right: 6px">✓</span>
+                  Connected Stripe payout account
+                </div>
+                <div>
+                  <span style="color: var(--blue); margin-right: 6px">✓</span>
+                  Agreed to platform terms
+                </div>
+                <div>
+                  <span style="color: var(--muted); margin-right: 6px">○</span>
+                  Preview listings form (next step)
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+      <div class="mocknote">
+        <span class="tag">Notes</span
+        ><span
+          >Monetization is intentionally modest — one switch for fees, one for
+          auctions, no tiers or add-ons. The POC note is explicit about Shouks's
+          0% revenue share during early launch so owners don't worry about being
+          nickel-and-dimed.</span
+        >
+      </div>
+    </section>
+
+    <!-- ================= 2E · REVIEW ================= -->
+    <section class="screen" data-screen="2e" hidden>
+      <div class="screen-caption">
+        <span class="cap-num">05 / 06</span>
+        <h2>Review</h2>
+        <span class="sub"
+          >Last look before publishing. Name and URL lock once you hit
+          publish.</span
+        >
+      </div>
+      <div class="screen-frame">
+        <div class="browser-bar">
+          <div class="dots">
+            <span class="dot"></span><span class="dot"></span
+            ><span class="dot"></span>
+          </div>
+          <div class="url">shouks.com / new-marketplace / review</div>
+        </div>
+        <div class="app">
+          <div class="navbar">
+            <a class="brand" href="#"
+              ><svg viewBox="0 0 44 44" fill="none">
+                <path
+                  d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+                <circle cx="22" cy="22" r="3.4" fill="var(--blue)" />
+                <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+                <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+                <circle cx="11.6" cy="28" r="2.4" fill="currentColor" /></svg
+              >Shouks</a
+            >
+            <nav class="nav-links">
+              <a href="#">Explore</a><a href="#">Messages</a>
+            </nav>
+            <div class="spacer"></div>
+            <button class="btn btn-ghost">Save &amp; exit</button>
+            <div class="avatar">J</div>
+          </div>
+
+          <div class="wiz-wrap">
+            <div class="wiz-steps">
+              <div class="label">Create a marketplace</div>
+              <div class="wiz-step done">
+                <div class="ball">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="t">Identity</div>
+                  <div class="s">Air-Cooled Ferraris</div>
+                </div>
+              </div>
+              <div class="wiz-step done">
+                <div class="ball">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="t">Listing fields</div>
+                  <div class="s">9 fields</div>
+                </div>
+              </div>
+              <div class="wiz-step done">
+                <div class="ball">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="t">Membership</div>
+                  <div class="s">Closed · Application</div>
+                </div>
+              </div>
+              <div class="wiz-step done">
+                <div class="ball">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="t">Monetization</div>
+                  <div class="s">$10 / month</div>
+                </div>
+              </div>
+              <div class="wiz-step active">
+                <div class="ball">5</div>
+                <div>
+                  <div class="t">Review</div>
+                  <div class="s">Publish</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="wiz-body">
+              <div class="wiz-head">
+                <h1>Review &amp; publish.</h1>
+                <div class="sub">
+                  Everything looks good? Publishing makes your marketplace
+                  discoverable. Name and URL cannot be changed after this.
+                </div>
+              </div>
+
+              <div
+                class="info-callout"
+                style="
+                  background: oklch(0.97 0.04 75);
+                  border-color: oklch(0.9 0.08 75);
+                "
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  style="color: oklch(0.48 0.15 65)"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 8v4M12 16h.01" />
+                </svg>
+                <div class="txt" style="color: oklch(0.38 0.1 55)">
+                  <b>Final check.</b> After publishing, the marketplace name and
+                  URL slug cannot be changed. All other settings — fields,
+                  visibility, fees, auctions — remain editable.
+                </div>
+              </div>
+
+              <div class="rev-card">
+                <div class="rev-hd">
+                  <h3>Identity</h3>
+                  <button class="edit" data-goto="2a">Edit ↗</button>
+                </div>
+                <div class="rev-body">
+                  <div class="rev-id">
+                    <div class="logo">A</div>
+                    <div>
+                      <div class="n">Air-Cooled Ferraris</div>
+                      <div class="d" style="max-width: 520px">
+                        A members-only community for owners and enthusiasts of
+                        pre-1998 Ferraris. Verified sellers, structured service
+                        histories, no brokers.
+                      </div>
+                      <div class="cat">
+                        <span
+                          style="
+                            padding: 2px 7px;
+                            background: var(--bg-soft);
+                            border: 1px solid var(--line);
+                            border-radius: 4px;
+                            font-weight: 600;
+                            color: var(--ink-soft);
+                            font-size: 10.5px;
+                            letter-spacing: 0.04em;
+                          "
+                          >VEHICLES</span
+                        >
+                        ·
+                        <span style="font-family: ui-monospace, monospace"
+                          >shouks.com/air-cooled-ferraris</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="rev-card">
+                <div class="rev-hd">
+                  <h3>Listing fields</h3>
+                  <button class="edit" data-goto="2b">Edit ↗</button>
+                </div>
+                <div class="rev-body">
+                  <div class="rev-badges">
+                    <span class="rev-badge required">Title *</span>
+                    <span class="rev-badge required">Price *</span>
+                    <span class="rev-badge required">Images *</span>
+                    <span class="rev-badge required filter">Model year *</span>
+                    <span class="rev-badge required filter">Model *</span>
+                    <span class="rev-badge required">Transmission *</span>
+                    <span class="rev-badge required filter"
+                      >Mileage (km) *</span
+                    >
+                    <span class="rev-badge required">Service history *</span>
+                    <span class="rev-badge filter">Matching numbers</span>
+                  </div>
+                  <div
+                    style="
+                      margin-top: 10px;
+                      font-size: 11.5px;
+                      color: var(--muted);
+                    "
+                  >
+                    9 fields · 7 required · 4 filterable
+                  </div>
+                  <div
+                    style="
+                      margin-top: 12px;
+                      padding-top: 12px;
+                      border-top: 1px solid var(--line-soft);
+                      display: grid;
+                      grid-template-columns: 140px 1fr;
+                      gap: 12px;
+                      font-size: 13px;
+                    "
+                  >
+                    <div style="color: var(--muted); font-size: 12.5px">
+                      Listing rules
+                    </div>
+                    <div style="color: var(--ink); font-weight: 500">
+                      Auctions enabled · anti-snipe on · reserve prices on
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="rev-card">
+                <div class="rev-hd">
+                  <h3>Membership</h3>
+                  <button class="edit" data-goto="2c">Edit ↗</button>
+                </div>
+                <div class="rev-body">
+                  <div class="kv">
+                    <div class="k">Visibility</div>
+                    <div class="v">
+                      Closed — listed publicly, listings hidden from non-members
+                    </div>
+                  </div>
+                  <div class="kv">
+                    <div class="k">Entry method</div>
+                    <div class="v">
+                      Application · 3 questions · reviewed by owner
+                    </div>
+                  </div>
+                  <div class="kv">
+                    <div class="k">Verifications</div>
+                    <div class="v">
+                      Facebook · Instagram · Google · Phone (SMS)
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="rev-card">
+                <div class="rev-hd">
+                  <h3>Monetization</h3>
+                  <button class="edit" data-goto="2d">Edit ↗</button>
+                </div>
+                <div class="rev-body">
+                  <div class="kv">
+                    <div class="k">Membership fee</div>
+                    <div class="v">$10 / month · $96 / year</div>
+                  </div>
+                  <div class="kv">
+                    <div class="k">Platform fee</div>
+                    <div class="v" style="color: var(--success)">0% (POC)</div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                style="
+                  background: #fff;
+                  border: 1px solid var(--line);
+                  border-radius: 12px;
+                  padding: 16px 18px;
+                  margin-top: 18px;
+                "
+              >
+                <label
+                  style="
+                    display: flex;
+                    gap: 10px;
+                    align-items: flex-start;
+                    cursor: pointer;
+                  "
+                >
+                  <input
+                    type="checkbox"
+                    checked
+                    style="
+                      margin-top: 3px;
+                      width: 14px;
+                      height: 14px;
+                      accent-color: var(--blue);
+                    "
+                  />
+                  <span
+                    style="
+                      font-size: 12.5px;
+                      color: var(--ink-soft);
+                      line-height: 1.5;
+                    "
+                    >I agree to the
+                    <a href="#" style="color: var(--blue-ink); font-weight: 500"
+                      >Shouks Platform Terms</a
+                    >
+                    and confirm that
+                    <b style="color: var(--ink)">Air-Cooled Ferraris</b>
+                    complies with applicable laws in jurisdictions where
+                    listings are sold.</span
+                  >
+                </label>
+              </div>
+
+              <div class="wiz-footer">
+                <button class="btn btn-outline" data-goto="2d">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                  </svg>
+                  Back
+                </button>
+                <button class="btn btn-primary" data-goto="2f">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" /></svg
+                  >Publish marketplace
+                </button>
+              </div>
+            </div>
+
+            <aside class="preview">
+              <div class="pv-label">Publish preview</div>
+              <div class="pv-frame">
+                <div class="pv-card" style="padding: 0; overflow: hidden">
+                  <div
+                    style="
+                      height: 72px;
+                      background: linear-gradient(
+                        135deg,
+                        oklch(0.55 0.17 25),
+                        oklch(0.3 0.1 25)
+                      );
+                    "
+                  ></div>
+                  <div style="padding: 12px 14px">
+                    <div
+                      style="
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        margin-bottom: 8px;
+                      "
+                    >
+                      <div
+                        style="
+                          width: 32px;
+                          height: 32px;
+                          border-radius: 7px;
+                          margin-top: -22px;
+                          border: 2px solid #fff;
+                          background: linear-gradient(
+                            135deg,
+                            oklch(0.55 0.17 25),
+                            oklch(0.3 0.1 25)
+                          );
+                          color: #fff;
+                          display: grid;
+                          place-items: center;
+                          font-family: &quot;Instrument Serif&quot;, serif;
+                          font-size: 16px;
+                        "
+                      >
+                        A
+                      </div>
+                    </div>
+                    <div
+                      style="
+                        font-family: &quot;Instrument Serif&quot;, serif;
+                        font-size: 17px;
+                        letter-spacing: -0.005em;
+                      "
+                    >
+                      Air-Cooled Ferraris
+                    </div>
+                    <div
+                      style="
+                        font-size: 11px;
+                        color: var(--muted);
+                        margin: 3px 0 10px;
+                      "
+                    >
+                      Vehicles · Members only
+                    </div>
+                    <div
+                      style="
+                        font-size: 11px;
+                        color: var(--ink-soft);
+                        line-height: 1.5;
+                      "
+                    >
+                      A members-only community for owners and enthusiasts of
+                      pre-1998 Ferraris. Verified sellers…
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                style="
+                  margin-top: 20px;
+                  font-size: 11.5px;
+                  color: var(--muted);
+                  line-height: 1.6;
+                "
+              >
+                Your marketplace card as it will appear in
+                <b style="color: var(--ink)">Explore</b> and when you share the
+                URL.
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+      <div class="mocknote">
+        <span class="tag">Notes</span
+        ><span
+          >Review uses 4 cards with "Edit ↗" deep-links back to each step so
+          owners can fix problems without losing their place. The amber callout
+          surfaces the one irreversible thing (name &amp; URL lock). Terms
+          checkbox is required before Publish.</span
+        >
+      </div>
+    </section>
+
+    <!-- ================= 2F · SUCCESS ================= -->
+    <section class="screen" data-screen="2f" hidden>
+      <div class="screen-caption">
+        <span class="cap-num">06 / 06</span>
+        <h2>Published</h2>
+        <span class="sub"
+          >Your marketplace is live. Seed it with listings and invite your first
+          members.</span
+        >
+      </div>
+      <div class="screen-frame">
+        <div class="browser-bar">
+          <div class="dots">
+            <span class="dot"></span><span class="dot"></span
+            ><span class="dot"></span>
+          </div>
+          <div class="url">shouks.com / air-cooled-ferraris / published</div>
+        </div>
+        <div class="app">
+          <div class="navbar">
+            <a class="brand" href="#"
+              ><svg viewBox="0 0 44 44" fill="none">
+                <path
+                  d="M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M22 22 L22 3 M22 22 L5.5 31.5 M22 22 L38.5 31.5"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M22 22 L22 10 M22 22 L32.4 28 M22 22 L11.6 28"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+                <circle cx="22" cy="22" r="3.4" fill="var(--blue)" />
+                <circle cx="22" cy="10" r="2.4" fill="currentColor" />
+                <circle cx="32.4" cy="28" r="2.4" fill="currentColor" />
+                <circle cx="11.6" cy="28" r="2.4" fill="currentColor" /></svg
+              >Shouks</a
+            >
+            <nav class="nav-links">
+              <a href="#">Explore</a><a href="#">Messages</a>
+            </nav>
+            <div class="spacer"></div>
+            <div class="avatar">J</div>
+          </div>
+
+          <div class="success-wrap">
+            <div class="seal">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            </div>
+            <h1><em>Air-Cooled Ferraris</em><br />is live.</h1>
+            <div class="lead">
+              You're the owner. Now seed it with a couple of listings, invite
+              your first members, and keep quality high as applications roll in.
+            </div>
+
+            <div class="sx-card">
+              <h3>Share your marketplace</h3>
+              <div class="sx-link">
+                <span class="url">https://shouks.com/air-cooled-ferraris</span>
+                <button>Copy</button>
+                <button>Open ↗</button>
+              </div>
+              <div
+                style="
+                  font-size: 11.5px;
+                  color: var(--muted);
+                  margin-top: 8px;
+                  line-height: 1.5;
+                "
+              >
+                Non-members see the marketplace card and "Request to join."
+                Members go straight to the browse view.
+              </div>
+            </div>
+
+            <div class="sx-card">
+              <h3>Get started</h3>
+              <div class="sx-next">
+                <a href="#">
+                  <div class="nx-ic">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M12 5v14M5 12h14" />
+                    </svg>
+                  </div>
+                  <div class="nx-t">Post your first listing</div>
+                  <div class="nx-s">
+                    An empty marketplace never gets members. Lead by example.
+                  </div>
+                </a>
+                <a href="#">
+                  <div class="nx-ic">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M22 11h-6M19 8v6" />
+                    </svg>
+                  </div>
+                  <div class="nx-t">Invite founding members</div>
+                  <div class="nx-s">
+                    Pre-approve up to 20 invite links. Skip the application.
+                  </div>
+                </a>
+                <a href="#">
+                  <div class="nx-ic">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="3" />
+                      <path
+                        d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"
+                      />
+                    </svg>
+                  </div>
+                  <div class="nx-t">Open owner dashboard</div>
+                  <div class="nx-s">
+                    Review applications, moderate listings, see analytics.
+                  </div>
+                </a>
+              </div>
+            </div>
+
+            <div style="margin-top: 24px; font-size: 12px; color: var(--muted)">
+              <a href="#" style="color: var(--muted)"
+                >Return to your marketplaces →</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mocknote">
+        <span class="tag">Notes</span
+        ><span
+          >Success screen is intentionally spare — share link (biggest single
+          asset), three high-signal next steps, and nothing else. The share link
+          is the owner's only tool for getting eyes on an empty marketplace, so
+          it's front and center. Post-MVP, we'd add launch-analytics (views,
+          applications) to this page after 24h.</span
+        >
+      </div>
+    </section>
+
+    <script>
+      const steps = ["2a", "2b", "2c", "2d", "2e", "2f"];
+      let cur = 0;
+      try {
+        const s = localStorage.getItem("shouks.flow2.step");
+        if (s) cur = Math.max(0, steps.indexOf(s));
+      } catch {}
+
+      function show(i) {
+        cur = Math.max(0, Math.min(steps.length - 1, i));
+        document.querySelectorAll(".screen").forEach(s => {
+          s.hidden = s.dataset.screen !== steps[cur];
+        });
+        document.querySelectorAll(".flow-nav .step-btn").forEach((b, idx) => {
+          b.classList.toggle("active", idx === cur);
+          b.classList.toggle("done", idx < cur);
+        });
+        try {
+          localStorage.setItem("shouks.flow2.step", steps[cur]);
+        } catch {}
+        window.scrollTo({ top: 0, behavior: "instant" });
+      }
+
+      document.querySelectorAll(".flow-nav .step-btn").forEach((b, i) => {
+        b.addEventListener("click", () => show(i));
+      });
+
+      document.addEventListener("click", e => {
+        const goto = e.target.closest("[data-goto]");
+        if (goto) {
+          const t = goto.dataset.goto;
+          const i = steps.indexOf(t);
+          if (i >= 0) show(i);
+        }
+      });
+
+      document.addEventListener("keydown", e => {
+        if (e.target.matches("input,textarea")) return;
+        if (e.key === "ArrowRight") show(cur + 1);
+        if (e.key === "ArrowLeft") show(cur - 1);
+      });
+
+      show(cur);
+    </script>
+  </body>
+</html>

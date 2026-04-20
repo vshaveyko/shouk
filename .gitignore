@@ -1,0 +1,91 @@
+# ─── Dependencies ───
+node_modules
+.pnp
+.pnp.js
+
+# ─── Build output ───
+.next
+out
+build
+dist
+*.tsbuildinfo
+next-env.d.ts
+
+# ─── Environment & secrets ───
+# Ignore ALL env files; only the safe template is tracked.
+.env
+.env.*
+.env.local
+.env.development
+.env.test
+.env.production
+.env.railway
+.env.vercel
+.env.fly
+!.env.example
+
+# Other common secret/credential files
+secrets/
+secrets.json
+credentials.json
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+id_rsa*
+id_ed25519*
+.npmrc
+.netrc
+firebase-adminsdk*.json
+gcp-service-account*.json
+service-account*.json
+*.keystore
+auth.json
+
+# ─── IDE & OS ───
+.DS_Store
+Thumbs.db
+.idea
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+*.swo
+
+# ─── Logs ───
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
+
+# ─── Testing ───
+coverage
+playwright-report
+test-results
+.nyc_output
+*.lcov
+
+# ─── Deployment caches ───
+.vercel
+.turbo
+.netlify
+.serverless
+.railway
+
+# ─── Local Prisma artifacts ───
+prisma/dev.db*
+prisma/*.db
+prisma/*.db-journal
+prisma/migrations/migration_lock.toml.bak
+
+# ─── Claude Code session state ───
+.claude/
+
+# ─── Misc ───
+.cache
+tmp
+temp
