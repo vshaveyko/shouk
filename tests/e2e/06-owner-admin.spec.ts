@@ -51,4 +51,31 @@ test.describe("Flow 7 · Owner Admin Settings", () => {
     await page.goto("/owner/ferrari-frenzy/settings/billing");
     await expect(page.getByRole("heading", { name: /billing|subscribers/i }).first()).toBeVisible();
   });
+
+  test("analytics page renders kpi sparklines and growth chart", async ({ page }) => {
+    await page.goto("/owner/ferrari-frenzy/analytics");
+    await expect(page.getByRole("heading", { name: /trending|analytics/i }).first()).toBeVisible();
+
+    // Three KPI cards each with a sparkline svg + at least one path.
+    const sparks = page.locator('[data-testid="kpi-spark"]');
+    await expect(sparks).toHaveCount(3);
+    for (let i = 0; i < 3; i++) {
+      await expect(sparks.nth(i).locator("svg")).toBeVisible();
+      await expect(sparks.nth(i).locator("svg path").first()).toHaveAttribute("d", /M/);
+    }
+
+    // Growth chart renders as SVG with gridlines, axis labels, and two series paths.
+    const growth = page.getByTestId("analytics-growth-chart");
+    await expect(growth).toBeVisible();
+    await expect(growth.locator("svg")).toBeVisible();
+    await expect(growth.locator("svg .gridline")).toHaveCount(4);
+    await expect(growth.locator("svg .axis-lbl").first()).toBeVisible();
+    // Two series — members has line + area (2 paths), listings is just a line.
+    await expect(growth.locator('svg path[data-series="members"]')).not.toHaveCount(0);
+    await expect(growth.locator('svg path[data-series="listings"]')).not.toHaveCount(0);
+
+    // Legend captures both series.
+    await expect(growth.getByText(/new members/i)).toBeVisible();
+    await expect(growth.getByText(/new listings/i)).toBeVisible();
+  });
 });
