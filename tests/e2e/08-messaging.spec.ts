@@ -25,6 +25,24 @@ test.describe("Flow 6E · Marketplace messaging", () => {
     await expect(page).toHaveURL(/\/m\/ferrari-frenzy\/messages/);
   });
 
+  test("nav tabs match between /m/<slug>/feed and /m/<slug>/messages for an owner", async ({ page }) => {
+    await signIn(page, "owner@shouks.test", "Test123!@#", /\/owner\//);
+
+    await page.goto("/m/ferrari-frenzy/feed");
+    const feedTabs = await page
+      .locator(".shouks-navbar .nav-links a")
+      .allTextContents();
+
+    await page.goto("/m/ferrari-frenzy/messages");
+    const msgsTabs = await page
+      .locator(".shouks-navbar .nav-links a")
+      .allTextContents();
+
+    const normalize = (arr: string[]) =>
+      arr.map((s) => s.replace(/\d+/g, "").trim()).filter(Boolean);
+    expect(normalize(msgsTabs)).toEqual(normalize(feedTabs));
+  });
+
   test("non-member of a marketplace is redirected away from messages", async ({ page }) => {
     // applicant is not an active member of ferrari-frenzy
     await signIn(page, "applicant@shouks.test", "Test123!@#");

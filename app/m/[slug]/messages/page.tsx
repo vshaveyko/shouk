@@ -172,7 +172,6 @@ export default async function MarketplaceMessagesPage({
           primaryColor: mp.primaryColor,
         }}
         marketplaces={[...ctx.owned, ...ctx.memberships]}
-        mode={isOwner ? "owner" : "member"}
         notificationCount={unreadNotifs}
       />
 
