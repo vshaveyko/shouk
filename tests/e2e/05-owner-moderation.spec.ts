@@ -14,6 +14,60 @@ test.describe("Flow 5 · Owner Moderation", () => {
     await expect(page.getByTestId("applications-list")).toBeVisible();
   });
 
+  test("owner can switch between status tabs", async ({ page }) => {
+    await signIn(page, "owner@shouks.test", "Test123!@#", /\/owner\//);
+    await page.goto("/owner/ferrari-frenzy/applications");
+    // Pending is the default tab and is highlighted
+    await expect(page.getByTestId("apps-tab-PENDING")).toHaveAttribute(
+      "data-active",
+      "true",
+    );
+    // Switch to All — URL updates and non-pending rows can appear (Jane's NEEDS_INFO historical app)
+    await page.getByTestId("apps-tab-ALL").click();
+    await expect(page).toHaveURL(/status=ALL/);
+    await expect(page.getByTestId("apps-tab-ALL")).toHaveAttribute(
+      "data-active",
+      "true",
+    );
+    // Switch to Approved — tab highlights even if queue is empty
+    await page.getByTestId("apps-tab-APPROVED").click();
+    await expect(page).toHaveURL(/status=APPROVED/);
+    await expect(page.getByTestId("apps-tab-APPROVED")).toHaveAttribute(
+      "data-active",
+      "true",
+    );
+  });
+
+  test("owner can search applicants by name", async ({ page }) => {
+    await signIn(page, "owner@shouks.test", "Test123!@#", /\/owner\//);
+    await page.goto("/owner/ferrari-frenzy/applications?status=ALL");
+    const search = page.getByTestId("apps-search");
+    await search.fill("jane");
+    await search.press("Enter");
+    await expect(page).toHaveURL(/q=jane/);
+    const rows = page.getByTestId(/app-row-/);
+    await expect(rows.first()).toBeVisible();
+    await expect(rows.first()).toContainText(/jane/i);
+    // Bogus query returns no rows
+    await search.fill("zzz-no-match-xyz");
+    await search.press("Enter");
+    await expect(page.getByTestId("apps-empty")).toBeVisible();
+  });
+
+  test("owner can filter by verification level and change sort", async ({ page }) => {
+    await signIn(page, "owner@shouks.test", "Test123!@#", /\/owner\//);
+    await page.goto("/owner/ferrari-frenzy/applications?status=ALL");
+    // Verification filter (Ferrari requires GOOGLE + FACEBOOK). Jane only has
+    // GOOGLE, so she is "partial". Selecting "Fully verified" drops her.
+    await page.getByTestId("apps-filter-verif").click();
+    await page.getByTestId("apps-verif-full").click();
+    await expect(page).toHaveURL(/verif=full/);
+    // Switch sort to Newest first
+    await page.getByTestId("apps-filter-sort").click();
+    await page.getByTestId("apps-sort-newest").click();
+    await expect(page).toHaveURL(/sort=newest/);
+  });
+
   test("owner can approve an application", async ({ page }) => {
     // First create a fresh applicant
     const applicantEmail = uniqueEmail("approve");

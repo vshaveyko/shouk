@@ -12,9 +12,15 @@ const applicationsCss = `
 
 .apps-body .queue-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 16px; flex-wrap: wrap; }
 .apps-body .queue-tabs { display: flex; gap: 2px; background: var(--bg-soft); border: 1px solid var(--line); border-radius: 8px; padding: 3px; }
-.apps-body .queue-tabs a { padding: 6px 12px; border-radius: 5px; font-size: 12.5px; color: var(--muted); font-weight: 500; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+.apps-body .queue-tabs a { padding: 6px 12px; border-radius: 5px; font-size: 12.5px; color: var(--muted); font-weight: 500; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; cursor: pointer; }
+.apps-body .queue-tabs a:hover { color: var(--ink); }
 .apps-body .queue-tabs a .qt-count { font-size: 10.5px; font-weight: 700; padding: 1px 6px; border-radius: 999px; background: var(--ink); color: #fff; }
 .apps-body .queue-tabs a.on { background: #fff; color: var(--ink); box-shadow: 0 1px 2px oklch(0 0 0 / 0.06); }
+
+.filter-menu { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 4px; box-shadow: var(--shadow-lg); min-width: 180px; z-index: 60; display: flex; flex-direction: column; }
+.filter-menu-item { text-align: left; padding: 7px 10px; font-size: 12.5px; color: var(--ink); border-radius: 6px; background: transparent; border: 0; cursor: pointer; }
+.filter-menu-item:hover { background: var(--hover); }
+.filter-menu-item.on { background: var(--blue-softer); color: var(--blue); font-weight: 600; }
 
 .apps-body .queue-filters { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .apps-body .filter-chip { padding: 5px 11px; border-radius: 7px; font-size: 12px; font-weight: 500; color: var(--ink-soft); background: #fff; border: 1px solid var(--line); display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; cursor: pointer; }
@@ -112,25 +118,18 @@ export default async function ApplicationsLayout({
 }) {
   const { marketplace } = await requireOwnerOf(params.slug);
 
-  const [pendingCount, approvedCount, rejectedCount, pendingOver48h] =
-    await Promise.all([
-      prisma.application.count({
-        where: { marketplaceId: marketplace.id, status: "PENDING" },
-      }),
-      prisma.application.count({
-        where: { marketplaceId: marketplace.id, status: "APPROVED" },
-      }),
-      prisma.application.count({
-        where: { marketplaceId: marketplace.id, status: "REJECTED" },
-      }),
-      prisma.application.count({
-        where: {
-          marketplaceId: marketplace.id,
-          status: "PENDING",
-          createdAt: { lte: new Date(Date.now() - 48 * 3600 * 1000) },
-        },
-      }),
-    ]);
+  const [pendingCount, pendingOver48h] = await Promise.all([
+    prisma.application.count({
+      where: { marketplaceId: marketplace.id, status: "PENDING" },
+    }),
+    prisma.application.count({
+      where: {
+        marketplaceId: marketplace.id,
+        status: "PENDING",
+        createdAt: { lte: new Date(Date.now() - 48 * 3600 * 1000) },
+      },
+    }),
+  ]);
 
   return (
     <OwnerShell slug={params.slug}>
@@ -147,45 +146,7 @@ export default async function ApplicationsLayout({
             </div>
           </div>
         </div>
-
-        <div className="queue-head">
-          <nav className="queue-tabs" aria-label="Queue tabs">
-            <a className="on" href="#pending">
-              Pending
-              {pendingCount > 0 && <span className="qt-count">{pendingCount}</span>}
-            </a>
-            <a href="#approved">
-              Approved{approvedCount > 0 ? ` (${approvedCount})` : ""}
-            </a>
-            <a href="#rejected">
-              Rejected{rejectedCount > 0 ? ` (${rejectedCount})` : ""}
-            </a>
-            <a href="#all">All</a>
-          </nav>
-          <div className="queue-filters">
-            <div className="search-field">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="7" />
-                <path d="m21 21-4.3-4.3" />
-              </svg>
-              <input placeholder="Search applicants, answers…" disabled />
-            </div>
-            <button type="button" className="filter-chip">
-              All verifications
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="m6 9 6 6 6-6" />
-              </svg>
-            </button>
-            <button type="button" className="filter-chip">
-              Sort: Oldest first
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="m6 9 6 6 6-6" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <div className="queue-split">{children}</div>
+        {children}
       </main>
     </OwnerShell>
   );
