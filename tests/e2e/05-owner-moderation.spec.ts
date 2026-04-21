@@ -145,4 +145,18 @@ test.describe("Flow 5 · Owner Moderation", () => {
     await page.goto("/owner/ferrari-frenzy/listings");
     await expect(page.getByTestId(/listings-tab-/).first()).toBeVisible();
   });
+
+  test("owner sidebar is sticky under the navbar", async ({ page }) => {
+    await signIn(page, "owner@shouks.test", "Test123!@#", /\/owner\//);
+    await page.goto("/owner/ferrari-frenzy/dashboard");
+    const sidebar = page.getByTestId("owner-sidebar");
+    await expect(sidebar).toBeVisible();
+    const { position, top } = await sidebar.evaluate((el) => {
+      const s = getComputedStyle(el);
+      return { position: s.position, top: s.top };
+    });
+    expect(position).toBe("sticky");
+    // Should pin below the 60px-tall navbar
+    expect(top).toBe("60px");
+  });
 });

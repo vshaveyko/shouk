@@ -59,7 +59,10 @@ export function OwnerSidebar({
   ];
 
   return (
-    <aside className="hidden sm:block w-[232px] flex-none border-r border-line bg-surface px-3.5 py-[22px]">
+    <aside
+      data-testid="owner-sidebar"
+      className="hidden sm:block w-[232px] flex-none border-r border-line bg-surface px-3.5 py-[22px] sticky top-[60px] self-start max-h-[calc(100vh-60px)] overflow-y-auto"
+    >
       <div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted px-2.5 pb-2">
         Moderation
       </div>
