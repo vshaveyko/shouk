@@ -121,4 +121,15 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     await page.goto("/owner/ferrari-frenzy/settings/rules");
     await expect(page.getByTestId("rules-entry-public")).toBeVisible();
   });
+
+  test("SHK-021: Marketplace type labels appear on each entry method", async ({
+    page,
+  }) => {
+    await page.goto("/owner/create");
+    await expect(page.getByRole("heading", { name: /marketplace type/i })).toBeVisible();
+    await expect(page.getByTestId("marketplace-type-label-public")).toHaveText(/public/i);
+    await expect(page.getByTestId("marketplace-type-label-invite")).toHaveText(/private/i);
+    await expect(page.getByTestId("marketplace-type-label-application")).toHaveText(/closed/i);
+    await expect(page.getByTestId("marketplace-type-label-referral")).toHaveText(/closed/i);
+  });
 });

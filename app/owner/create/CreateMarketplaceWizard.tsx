@@ -1082,30 +1082,35 @@ function MembershipStep({
     title: string;
     body: string;
     testid: string;
+    kind: "Public" | "Closed" | "Private";
   }[] = [
     {
       id: "PUBLIC",
       title: "Open",
       body: "Anyone signed in can join with one click. No approval needed.",
       testid: "entry-method-public",
+      kind: "Public",
     },
     {
       id: "APPLICATION",
       title: "Application",
       body: "People apply with a short form. You review and approve.",
       testid: "entry-method-application",
+      kind: "Closed",
     },
     {
       id: "INVITE",
       title: "Invite link or code",
       body: "Share a link or code. Holders can join instantly.",
       testid: "entry-method-invite",
+      kind: "Private",
     },
     {
       id: "REFERRAL",
       title: "Referral",
       body: "Existing members vouch for newcomers.",
       testid: "entry-method-referral",
+      kind: "Closed",
     },
   ];
 
@@ -1113,11 +1118,15 @@ function MembershipStep({
     <div className="space-y-5">
       <Card>
         <CardHeader>
-          <CardTitle>How do people join?</CardTitle>
-          <CardDescription>Pick a single entry method.</CardDescription>
+          <CardTitle>Marketplace type</CardTitle>
+          <CardDescription>
+            Public marketplaces are discoverable and anyone can join. Closed
+            marketplaces gate new members through application or referral.
+            Private marketplaces are invite-only. (SHK-021)
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3" role="radiogroup" aria-label="Entry method">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3" role="radiogroup" aria-label="Marketplace type">
             {entryOptions.map((opt) => {
               const selected = state.entryMethod === opt.id;
               return (
@@ -1149,6 +1158,12 @@ function MembershipStep({
                       )}
                     </span>
                   </div>
+                  <span
+                    className="inline-flex items-center rounded-full border border-line px-2 py-px text-[10px] font-semibold uppercase tracking-[0.08em] text-muted mb-1.5"
+                    data-testid={`marketplace-type-label-${opt.id.toLowerCase()}`}
+                  >
+                    {opt.kind}
+                  </span>
                   <p className="text-[12.5px] text-muted">{opt.body}</p>
                 </button>
               );
