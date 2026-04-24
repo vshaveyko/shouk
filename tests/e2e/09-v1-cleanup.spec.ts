@@ -59,4 +59,13 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     const items = page.getByRole("menuitem", { name: /ferrari frenzy/i });
     await expect(items).toHaveCount(1);
   });
+
+  test("SHK-030: marketplace switcher clears selection outside marketplace context", async ({
+    page,
+  }) => {
+    await page.goto("/explore");
+    const switcher = page.getByTestId("marketplace-switcher");
+    await expect(switcher).toBeVisible();
+    await expect(switcher).toContainText(/choose a marketplace/i);
+  });
 });

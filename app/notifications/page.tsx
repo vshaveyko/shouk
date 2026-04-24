@@ -23,7 +23,6 @@ export default async function NotificationsPage() {
   });
 
   const unread = items.filter((n) => !n.readAt).length;
-  const active = memberships[0] ?? owned[0] ?? null;
 
   // Serialize dates to strings so we can pass into a client component.
   const serialized = items.map((n) => ({
@@ -52,7 +51,7 @@ export default async function NotificationsPage() {
           image: user.image,
           email: user.email,
         }}
-        activeMarketplace={active}
+        activeMarketplace={null}
         marketplaces={[...owned, ...memberships]}
         mode="member"
         notificationCount={unread}

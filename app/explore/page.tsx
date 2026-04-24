@@ -56,7 +56,7 @@ export default async function ExplorePage({
       {user ? (
         <Navbar
           user={{ id: user.id, name: user.displayName ?? user.name, image: user.image, email: user.email }}
-          activeMarketplace={active}
+          activeMarketplace={null}
           marketplaces={[...owned, ...memberships]}
           mode="member"
           notificationCount={unread}

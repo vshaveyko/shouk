@@ -58,13 +58,12 @@ export default async function SavedPage() {
   }
 
   const { user, memberships, owned } = ctx;
-  const active = memberships[0] ?? owned[0] ?? null;
 
   return (
     <div className="min-h-screen bg-bg-soft">
       <Navbar
         user={{ id: user.id, name: user.displayName ?? user.name, image: user.image, email: user.email }}
-        activeMarketplace={active}
+        activeMarketplace={null}
         marketplaces={[...owned, ...memberships]}
         mode="member"
         notificationCount={unread}

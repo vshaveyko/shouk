@@ -26,7 +26,6 @@ export default async function ProfilePage() {
   if (!ctx) redirect("/signin?callbackUrl=/profile");
 
   const { user, memberships, owned } = ctx;
-  const active = memberships[0] ?? owned[0] ?? null;
 
   const unread = await prisma.notification.count({
     where: { userId: session.user.id, readAt: null },
@@ -41,7 +40,7 @@ export default async function ProfilePage() {
     <div className="min-h-screen bg-bg-soft">
       <Navbar
         user={{ id: user.id, name: user.displayName ?? user.name, image: user.image, email: user.email }}
-        activeMarketplace={active}
+        activeMarketplace={null}
         marketplaces={[...owned, ...memberships]}
         mode="member"
         notificationCount={unread}
