@@ -33,8 +33,16 @@ export async function getUserContext() {
   });
   if (!user) return null;
 
-  const memberships = user.memberships.map((m) => m.marketplace);
+  // Marketplace owners also have an auto-created OWNER Membership (so the
+  // usual membership-based queries don't need an `ownerId` special case). For
+  // the shell chrome we don't want to show those twice — filter them out of
+  // `memberships` so every caller can safely do `[...owned, ...memberships]`
+  // without double-listing the user's own marketplaces (SHK-034 / SHK-043).
   const owned = user.ownedMarketplaces;
+  const ownedIds = new Set(owned.map((o) => o.id));
+  const memberships = user.memberships
+    .map((m) => m.marketplace)
+    .filter((mp) => !ownedIds.has(mp.id));
 
   return { user, memberships, owned };
 }

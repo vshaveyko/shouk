@@ -49,4 +49,14 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
       page.getByRole("heading", { name: /your marketplaces/i }),
     ).toBeVisible();
   });
+
+  test("SHK-034/043: owned marketplaces appear once in switcher", async ({
+    page,
+  }) => {
+    await page.goto("/owner/ferrari-frenzy/dashboard");
+    await page.getByTestId("marketplace-switcher").click();
+    // Ferrari Frenzy is owned by this user — should show exactly once, not twice.
+    const items = page.getByRole("menuitem", { name: /ferrari frenzy/i });
+    await expect(items).toHaveCount(1);
+  });
 });
