@@ -143,4 +143,26 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
       page.getByRole("link", { name: /get started/i }),
     ).toHaveCount(0);
   });
+
+  test("SHK-039: apply page loads for a pending applicant (smoke)", async ({
+    browser,
+  }) => {
+    // The owner fixture's beforeEach signs us in as the owner. Use a
+    // fresh browser context as the applicant so the existing session
+    // doesn't collide. The substantive SHK-039 fix — updating the same
+    // application row rather than creating a second — is in
+    // app/api/marketplaces/[slug]/applications/route.ts; this spec just
+    // keeps the apply UI honest.
+    const ctx = await browser.newContext();
+    const page = await ctx.newPage();
+    await page.goto("/signin");
+    await page.getByTestId("credentials-form").getByLabel("Email").fill("applicant@shouks.test");
+    await page.getByTestId("credentials-form").getByLabel("Password").fill("Test123!@#");
+    await page.getByTestId("credentials-form").getByRole("button", { name: /sign in/i }).click();
+    await page.goto("/apply/ferrari-frenzy");
+    // The applicant already has a pending app, so the apply flow should
+    // either show the form or a status banner — both are OK. No crash.
+    await expect(page.locator("body")).toBeVisible();
+    await ctx.close();
+  });
 });

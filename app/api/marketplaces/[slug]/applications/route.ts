@@ -67,14 +67,35 @@ export async function POST(req: Request, { params }: { params: { slug: string } 
     mp.entryMethod === "PUBLIC" ||
     (mp.autoApprove && mp.entryMethod !== "APPLICATION");
 
-  const application = await prisma.application.create({
-    data: {
+  // If the applicant is coming back after a NEEDS_INFO follow-up, update
+  // the existing application in place (SHK-039) instead of spawning a
+  // second record.
+  const needsInfo = await prisma.application.findFirst({
+    where: {
       userId: session.user.id,
       marketplaceId: mp.id,
-      answers: parsed.data.answers,
-      status: autoApprove ? "APPROVED" : "PENDING",
+      status: "NEEDS_INFO",
     },
+    orderBy: { createdAt: "desc" },
   });
+
+  const application = needsInfo
+    ? await prisma.application.update({
+        where: { id: needsInfo.id },
+        data: {
+          answers: parsed.data.answers,
+          status: autoApprove ? "APPROVED" : "PENDING",
+          reviewerNote: null,
+        },
+      })
+    : await prisma.application.create({
+        data: {
+          userId: session.user.id,
+          marketplaceId: mp.id,
+          answers: parsed.data.answers,
+          status: autoApprove ? "APPROVED" : "PENDING",
+        },
+      });
 
   if (autoApprove) {
     await prisma.membership.upsert({
@@ -84,13 +105,16 @@ export async function POST(req: Request, { params }: { params: { slug: string } 
     });
   }
 
-  // Notify owner
+  // Notify owner. For the NEEDS_INFO follow-up case we nudge them that
+  // the applicant has replied rather than pretending it's a new app.
   await prisma.notification.create({
     data: {
       userId: mp.ownerId,
       marketplaceId: mp.id,
       kind: "APPLICATION_SUBMITTED",
-      title: `New application from ${session.user.name ?? "a new user"}`,
+      title: needsInfo
+        ? `${session.user.name ?? "An applicant"} replied with more info`
+        : `New application from ${session.user.name ?? "a new user"}`,
       deeplink: `/owner/${mp.slug}/applications/${application.id}`,
     },
   });
