@@ -35,7 +35,7 @@ const createSchema = z.object({
   category: z.string().min(1),
   coverImageUrl: z.string().url().optional().nullable(),
   primaryColor: z.string().regex(/^#([0-9a-fA-F]{6})$/).optional().nullable(),
-  entryMethod: z.enum(["APPLICATION", "INVITE", "REFERRAL"]).default("APPLICATION"),
+  entryMethod: z.enum(["APPLICATION", "INVITE", "REFERRAL", "PUBLIC"]).default("APPLICATION"),
   requiredVerifications: z.array(z.enum(["GOOGLE", "FACEBOOK", "INSTAGRAM", "LINKEDIN", "TWITTER", "PHONE"])).min(1),
   autoApprove: z.boolean().default(false),
   auctionsEnabled: z.boolean().default(false),

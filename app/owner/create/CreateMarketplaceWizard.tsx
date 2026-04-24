@@ -71,7 +71,7 @@ type ApplicationQuestion = {
   options?: string[];
 };
 
-type EntryMethod = "APPLICATION" | "INVITE" | "REFERRAL";
+type EntryMethod = "APPLICATION" | "INVITE" | "REFERRAL" | "PUBLIC";
 type VerifyProviderId = (typeof verifyProviders)[number]["id"];
 
 type FormState = {
@@ -1084,6 +1084,12 @@ function MembershipStep({
     testid: string;
   }[] = [
     {
+      id: "PUBLIC",
+      title: "Open",
+      body: "Anyone signed in can join with one click. No approval needed.",
+      testid: "entry-method-public",
+    },
+    {
       id: "APPLICATION",
       title: "Application",
       body: "People apply with a short form. You review and approve.",
@@ -1111,7 +1117,7 @@ function MembershipStep({
           <CardDescription>Pick a single entry method.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3" role="radiogroup" aria-label="Entry method">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3" role="radiogroup" aria-label="Entry method">
             {entryOptions.map((opt) => {
               const selected = state.entryMethod === opt.id;
               return (

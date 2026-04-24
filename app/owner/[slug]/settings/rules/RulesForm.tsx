@@ -24,7 +24,7 @@ import {
 } from "@/components/ui";
 import { cn, verifyProviders } from "@/lib/utils";
 
-type EntryMethod = "APPLICATION" | "INVITE" | "REFERRAL";
+type EntryMethod = "APPLICATION" | "INVITE" | "REFERRAL" | "PUBLIC";
 type VerifyProviderId = (typeof verifyProviders)[number]["id"];
 
 type QuestionType =
@@ -220,6 +220,12 @@ export function RulesForm({
     body: string;
     testid: string;
   }[] = [
+    {
+      id: "PUBLIC",
+      title: "Open",
+      body: "Anyone signed in can join with one click. No approval needed.",
+      testid: "rules-entry-public",
+    },
     {
       id: "APPLICATION",
       title: "Application",

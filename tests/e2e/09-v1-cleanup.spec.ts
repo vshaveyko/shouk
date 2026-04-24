@@ -111,4 +111,14 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     await expect(page.getByRole("link", { name: /pending review/i })).toHaveCount(0);
     await expect(page.getByRole("link", { name: /^flagged/i })).toHaveCount(0);
   });
+
+  test("SHK-042: Open/Public entry method option is offered in wizard and rules", async ({
+    page,
+  }) => {
+    await page.goto("/owner/create");
+    await expect(page.getByTestId("entry-method-public")).toBeVisible();
+
+    await page.goto("/owner/ferrari-frenzy/settings/rules");
+    await expect(page.getByTestId("rules-entry-public")).toBeVisible();
+  });
 });

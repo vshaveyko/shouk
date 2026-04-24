@@ -24,7 +24,7 @@ const updateSchema = z.object({
   description: z.string().max(500).optional().nullable(),
   coverImageUrl: z.string().url().optional().nullable(),
   primaryColor: z.string().regex(/^#([0-9a-fA-F]{6})$/).optional().nullable(),
-  entryMethod: z.enum(["APPLICATION", "INVITE", "REFERRAL"]).optional(),
+  entryMethod: z.enum(["APPLICATION", "INVITE", "REFERRAL", "PUBLIC"]).optional(),
   requiredVerifications: z.array(z.enum(["GOOGLE", "FACEBOOK", "INSTAGRAM", "LINKEDIN", "TWITTER", "PHONE"])).optional(),
   autoApprove: z.boolean().optional(),
   auctionsEnabled: z.boolean().optional(),

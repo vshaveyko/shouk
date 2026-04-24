@@ -179,6 +179,7 @@ enum EntryMethod {
   APPLICATION
   INVITE
   REFERRAL
+  PUBLIC
 }
 
 // Listing schema field definitions

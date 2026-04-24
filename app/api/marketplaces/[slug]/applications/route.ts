@@ -61,17 +61,22 @@ export async function POST(req: Request, { params }: { params: { slug: string } 
     }
   }
 
+  // PUBLIC marketplaces auto-admit everyone on submit (SHK-042). Referral
+  // marketplaces can also opt in via autoApprove.
+  const autoApprove =
+    mp.entryMethod === "PUBLIC" ||
+    (mp.autoApprove && mp.entryMethod !== "APPLICATION");
+
   const application = await prisma.application.create({
     data: {
       userId: session.user.id,
       marketplaceId: mp.id,
       answers: parsed.data.answers,
-      status: mp.autoApprove && mp.entryMethod !== "APPLICATION" ? "APPROVED" : "PENDING",
+      status: autoApprove ? "APPROVED" : "PENDING",
     },
   });
 
-  // Auto-approved flow (for referrals with auto-approval)
-  if (mp.autoApprove && mp.entryMethod !== "APPLICATION") {
+  if (autoApprove) {
     await prisma.membership.upsert({
       where: { userId_marketplaceId: { userId: session.user.id, marketplaceId: mp.id } },
       update: { status: "ACTIVE", role: "MEMBER" },
