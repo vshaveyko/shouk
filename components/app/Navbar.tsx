@@ -53,6 +53,7 @@ export function Navbar({
   marketplaces,
   mode = "member",
   notificationCount = 0,
+  unreadMessagesCount = 0,
 }: {
   user: {
     id: string;
@@ -64,6 +65,7 @@ export function Navbar({
   marketplaces: Marketplace[];
   mode?: "member" | "owner";
   notificationCount?: number;
+  unreadMessagesCount?: number;
 }) {
   const pathname = usePathname();
 
@@ -144,8 +146,10 @@ export function Navbar({
                 className={l.active ? "active" : ""}
               >
                 {l.label}
-                {l.label === "Messages" && notificationCount > 0 ? (
-                  <span className="ping">{notificationCount}</span>
+                {l.label === "Messages" && unreadMessagesCount > 0 ? (
+                  <span className="ping" data-testid="nav-messages-ping">
+                    {unreadMessagesCount}
+                  </span>
                 ) : null}
               </Link>
             ))}

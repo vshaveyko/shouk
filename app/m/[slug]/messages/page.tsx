@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getUserContext } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { Navbar } from "@/components/app/Navbar";
-import { findOrCreateThread } from "@/lib/messages";
+import { findOrCreateThread, countUnreadThreads } from "@/lib/messages";
 import { MessagesClient, type ThreadSummary, type MessageItem } from "./MessagesClient";
 
 export const dynamic = "force-dynamic";
@@ -151,9 +151,12 @@ export default async function MarketplaceMessagesPage({
     }
   }
 
-  const unreadNotifs = await prisma.notification.count({
-    where: { userId: ctx.user.id, readAt: null },
-  });
+  const [unreadNotifs, unreadMessages] = await Promise.all([
+    prisma.notification.count({
+      where: { userId: ctx.user.id, readAt: null },
+    }),
+    countUnreadThreads(ctx.user.id),
+  ]);
 
   return (
     <div className="min-h-screen bg-bg-soft">
@@ -173,6 +176,7 @@ export default async function MarketplaceMessagesPage({
         }}
         marketplaces={[...ctx.owned, ...ctx.memberships]}
         notificationCount={unreadNotifs}
+        unreadMessagesCount={unreadMessages}
       />
 
       <MessagesClient

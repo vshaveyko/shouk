@@ -6,6 +6,7 @@ import { Navbar } from "@/components/app/Navbar";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { prisma } from "@/lib/prisma";
+import { countUnreadThreads } from "@/lib/messages";
 
 export const dynamic = "force-dynamic";
 
@@ -31,11 +32,10 @@ export default async function HomeDashboard({
     redirect(`/owner/${owned[0].slug}/dashboard`);
   }
 
-  const active = memberships[0] ?? owned[0] ?? null;
-
-  const unread = await prisma.notification.count({
-    where: { userId: user.id, readAt: null },
-  });
+  const [unread, unreadMessages] = await Promise.all([
+    prisma.notification.count({ where: { userId: user.id, readAt: null } }),
+    countUnreadThreads(user.id),
+  ]);
 
   const publicMarketplaces = await prisma.marketplace.findMany({
     where: { status: "ACTIVE" },
@@ -52,6 +52,7 @@ export default async function HomeDashboard({
         marketplaces={[...owned, ...memberships]}
         mode="member"
         notificationCount={unread}
+        unreadMessagesCount={unreadMessages}
       />
 
       <main className="max-w-[1280px] mx-auto px-6 py-10">

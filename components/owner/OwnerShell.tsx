@@ -3,6 +3,7 @@ import { Navbar } from "@/components/app/Navbar";
 import { OwnerSidebar } from "@/components/owner/OwnerSidebar";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { countUnreadThreads } from "@/lib/messages";
 
 /**
  * Server component shared across /owner/[slug]/... pages.
@@ -46,9 +47,12 @@ export async function OwnerShell({
   const marketplaces = [...owned, ...memberships.filter((m) => !owned.find((o) => o.id === m.id))];
   const active = marketplaces.find((m) => m.slug === slug) ?? null;
 
-  const unread =
-    notificationCount ??
-    (await prisma.notification.count({ where: { userId: user.id, readAt: null } }));
+  const [unread, unreadMessages] = await Promise.all([
+    notificationCount !== undefined
+      ? Promise.resolve(notificationCount)
+      : prisma.notification.count({ where: { userId: user.id, readAt: null } }),
+    countUnreadThreads(user.id),
+  ]);
 
   const counts = active
     ? await (async () => {
@@ -87,6 +91,7 @@ export async function OwnerShell({
         marketplaces={marketplaces}
         mode="owner"
         notificationCount={unread}
+        unreadMessagesCount={unreadMessages}
       />
       <div className="flex flex-1 min-h-0">
         <OwnerSidebar slug={slug} counts={counts} />

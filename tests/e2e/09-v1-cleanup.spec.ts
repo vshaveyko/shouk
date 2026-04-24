@@ -68,4 +68,16 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     await expect(switcher).toBeVisible();
     await expect(switcher).toContainText(/choose a marketplace/i);
   });
+
+  test("SHK-036: Messages ping is independent of notification count", async ({
+    page,
+  }) => {
+    // Owner has notifications (from seed activity) but no unread DMs.
+    await page.goto("/owner/ferrari-frenzy/dashboard");
+    // The messages nav link exists and does NOT show a ping tied to notifications.
+    await expect(
+      page.getByRole("link", { name: /^messages/i }).first(),
+    ).toBeVisible();
+    await expect(page.getByTestId("nav-messages-ping")).toHaveCount(0);
+  });
 });
