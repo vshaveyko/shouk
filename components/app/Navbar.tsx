@@ -120,7 +120,11 @@ export function Navbar({
     <>
       <style dangerouslySetInnerHTML={{ __html: navbarCss }} />
       <header className="shouks-navbar">
-        <Link href="/home" className="brand">
+        <Link
+          href={isOwnerMode ? "/home?stay=1" : "/home"}
+          className="brand"
+          data-testid="navbar-brand"
+        >
           <ShouksMark size={24} />
           <span>Shouks</span>
         </Link>

@@ -9,14 +9,25 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-export default async function HomeDashboard() {
+export default async function HomeDashboard({
+  searchParams,
+}: {
+  searchParams?: { stay?: string };
+}) {
   const ctx = await getUserContext();
   if (!ctx) redirect("/signin?callbackUrl=/home");
   const { user, memberships, owned } = ctx;
 
   // Owners whose primary identity is "owner" and who already run at least one
-  // marketplace should land in their admin shell, not the member home feed.
-  if (user.defaultRole === "OWNER" && owned.length > 0) {
+  // marketplace should land in their admin shell, not the member home feed —
+  // but only for "implicit" visits. `?stay=1` opts out so that clicking the
+  // brand/logo from inside the owner shell doesn't trap the user in a
+  // same-page redirect loop (SHK-028).
+  if (
+    searchParams?.stay !== "1" &&
+    user.defaultRole === "OWNER" &&
+    owned.length > 0
+  ) {
     redirect(`/owner/${owned[0].slug}/dashboard`);
   }
 

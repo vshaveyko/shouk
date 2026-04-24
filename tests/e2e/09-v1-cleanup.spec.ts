@@ -37,4 +37,16 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     await expect(page.getByRole("heading", { name: /welcome back/i }).first()).toBeVisible();
     await expect(page.getByRole("link", { name: /share marketplace/i })).toHaveCount(0);
   });
+
+  test("SHK-028: Shouks brand logo from owner shell lands on member home", async ({
+    page,
+  }) => {
+    await page.goto("/owner/ferrari-frenzy/dashboard");
+    await expect(page.getByTestId("navbar-brand")).toBeVisible();
+    await page.getByTestId("navbar-brand").click();
+    await expect(page).toHaveURL(/\/home(\?|$)/);
+    await expect(
+      page.getByRole("heading", { name: /your marketplaces/i }),
+    ).toBeVisible();
+  });
 });
