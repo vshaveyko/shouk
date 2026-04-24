@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/Badge";
 import { BrandLockup } from "@/components/brand/Logo";
 import { verifyProviders } from "@/lib/utils";
 import { ApplyForm } from "./ApplyForm";
+import { VerifyViaWhatsAppCard } from "@/components/whatsapp/VerifyViaWhatsAppCard";
 
 export const dynamic = "force-dynamic";
 
@@ -117,6 +118,16 @@ export default async function ApplyPage({ params }: { params: Params }) {
             Tell {ownerName} a bit about you. Typical review takes ~48 hours.
           </p>
         </div>
+
+        {mp.whatsappGroupId &&
+          mp.whatsappAutoApproval &&
+          process.env.WHATSAPP_ENABLED === "true" && (
+            <VerifyViaWhatsAppCard
+              marketplaceId={mp.id}
+              marketplaceSlug={mp.slug}
+              groupName={mp.whatsappGroupName}
+            />
+          )}
 
         {/* Reviewer follow-up call-out for NEEDS_INFO */}
         {reviewerFollowUp && (

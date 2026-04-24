@@ -149,6 +149,10 @@ model Marketplace {
   annualPriceCents      Int?
   status                MarketplaceStatus @default(ACTIVE)
   publishedAt           DateTime?
+  // ── WhatsApp group linking ──
+  whatsappGroupId       String?           @unique
+  whatsappGroupName     String?
+  whatsappAutoApproval  Boolean           @default(false)
   createdAt             DateTime          @default(now())
   updatedAt             DateTime          @updatedAt
 
@@ -159,6 +163,7 @@ model Marketplace {
   schemaFields         SchemaField[]
   applicationQuestions ApplicationQuestion[]
   invites              Invite[]
+  phoneInvites         PhoneInvite[]
   notifications        Notification[]
   savedSearches        SavedSearch[]
   listingSaves         ListingSave[]
@@ -166,6 +171,31 @@ model Marketplace {
 
   @@index([ownerId])
   @@index([status])
+}
+
+// Phone-number-based invitations (e.g. imported from WhatsApp group).
+// We don't send SMS from the app yet — see lib/whatsapp.ts sendSmsStub().
+model PhoneInvite {
+  id            String            @id @default(cuid())
+  marketplaceId String
+  phone         String
+  status        PhoneInviteStatus @default(PENDING)
+  source        String?
+  issuerId      String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  marketplace Marketplace @relation(fields: [marketplaceId], references: [id], onDelete: Cascade)
+
+  @@unique([marketplaceId, phone])
+  @@index([phone])
+}
+
+enum PhoneInviteStatus {
+  PENDING
+  SENT
+  ACCEPTED
+  CANCELLED
 }
 
 enum MarketplaceStatus {
