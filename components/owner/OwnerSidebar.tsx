@@ -9,7 +9,6 @@ import {
   Users,
   Settings,
   LineChart,
-  Wallet,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -55,7 +54,6 @@ export function OwnerSidebar({
   const mpItems = [
     { href: `${base}/settings`, label: "Settings", icon: Settings },
     { href: `${base}/analytics`, label: "Analytics", icon: LineChart },
-    { href: `${base}/payouts`, label: "Payouts", icon: Wallet },
   ];
 
   return (

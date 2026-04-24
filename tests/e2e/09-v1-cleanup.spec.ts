@@ -17,4 +17,11 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     await expect(page.getByTestId("settings-tab-identity")).toBeVisible();
     await expect(page.getByTestId("settings-tab-billing")).toHaveCount(0);
   });
+
+  test("SHK-024: Payouts link hidden from owner sidebar", async ({ page }) => {
+    await page.goto("/owner/ferrari-frenzy/dashboard");
+    const sidebar = page.getByTestId("owner-sidebar");
+    await expect(sidebar).toBeVisible();
+    await expect(sidebar.getByRole("link", { name: /payouts/i })).toHaveCount(0);
+  });
 });
