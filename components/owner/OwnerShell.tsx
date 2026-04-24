@@ -42,9 +42,14 @@ export async function OwnerShell({
   });
   if (!user) redirect("/signin");
 
-  const memberships = user.memberships.map((m) => m.marketplace);
-  const owned = user.ownedMarketplaces;
-  const marketplaces = [...owned, ...memberships.filter((m) => !owned.find((o) => o.id === m.id))];
+  const ownedRaw = user.ownedMarketplaces;
+  const ownedIds = new Set(ownedRaw.map((o) => o.id));
+  const owned = ownedRaw.map((m) => ({ ...m, isOwner: true }));
+  const memberships = user.memberships
+    .map((m) => m.marketplace)
+    .filter((mp) => !ownedIds.has(mp.id))
+    .map((m) => ({ ...m, isOwner: false }));
+  const marketplaces = [...owned, ...memberships];
   const active = marketplaces.find((m) => m.slug === slug) ?? null;
 
   const [unread, unreadMessages] = await Promise.all([

@@ -230,4 +230,16 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     await expect(page.locator("body")).toBeVisible();
     await ctx.close();
   });
+
+  test("SHK-051: switcher routes owner vs member marketplaces differently", async ({
+    page,
+  }) => {
+    // Owner owns Ferrari Frenzy + Gooners United. Both entries in the
+    // switcher should route into /owner/<slug>/dashboard. Use 'member'
+    // account (member of both) to exercise the other branch.
+    await page.goto("/home?stay=1");
+    await page.getByTestId("marketplace-switcher").click();
+    const ferrari = page.getByRole("menuitem", { name: /ferrari frenzy/i });
+    await expect(ferrari).toHaveAttribute("href", /\/owner\/ferrari-frenzy/);
+  });
 });

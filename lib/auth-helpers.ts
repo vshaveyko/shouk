@@ -38,11 +38,15 @@ export async function getUserContext() {
   // the shell chrome we don't want to show those twice — filter them out of
   // `memberships` so every caller can safely do `[...owned, ...memberships]`
   // without double-listing the user's own marketplaces (SHK-034 / SHK-043).
-  const owned = user.ownedMarketplaces;
-  const ownedIds = new Set(owned.map((o) => o.id));
+  const ownedIds = new Set(user.ownedMarketplaces.map((o) => o.id));
+  // Tag each marketplace with isOwner so the Navbar switcher can route
+  // owner-owned entries into /owner/<slug> and member-only entries into
+  // /m/<slug> (SHK-051).
+  const owned = user.ownedMarketplaces.map((m) => ({ ...m, isOwner: true }));
   const memberships = user.memberships
     .map((m) => m.marketplace)
-    .filter((mp) => !ownedIds.has(mp.id));
+    .filter((mp) => !ownedIds.has(mp.id))
+    .map((m) => ({ ...m, isOwner: false }));
 
   return { user, memberships, owned };
 }

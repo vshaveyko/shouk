@@ -15,6 +15,12 @@ type Marketplace = {
   slug: string;
   logoUrl?: string | null;
   primaryColor?: string | null;
+  /**
+   * Whether the current user owns this marketplace. Used by the switcher
+   * to decide whether to route into /owner/<slug>/dashboard or the
+   * member-facing /m/<slug> (SHK-051).
+   */
+  isOwner?: boolean;
 };
 
 const navbarCss = `
@@ -235,7 +241,15 @@ function MarketplaceSwitcher({
             marketplaces.map((m) => (
               <DropdownMenu.Item key={m.id} asChild>
                 <Link
-                  href={mode === "owner" ? `/owner/${m.slug}/dashboard` : `/m/${m.slug}`}
+                  href={
+                    // Owner-owned marketplaces always go to the owner shell;
+                    // member-only marketplaces go to /m/<slug> regardless of
+                    // the current navbar mode so members don't get bounced
+                    // to /home by requireOwnerOf (SHK-051).
+                    m.isOwner
+                      ? `/owner/${m.slug}/dashboard`
+                      : `/m/${m.slug}`
+                  }
                   className="flex items-center gap-2 px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[14px]"
                 >
                   <span
