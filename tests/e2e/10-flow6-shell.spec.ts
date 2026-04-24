@@ -41,4 +41,18 @@ test.describe("Flow 6 · Core app shell — visual structure", () => {
     await expect(page.locator(".mp-toolbar")).toBeVisible();
     await expect(page.locator(".listings-grid")).toBeVisible();
   });
+
+  test("6C listing detail has ld split-pane with ld-left gallery and ld-right info", async ({ page }) => {
+    await signIn(page, "member@shouks.test", "Test123!@#");
+    await page.goto("/m/ferrari-frenzy/feed");
+    const firstCard = page.locator(".listings-grid .listing").first();
+    await firstCard.click();
+    await expect(page).toHaveURL(/\/l\//);
+    await expect(page.locator(".ld")).toBeVisible();
+    await expect(page.locator(".ld .ld-left")).toBeVisible();
+    await expect(page.locator(".ld .ld-right")).toBeVisible();
+    await expect(page.locator(".ld .ld-main-img")).toBeVisible();
+    // Serif H1 in the head block
+    await expect(page.locator(".ld-head h1")).toBeVisible();
+  });
 });

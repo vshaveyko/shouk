@@ -9,6 +9,44 @@ import { ListingClient } from "./ListingClient";
 
 export const dynamic = "force-dynamic";
 
+// Design source: design_handoff_shouks_mvp/Flow 6 - Core App Shell.html  · 6C.
+// Class names (.ld, .ld-left, .ld-right, .ld-main-img, .ld-thumbs,
+// .ld-head, .ld-price, .ld-cta, .ld-spec, .seller-box, .description)
+// mirror the design so future visual edits map 1:1.
+const ldCss = `
+.ld { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 24px; padding: 8px 0 40px; max-width: 1280px; margin: 0 auto; }
+@media (max-width: 900px) { .ld { grid-template-columns: 1fr; } }
+.ld-left { display: flex; flex-direction: column; gap: 16px; }
+.ld-right { display: flex; flex-direction: column; gap: 16px; }
+.ld-main-img { position: relative; aspect-ratio: 4 / 3; background: var(--bg-panel); border-radius: 14px; overflow: hidden; }
+.ld-main-img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ld-thumbs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.ld-thumb { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: var(--bg-panel); border: 2px solid transparent; cursor: pointer; }
+.ld-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ld-thumb.on { border-color: var(--ink); }
+.ld-thumb:hover:not(.on) { border-color: var(--line); }
+.ld-head { padding: 0; }
+.ld-head .breadcrumb { font-size: 11.5px; color: var(--muted); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.ld-head .breadcrumb a { color: var(--blue-ink); text-decoration: none; }
+.ld-head .breadcrumb a:hover { text-decoration: underline; }
+.ld-head h1 { font-family: "Instrument Serif", serif; font-weight: 400; font-size: 30px; letter-spacing: -0.005em; margin: 0 0 8px; line-height: 1.15; }
+.ld-head .meta { font-size: 12.5px; color: var(--muted); display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.ld-price { padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.ld-price .amt { font-family: "Instrument Serif", serif; font-size: 34px; font-weight: 400; letter-spacing: -0.01em; line-height: 1; }
+.ld-price .sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.ld-cta { display: flex; gap: 10px; flex-wrap: wrap; }
+.ld-cta > * { flex: 1; min-width: 140px; }
+.ld-spec { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #fff; }
+.ld-spec .sp-row { display: grid; grid-template-columns: 120px 1fr; padding: 10px 14px; border-bottom: 1px solid var(--line-soft); font-size: 13px; gap: 12px; align-items: start; }
+.ld-spec .sp-row:last-child { border-bottom: 0; }
+.ld-spec .sp-row .k { color: var(--muted); }
+.ld-spec .sp-row .v { font-weight: 500; }
+.seller-box { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+.description { font-size: 13.5px; color: var(--ink-soft); line-height: 1.6; }
+.description h4 { font-size: 13px; color: var(--ink); margin: 0 0 8px; font-weight: 600; }
+.ld-locked { padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-panel); font-size: 13px; color: var(--ink-soft); display: flex; align-items: center; gap: 8px; }
+`;
+
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const listing = await prisma.listing.findUnique({
     where: { id: params.id },
@@ -115,8 +153,9 @@ export default async function ListingPage({ params }: { params: { id: string } }
         </header>
       )}
 
-      <main className="max-w-[1280px] mx-auto px-6 py-8">
-        <div className="mb-5">
+      <style dangerouslySetInnerHTML={{ __html: ldCss }} />
+      <main className="max-w-[1280px] mx-auto px-6 py-6">
+        <div className="mb-3">
           <Link
             href={`/m/${listing.marketplace.slug}/feed`}
             className="inline-flex items-center gap-1.5 text-[13px] text-ink-soft hover:text-ink"

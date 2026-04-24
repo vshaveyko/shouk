@@ -193,50 +193,44 @@ export function ListingClient(props: Props) {
         </div>
       )}
 
-      <div className="grid gap-8 lg:grid-cols-[1.35fr_1fr]">
+      <div className="ld">
         {/* LEFT: gallery + details */}
-        <div className="space-y-6">
+        <div className="ld-left">
           {/* Gallery */}
-          <div className="space-y-3">
-            <div className="relative aspect-[4/3] bg-bg-panel rounded-[14px] overflow-hidden">
-              {listing.images.length > 0 ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={listing.images[activeImage]}
-                  alt={listing.title}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  data-testid={`listing-image-${activeImage}`}
-                />
-              ) : (
-                <div
-                  className="absolute inset-0 grid place-items-center text-muted text-[13px]"
-                  style={{ background: "linear-gradient(135deg, var(--blue-softer), var(--bg-panel))" }}
-                >
-                  No image
-                </div>
-              )}
-            </div>
-
-            {listing.images.length > 1 && (
-              <div className="grid grid-cols-5 gap-2">
-                {listing.images.map((src, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => setActiveImage(i)}
-                    className={cn(
-                      "relative aspect-square bg-bg-panel rounded-[10px] overflow-hidden border-2 transition-colors",
-                      i === activeImage ? "border-blue" : "border-transparent hover:border-line",
-                    )}
-                    data-testid={`listing-image-thumb-${i}`}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={src} alt="" className="absolute inset-0 w-full h-full object-cover" />
-                  </button>
-                ))}
+          <div className="ld-main-img">
+            {listing.images.length > 0 ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={listing.images[activeImage]}
+                alt={listing.title}
+                data-testid={`listing-image-${activeImage}`}
+              />
+            ) : (
+              <div
+                className="absolute inset-0 grid place-items-center text-muted text-[13px]"
+                style={{ background: "linear-gradient(135deg, var(--blue-softer), var(--bg-panel))" }}
+              >
+                No image
               </div>
             )}
           </div>
+
+          {listing.images.length > 1 && (
+            <div className="ld-thumbs">
+              {listing.images.map((src, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setActiveImage(i)}
+                  className={cn("ld-thumb", i === activeImage && "on")}
+                  data-testid={`listing-image-thumb-${i}`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={src} alt="" />
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Description */}
           {listing.description && (
@@ -323,33 +317,25 @@ export function ListingClient(props: Props) {
         </div>
 
         {/* RIGHT: sticky sidebar */}
-        <aside className="space-y-4">
+        <aside className="ld-right">
           <div className="bg-surface border border-line rounded-[14px] p-5 space-y-4">
             {/* Title */}
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                {isAuction && <Badge variant="auction"><Gavel size={10} /> Auction</Badge>}
-                {isISO && <Badge variant="iso">In search of</Badge>}
-                {isFixed && <Badge variant="neutral">Fixed price</Badge>}
-                {isSold && <Badge variant="approved">Sold</Badge>}
-                {isClosed && <Badge variant="rejected">Closed</Badge>}
+            <div className="ld-head">
+              <div className="breadcrumb">
+                <Link href={`/m/${props.marketplace.slug}/feed`}>{props.marketplace.name}</Link>
+                <span>·</span>
+                {isAuction && <span>Auction</span>}
+                {isISO && <span>In search of</span>}
+                {isFixed && <span>Fixed price</span>}
+                {isSold && <span>Sold</span>}
+                {isClosed && <span>Closed</span>}
               </div>
-              <h1
-                className="serif leading-[1.1] tracking-[-0.01em]"
-                style={{ fontWeight: 400, fontSize: 30, fontFamily: '"Instrument Serif", serif' }}
-                data-testid="listing-title"
-              >
-                {listing.title}
-              </h1>
-              <p className="text-[12px] text-muted mt-1.5 flex items-center gap-3">
-                <Link href={`/m/${props.marketplace.slug}/feed`} className="hover:text-ink">
-                  {props.marketplace.name}
-                </Link>
-                <span className="w-1 h-1 rounded-full bg-current opacity-40" />
-                <span className="inline-flex items-center gap-1"><Eye size={11} /> {listing.views}</span>
-                <span className="w-1 h-1 rounded-full bg-current opacity-40" />
+              <h1 data-testid="listing-title">{listing.title}</h1>
+              <div className="meta">
+                <span className="inline-flex items-center gap-1"><Eye size={11} /> {listing.views} views</span>
+                <span>·</span>
                 <span>{timeAgo(listing.createdAt)}</span>
-              </p>
+              </div>
             </div>
 
             {/* Price */}
