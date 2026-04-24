@@ -98,4 +98,17 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     await expect(page.getByTestId("auctions-toggle")).toHaveCount(0);
     await expect(page.getByTestId("anti-snipe-toggle")).toHaveCount(0);
   });
+
+  test("SHK-041: moderation toggle hidden; Listings page defaults to Active tab", async ({
+    page,
+  }) => {
+    await page.goto("/owner/create");
+    await expect(page.getByTestId("moderation-toggle")).toHaveCount(0);
+
+    await page.goto("/owner/ferrari-frenzy/listings");
+    await expect(page.getByRole("heading", { name: /^listings/i }).first()).toBeVisible();
+    // No Pending review or Flagged tabs
+    await expect(page.getByRole("link", { name: /pending review/i })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: /^flagged/i })).toHaveCount(0);
+  });
 });

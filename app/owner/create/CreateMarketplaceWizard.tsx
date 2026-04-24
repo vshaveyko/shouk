@@ -1460,25 +1460,9 @@ function MonetizationStep({
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Rules & behavior</CardTitle>
-          <CardDescription>Tune moderation for new listings.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <ToggleRow
-              testid="moderation-toggle"
-              title="Require moderation for new listings"
-              body="Every new listing waits for approval before going live."
-              checked={state.moderationRequired}
-              onChange={(v) => setState((s) => ({ ...s, moderationRequired: v }))}
-            />
-            {/* Auctions and anti-snipe are hidden for V1 (SHK-027). Retained
-                in state so migrations stay intact. */}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Rules & behavior card is hidden for V1 (SHK-027 auctions,
+          SHK-041 listing moderation). State fields stay in place so we
+          can re-expose without a migration. */}
 
       <div className="rounded-[10px] border border-blue/20 bg-blue-soft px-4 py-3 flex items-start gap-3">
         <Sparkles size={18} className="text-blue-ink shrink-0 mt-0.5" />

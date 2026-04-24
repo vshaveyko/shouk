@@ -11,7 +11,8 @@ type Tab = "pending" | "flagged" | "active";
 function parseTab(v: string | string[] | undefined): Tab {
   const raw = Array.isArray(v) ? v[0] : v;
   if (raw === "pending" || raw === "flagged" || raw === "active") return raw;
-  return "pending";
+  // V1 defaults straight to Active — the moderation queue is hidden (SHK-041).
+  return "active";
 }
 
 const listingsCss = `
@@ -129,9 +130,12 @@ export default async function ListingsModerationPage({
     }),
   ]);
 
+  // V1: listing moderation is hidden (SHK-041), so only the Active tab
+  // is surfaced. Keeping the pending/flagged counts computed for future
+  // un-hiding is cheap.
+  void pendingCount;
+  void flaggedCount;
   const tabs: { key: Tab; label: string; count: number }[] = [
-    { key: "pending", label: "Pending review", count: pendingCount },
-    { key: "flagged", label: "Flagged", count: flaggedCount },
     { key: "active", label: "Active", count: activeCount },
   ];
 
@@ -140,10 +144,9 @@ export default async function ListingsModerationPage({
       <style dangerouslySetInnerHTML={{ __html: listingsCss }} />
       <main className="list-body">
         <div className="page-head">
-          <h1>Listing moderation</h1>
+          <h1>Listings</h1>
           <div className="lead">
-            Review, approve, or remove listings in {marketplace.name}. Moderation queue
-            is task-first — approve the good stuff, kick back the rest.
+            All active listings in {marketplace.name}.
           </div>
         </div>
 
