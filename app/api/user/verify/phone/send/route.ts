@@ -21,6 +21,18 @@ export async function POST(req: Request) {
   const parsed = schema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "Invalid phone number" }, { status: 400 });
 
+  // Production doesn't have a wired-up SMS provider yet (SHK-033), so
+  // we'd silently drop the code on the floor. Fail loud instead of
+  // pretending it worked — the UI hides the row when the provider env
+  // var isn't set, but this is the server-side backstop.
+  const hasProvider = Boolean(process.env.SHOUKS_SMS_PROVIDER);
+  if (process.env.NODE_ENV === "production" && !hasProvider) {
+    return NextResponse.json(
+      { error: "Phone SMS is not available yet." },
+      { status: 503 },
+    );
+  }
+
   const code = process.env.NODE_ENV === "development" ? "123456" : Math.floor(100000 + Math.random() * 900000).toString();
   store.set(session.user.id, {
     code,

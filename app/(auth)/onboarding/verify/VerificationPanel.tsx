@@ -3,26 +3,28 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 import { Check, Link2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
 type LinkedAccount = { provider: string; handle: string };
 
+// V1 only surfaces identity sources we can actually verify — Google OAuth
+// (real) and phone (stub, SMS provider pending). The other providers are
+// hidden until we wire up real OAuth for them (SHK-031 / SHK-032 / SHK-035).
 const providers = [
   { id: "GOOGLE", label: "Google", badge: "G", bg: "#4285f4" },
-  { id: "FACEBOOK", label: "Facebook", badge: "f", bg: "#1877f2" },
-  { id: "INSTAGRAM", label: "Instagram", badge: "IG", bg: "linear-gradient(135deg,#f58529,#dd2a7b,#515bd4)" },
-  { id: "LINKEDIN", label: "LinkedIn", badge: "in", bg: "#0a66c2" },
-  { id: "TWITTER", label: "X / Twitter", badge: "X", bg: "#000" },
 ];
 
 export function VerificationPanel({
   initial,
   phone,
+  phoneEnabled,
   nextHref,
 }: {
   initial: LinkedAccount[];
   phone: { phoneNumber: string | null; phoneVerified: boolean } | null;
+  phoneEnabled: boolean;
   nextHref: string;
 }) {
   const router = useRouter();
@@ -33,6 +35,26 @@ export function VerificationPanel({
   const [phoneCode, setPhoneCode] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  function linkProvider(providerId: string) {
+    setError(null);
+    if (providerId === "GOOGLE") {
+      // Real OAuth link — sends the user through Google's consent screen.
+      // The auth.ts linkAccount / signIn events write a VerifiedAccount
+      // row with the real email as handle (SHK-031, SHK-032). Callback
+      // back to this very page so the panel re-renders the linked state.
+      void signIn("google", { callbackUrl: "/onboarding/verify" });
+      return;
+    }
+    // Other providers aren't wired yet — fall back to the mock path so the
+    // flow isn't dead. Kept behind a dev-only check so we never hallucinate
+    // a handle in production (SHK-032).
+    if (process.env.NODE_ENV !== "production") {
+      void mockLink(providerId);
+    } else {
+      setError("This provider isn't available yet.");
+    }
+  }
 
   async function mockLink(providerId: string) {
     setBusy(providerId);
@@ -139,7 +161,7 @@ export function VerificationPanel({
                   variant="secondary"
                   size="sm"
                   disabled={busy === p.id}
-                  onClick={() => mockLink(p.id)}
+                  onClick={() => linkProvider(p.id)}
                   data-testid={`link-${p.id.toLowerCase()}`}
                 >
                   <Link2 size={14} /> Link
@@ -149,7 +171,10 @@ export function VerificationPanel({
           );
         })}
 
-        {/* Phone */}
+        {/* Phone — hidden when no SMS provider is wired up (SHK-033).
+            The server-side API also returns 503 in that case, so
+            nothing can "appear to succeed" when it actually won't. */}
+        {phoneEnabled && (
         <div className="p-3 rounded-[10px] border border-line-soft bg-bg-panel" data-testid="verify-row-phone">
           <div className="flex items-center justify-between gap-3 mb-2">
             <div className="flex items-center gap-3 min-w-0">
@@ -208,6 +233,7 @@ export function VerificationPanel({
             </div>
           )}
         </div>
+        )}
       </div>
 
       {error && (

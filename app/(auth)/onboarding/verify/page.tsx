@@ -40,6 +40,10 @@ export default async function VerifyPage({
         <VerificationPanel
           initial={verified.map((v) => ({ provider: v.provider, handle: v.handle }))}
           phone={userPhone}
+          phoneEnabled={
+            process.env.NODE_ENV !== "production" ||
+            Boolean(process.env.SHOUKS_SMS_PROVIDER)
+          }
           nextHref={next}
         />
       </div>

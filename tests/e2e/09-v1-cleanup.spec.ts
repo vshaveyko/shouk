@@ -154,6 +154,18 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     expect(body.items).toBeUndefined();
   });
 
+  test("SHK-031/032: Verify panel hides mock providers, keeps Google", async ({
+    page,
+  }) => {
+    await page.goto("/onboarding/verify");
+    await expect(page.getByTestId("verify-row-google")).toBeVisible();
+    // Mock-only providers are hidden in V1 so we can't hallucinate handles.
+    await expect(page.getByTestId("verify-row-facebook")).toHaveCount(0);
+    await expect(page.getByTestId("verify-row-instagram")).toHaveCount(0);
+    await expect(page.getByTestId("verify-row-linkedin")).toHaveCount(0);
+    await expect(page.getByTestId("verify-row-twitter")).toHaveCount(0);
+  });
+
   test("SHK-019: Signup route redirects to OAuth-only signin when credentials are off", async ({
     browser,
   }) => {

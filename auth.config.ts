@@ -15,7 +15,8 @@ export const authConfig = {
     Google({
       clientId: process.env.AUTH_GOOGLE_ID,
       clientSecret: process.env.AUTH_GOOGLE_SECRET,
-      allowDangerousEmailAccountLinking: true,
+      // See auth.ts — allowDangerousEmailAccountLinking intentionally off
+      // to prevent cross-account session hijacks (SHK-038).
     }),
     // Credentials provider is wired up in auth.ts (needs Prisma / bcrypt which
     // are node-runtime-only; we keep this config edge-compatible here.)
