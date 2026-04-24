@@ -144,6 +144,16 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     ).toHaveCount(0);
   });
 
+  test("SHK-040: /api/notifications?countOnly=1 returns just the unread count", async ({
+    request,
+  }) => {
+    const res = await request.get("/api/notifications?countOnly=1");
+    expect(res.ok()).toBeTruthy();
+    const body = await res.json();
+    expect(typeof body.unread).toBe("number");
+    expect(body.items).toBeUndefined();
+  });
+
   test("SHK-039: apply page loads for a pending applicant (smoke)", async ({
     browser,
   }) => {

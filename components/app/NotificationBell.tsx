@@ -48,6 +48,38 @@ export function NotificationBell({ initialCount = 0 }: { initialCount?: number }
     setCount(initialCount);
   }, [initialCount]);
 
+  // Poll the unread count while the tab is visible (SHK-040). 30s is a
+  // good compromise between "feels live" and not hammering the API. We
+  // skip polling while the popover is open — the open/close handler
+  // already refreshes the list.
+  React.useEffect(() => {
+    let cancelled = false;
+    async function refreshCount() {
+      if (cancelled || open) return;
+      if (typeof document !== "undefined" && document.hidden) return;
+      try {
+        const res = await fetch("/api/notifications?countOnly=1", { cache: "no-store" });
+        if (!res.ok || cancelled) return;
+        const data = (await res.json()) as { unread?: number };
+        if (typeof data.unread === "number") {
+          setCount(data.unread);
+        }
+      } catch {
+        // ignore transient network failures; next tick will retry
+      }
+    }
+    const id = window.setInterval(refreshCount, 30_000);
+    const onVis = () => {
+      if (!document.hidden) void refreshCount();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      cancelled = true;
+      window.clearInterval(id);
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, [open]);
+
   async function loadItems() {
     setLoading(true);
     try {
