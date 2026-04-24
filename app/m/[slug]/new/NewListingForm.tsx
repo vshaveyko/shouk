@@ -412,17 +412,58 @@ export function NewListingForm({ slug, auctionsEnabled, currency, schemaFields }
             <div>
               <h2 className="text-[14px] font-semibold">{imageField?.label || "Photos"}</h2>
               <p className="text-[12px] text-muted mt-0.5">
-                {imageField?.helpText ??
-                  `Paste image URLs (try picsum.photos for demo). ${
-                    imageField?.minImages ? `At least ${imageField.minImages}.` : ""
-                  }`}
+                Upload from your device, or paste an image URL.
+                {imageField?.minImages ? ` At least ${imageField.minImages}.` : ""}
               </p>
             </div>
-            {imageUrls.length < maxImages && (
-              <Button type="button" variant="secondary" size="sm" className="gap-1.5" onClick={addImage}>
-                <Plus size={14} /> Add
-              </Button>
-            )}
+            <div className="flex items-center gap-2">
+              {imageUrls.length < maxImages && (
+                <>
+                  <label
+                    className="inline-flex items-center h-9 px-3 rounded-[9px] border border-line bg-surface hover:bg-hover text-[13px] font-medium cursor-pointer gap-1.5"
+                    data-testid="images-upload"
+                  >
+                    <Plus size={14} /> Upload
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={async (e) => {
+                        const files = Array.from(e.target.files ?? []);
+                        if (files.length === 0) return;
+                        const readers = files.map(
+                          (f) =>
+                            new Promise<string>((resolve, reject) => {
+                              const fr = new FileReader();
+                              fr.onload = () => resolve(String(fr.result ?? ""));
+                              fr.onerror = reject;
+                              fr.readAsDataURL(f);
+                            }),
+                        );
+                        try {
+                          const dataUrls = await Promise.all(readers);
+                          setImageUrls((prev) => {
+                            const filtered = prev.filter(Boolean);
+                            const combined = [...filtered, ...dataUrls].slice(0, maxImages);
+                            // Keep a trailing empty slot so "Add URL" still works.
+                            return combined.length < maxImages ? [...combined, ""] : combined;
+                          });
+                        } catch {
+                          setError("Couldn't read one of the images.");
+                        } finally {
+                          // Reset the input so the same file can be re-picked.
+                          e.target.value = "";
+                        }
+                      }}
+                    />
+                  </label>
+                  <Button type="button" variant="secondary" size="sm" className="gap-1.5" onClick={addImage}>
+                    <Plus size={14} /> Add URL
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
           <div className="space-y-2">
             {imageUrls.map((u, i) => (
@@ -437,11 +478,12 @@ export function NewListingForm({ slug, auctionsEnabled, currency, schemaFields }
                 </div>
                 <Input
                   type="url"
-                  value={u}
+                  value={u.startsWith("data:") ? "(uploaded file)" : u}
+                  readOnly={u.startsWith("data:")}
                   onChange={(e) =>
                     setImageUrls((prev) => prev.map((v, idx) => (idx === i ? e.target.value : v)))
                   }
-                  placeholder="https://picsum.photos/800/600"
+                  placeholder="https://example.com/photo.jpg"
                   data-testid={`images-input-${i}`}
                 />
                 {(imageUrls.length > 1 || u) && (
@@ -457,9 +499,7 @@ export function NewListingForm({ slug, auctionsEnabled, currency, schemaFields }
               </div>
             ))}
           </div>
-          <Help>
-            Up to {maxImages} images. Demo: https://picsum.photos/seed/1/800/600
-          </Help>
+          <Help>Up to {maxImages} images. JPEG / PNG / WebP.</Help>
         </section>
       )}
 
