@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { ArrowRight, Search, FileText, Gavel, Users, FileStack, CircleDollarSign } from "lucide-react";
+import { auth } from "@/auth";
 import { Button } from "@/components/ui/Button";
 import { ShouksMark } from "@/components/brand/Logo";
 import { prisma } from "@/lib/prisma";
@@ -22,6 +24,13 @@ async function getFeatured() {
 }
 
 export default async function LandingPage() {
+  // If the visitor is already signed in, don't show the marketing landing —
+  // their session should persist and drop them straight into the app (SHK-029).
+  const session = await auth();
+  if (session?.user?.id) {
+    redirect("/home");
+  }
+
   const featured = await getFeatured();
 
   return (

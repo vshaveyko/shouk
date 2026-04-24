@@ -132,4 +132,15 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     await expect(page.getByTestId("marketplace-type-label-application")).toHaveText(/closed/i);
     await expect(page.getByTestId("marketplace-type-label-referral")).toHaveText(/closed/i);
   });
+
+  test("SHK-029: Signed-in visitor is redirected away from the landing page", async ({
+    page,
+  }) => {
+    // We're already signed in via beforeEach. Loading the root should bounce to /home.
+    await page.goto("/");
+    await expect(page).toHaveURL(/\/home|\/owner\//);
+    await expect(
+      page.getByRole("link", { name: /get started/i }),
+    ).toHaveCount(0);
+  });
 });
