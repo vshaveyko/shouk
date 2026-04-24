@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { sendEmail } from "@/lib/email";
+import { applicationApprovedHtml } from "@/app/emails/emailHtml";
 
 export const runtime = "nodejs";
 
@@ -55,6 +57,25 @@ export async function POST(req: Request, { params }: { params: { id: string } })
       update: { status: "ACTIVE", role: "MEMBER" },
       create: { userId: application.userId, marketplaceId: application.marketplaceId, role: "MEMBER", status: "ACTIVE" },
     });
+
+    // Transactional email (SHK-044). sendEmail is a no-op when
+    // RESEND_API_KEY isn't configured — just logs in dev — so this is
+    // safe to always fire.
+    const applicant = await prisma.user.findUnique({
+      where: { id: application.userId },
+      select: { email: true, displayName: true, name: true },
+    });
+    if (applicant?.email) {
+      void sendEmail({
+        to: applicant.email,
+        subject: `You're in · ${application.marketplace.name}`,
+        html: applicationApprovedHtml({
+          marketplace: application.marketplace.name,
+          applicant: applicant.displayName ?? applicant.name ?? undefined,
+          ownerCosign: parsed.data.note ?? undefined,
+        }),
+      });
+    }
   }
 
   const kind: "APPLICATION_APPROVED" | "APPLICATION_REJECTED" | "APPLICATION_NEEDS_INFO" =
