@@ -55,4 +55,16 @@ test.describe("Flow 6 · Core app shell — visual structure", () => {
     // Serif H1 in the head block
     await expect(page.locator(".ld-head h1")).toBeVisible();
   });
+
+  test("6D new listing has cl layout, cl-head, mode-toggle, and cl-right preview", async ({ page }) => {
+    await signIn(page, "member@shouks.test", "Test123!@#");
+    await page.goto("/m/ferrari-frenzy/new");
+    await expect(page.locator(".cl")).toBeVisible();
+    await expect(page.locator(".cl .cl-head h1")).toBeVisible();
+    await expect(page.locator(".cl .mode-toggle")).toBeVisible();
+    // Sell mode is on by default
+    await expect(page.locator(".mode-toggle .mt-opt.on")).toContainText(/selling/i);
+    // Sticky live preview on the right
+    await expect(page.locator(".cl .cl-right .preview")).toBeVisible();
+  });
 });

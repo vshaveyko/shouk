@@ -61,7 +61,8 @@ const dashCss = `
 .mp-chip.new-mp .plus-ic { width: 28px; height: 28px; border-radius: 7px; background: var(--bg-soft); display: grid; place-items: center; }
 .mp-chip.new-mp .plus-ic svg { width: 14px; height: 14px; }
 
-.dash-two { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 20px; }
+.dash-two { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; }
+@media (max-width: 1100px) { .dash-two { grid-template-columns: minmax(0, 1fr) 260px; } }
 @media (max-width: 960px) { .dash-two { grid-template-columns: 1fr; } }
 
 .feed { display: flex; flex-direction: column; }
@@ -458,32 +459,36 @@ export default async function HomeDashboard({
             </div>
 
             <aside className="side-stack">
-              {myActiveCount > 0 && (
-                <div className="side-card mine" data-testid="your-listings-card">
-                  <div className="sc-head">
-                    <h3>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" />
-                      </svg>
-                      Your listings
-                    </h3>
-                    <Link href="/activity">Manage all</Link>
+              <div className="side-card mine" data-testid="your-listings-card">
+                <div className="sc-head">
+                  <h3>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" />
+                    </svg>
+                    Your listings
+                  </h3>
+                  {myActiveCount > 0 && <Link href="/activity">Manage all</Link>}
+                </div>
+                <div className="mine-stats">
+                  <div>
+                    <div className="v">{myActiveCount}</div>
+                    <span>Active</span>
                   </div>
-                  <div className="mine-stats">
-                    <div>
-                      <div className="v">{myActiveCount}</div>
-                      <span>Active</span>
-                    </div>
-                    <div>
-                      <div className="v">{myOfferCount}</div>
-                      <span>Offers</span>
-                    </div>
-                    <div>
-                      <div className="v">{myViewsTotal}</div>
-                      <span>Views</span>
-                    </div>
+                  <div>
+                    <div className="v">{myOfferCount}</div>
+                    <span>Offers</span>
                   </div>
-                  {myListings.map((l) => {
+                  <div>
+                    <div className="v">{myViewsTotal}</div>
+                    <span>Views</span>
+                  </div>
+                </div>
+                {myListings.length === 0 ? (
+                  <div className="empty-mini">
+                    You haven't posted anything yet. Your active listings and offers will show up here.
+                  </div>
+                ) : (
+                  myListings.map((l) => {
                     const color = l.marketplace.primaryColor ?? "oklch(0.55 0.17 25)";
                     const cover = l.images[0];
                     const bids = l._count.bids;
@@ -511,34 +516,38 @@ export default async function HomeDashboard({
                         )}
                       </Link>
                     );
-                  })}
-                  {firstMarketplaceSlug && (
-                    <Link
-                      href={`/m/${firstMarketplaceSlug}/new`}
-                      className="btn btn-dark"
-                      style={{ width: "100%", justifyContent: "center", marginTop: 10, height: 32, fontSize: 12 }}
-                    >
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M12 5v14M5 12h14" />
-                      </svg>
-                      Post a new listing
-                    </Link>
-                  )}
-                </div>
-              )}
+                  })
+                )}
+                {firstMarketplaceSlug && (
+                  <Link
+                    href={`/m/${firstMarketplaceSlug}/new`}
+                    className="btn btn-dark"
+                    style={{ width: "100%", justifyContent: "center", marginTop: 10, height: 32, fontSize: 12 }}
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 5v14M5 12h14" />
+                    </svg>
+                    Post a new listing
+                  </Link>
+                )}
+              </div>
 
-              {mySaved.length > 0 && (
-                <div className="side-card saved" data-testid="saved-listings-card">
-                  <div className="sc-head">
-                    <h3>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-                      </svg>
-                      Saved listings
-                    </h3>
-                    <Link href="/saved">See all</Link>
+              <div className="side-card saved" data-testid="saved-listings-card">
+                <div className="sc-head">
+                  <h3>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                    </svg>
+                    Saved listings
+                  </h3>
+                  {mySaved.length > 0 && <Link href="/saved">See all</Link>}
+                </div>
+                {mySaved.length === 0 ? (
+                  <div className="empty-mini">
+                    Nothing saved yet. Tap the bookmark on any listing to keep tabs on it.
                   </div>
-                  {mySaved.map((s) => {
+                ) : (
+                  mySaved.map((s) => {
                     const l = s.listing;
                     const color = l.marketplace.primaryColor ?? "oklch(0.55 0.17 25)";
                     const cover = l.images[0];
@@ -563,24 +572,9 @@ export default async function HomeDashboard({
                         <div className="rv-price">{formatMoneyShort(price)}</div>
                       </Link>
                     );
-                  })}
-                </div>
-              )}
-
-              {hasAnyMarketplace && myActiveCount === 0 && mySaved.length === 0 && (
-                <div className="side-card" data-testid="recently-viewed-card">
-                  <div className="sc-head">
-                    <h3>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="9" />
-                        <path d="M12 7v5l3 2" />
-                      </svg>
-                      Recently viewed
-                    </h3>
-                  </div>
-                  <div className="empty-mini">Listings you open will show up here.</div>
-                </div>
-              )}
+                  })
+                )}
+              </div>
             </aside>
           </div>
         </div>

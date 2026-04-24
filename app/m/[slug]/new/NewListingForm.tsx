@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Gavel, Search, Tag, Plus, Trash2, ImageIcon } from "lucide-react";
@@ -41,6 +42,8 @@ type ListingType = "FIXED" | "AUCTION" | "ISO";
 
 type Props = {
   slug: string;
+  marketplaceName: string;
+  primaryColor: string | null;
   auctionsEnabled: boolean;
   currency: string;
   schemaFields: SchemaField[];
@@ -55,7 +58,14 @@ const DURATION_PRESETS = [
   { value: "7d", label: "7 days", ms: 7 * 24 * 60 * 60 * 1000 },
 ];
 
-export function NewListingForm({ slug, auctionsEnabled, currency, schemaFields }: Props) {
+export function NewListingForm({
+  slug,
+  marketplaceName,
+  primaryColor,
+  auctionsEnabled,
+  currency,
+  schemaFields,
+}: Props) {
   const router = useRouter();
 
   const [type, setType] = React.useState<ListingType>("FIXED");
@@ -186,55 +196,86 @@ export function NewListingForm({ slug, auctionsEnabled, currency, schemaFields }
     }
   }
 
+  const isISO = type === "ISO";
+  const coverImage = imageUrls.find(Boolean) ?? null;
+  const previewPrice = isISO
+    ? budgetDollars
+      ? `Up to $${Number(budgetDollars).toLocaleString()}`
+      : "Budget open"
+    : priceDollars
+      ? `$${Number(priceDollars).toLocaleString()}`
+      : "$ —";
+
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        submit();
-      }}
-      data-testid="create-listing-form"
-      className="space-y-8"
-    >
-      {/* Type */}
-      <section className="bg-surface border border-line rounded-[14px] p-5">
-        <h2 className="text-[14px] font-semibold mb-3">Listing type</h2>
-        <div
-          role="radiogroup"
-          aria-label="Listing type"
-          className="grid gap-3 sm:grid-cols-2"
-        >
-          <TypeCard
-            active={type === "FIXED"}
-            onSelect={() => setType("FIXED")}
-            icon={<Tag size={16} />}
-            title="Fixed price"
-            desc="Buy now at a set price."
-            testid="listing-type-fixed"
-          />
-          {/* Auctions are hidden for V1 (SHK-027). Kept in the data model
-              so we can re-enable later without a migration. */}
-          {false && (
-            <TypeCard
-              active={type === "AUCTION"}
-              onSelect={() => setType("AUCTION")}
-              icon={<Gavel size={16} />}
-              title="Auction"
-              desc="Let the market set the price."
-              disabled={!auctionsEnabled}
-              disabledHint={!auctionsEnabled ? "Auctions not enabled" : undefined}
-              testid="listing-type-auction"
-            />
-          )}
-          <TypeCard
-            active={type === "ISO"}
-            onSelect={() => setType("ISO")}
-            icon={<Search size={16} />}
-            title="In search of"
-            desc="Let others know what you're hunting for."
-            testid="listing-type-iso"
-          />
+    <div className="cl">
+      <div className="cl-body">
+        <div className="cl-head">
+          <div className="breadcrumb">
+            <Link href={`/m/${slug}/feed`}>{marketplaceName}</Link>
+            <span>·</span>
+            <span>New post</span>
+          </div>
+          <h1>Post to {marketplaceName}</h1>
+          <p>
+            Choose what kind of post this is. Fields marked{" "}
+            <span className="req">*</span> are required by this marketplace.
+          </p>
         </div>
-      </section>
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            submit();
+          }}
+          data-testid="create-listing-form"
+        >
+          {/* Mode toggle — Sell vs ISO (Auctions hidden for V1 per SHK-027) */}
+          <div className="mode-toggle" role="tablist" aria-label="Post mode">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={type === "FIXED"}
+              className={`mt-opt${type === "FIXED" ? " on" : ""}`}
+              onClick={() => setType("FIXED")}
+              data-testid="listing-type-fixed"
+            >
+              <div className="mt-ic">
+                <Tag size={16} />
+              </div>
+              <div>
+                <span className="mt-l">I'm selling</span>
+                <span className="mt-s">Post something you have and want to sell or trade.</span>
+              </div>
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={type === "ISO"}
+              className={`mt-opt${type === "ISO" ? " on" : ""}`}
+              onClick={() => setType("ISO")}
+              data-testid="listing-type-iso"
+            >
+              <div className="mt-ic">
+                <Search size={16} />
+              </div>
+              <div>
+                <span className="mt-l">I'm looking for (ISO)</span>
+                <span className="mt-s">Post a wanted ad. Sellers with a match can DM you.</span>
+              </div>
+            </button>
+          </div>
+
+          {isISO && (
+            <div className="iso-banner">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 8v4M12 16h.01" />
+              </svg>
+              <div>
+                <strong>Wanted posts are public.</strong> Every {marketplaceName} seller can see this — and Shouks will ping you when a new listing matches your criteria. Your budget is visible; your name and contact stay private until you reply.
+              </div>
+            </div>
+          )}
 
       {/* Basics */}
       <section className="bg-surface border border-line rounded-[14px] p-5 space-y-4">
@@ -640,7 +681,48 @@ export function NewListingForm({ slug, auctionsEnabled, currency, schemaFields }
           {submitting ? "Publishing…" : "Publish listing"}
         </Button>
       </div>
-    </form>
+        </form>
+      </div>
+
+      <aside className="cl-right" aria-label="Live preview">
+        <div className="preview">
+          <div className="preview-hd">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+            Live preview
+          </div>
+          <div
+            className="preview-img"
+            style={
+              coverImage
+                ? { backgroundImage: `url(${coverImage})` }
+                : {
+                    background: `linear-gradient(135deg, ${primaryColor ?? "oklch(0.5 0.18 25)"}, color-mix(in oklab, ${primaryColor ?? "oklch(0.5 0.18 25)"} 40%, black))`,
+                  }
+            }
+          />
+          <div className="preview-body">
+            {isISO && <div className="iso-preview-tag">Wanted · ISO</div>}
+            <div className="p-t">{title.trim() || (isISO ? "What you're looking for" : "Your listing title")}</div>
+            <div className="p-p">{previewPrice}</div>
+            {Object.entries(schemaValues).slice(0, 4).map(([k, v]) => {
+              const val = Array.isArray(v) ? v.join(", ") : String(v ?? "");
+              if (!val) return null;
+              const field = schemaFields.find((f) => f.name === k);
+              if (!field) return null;
+              return (
+                <div className="p-spec" key={k}>
+                  <div className="k">{field.label}</div>
+                  <div>{val}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </aside>
+    </div>
   );
 }
 
