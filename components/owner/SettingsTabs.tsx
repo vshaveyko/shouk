@@ -10,7 +10,6 @@ const TABS = [
   { id: "rules", label: "Rules" },
   { id: "monetization", label: "Monetization" },
   { id: "roles", label: "Roles" },
-  { id: "billing", label: "Billing" },
 ] as const;
 
 export function SettingsTabs({ slug }: { slug: string }) {

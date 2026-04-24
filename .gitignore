@@ -89,3 +89,7 @@ prisma/migrations/migration_lock.toml.bak
 .cache
 tmp
 temp
+
+# ─── Bug-tracker tooling (local only) ───
+scripts/sheets-bot-key.json
+scripts/__pycache__/
