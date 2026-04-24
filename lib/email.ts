@@ -19,6 +19,14 @@ type SendEmailInput = {
   from?: string;
 };
 
+/**
+ * Addresses the seed/e2e users sit under. Sending to them would
+ * hard-bounce from any real SMTP provider and count against the sender
+ * reputation, so sendEmail short-circuits any recipient under `.test`
+ * or `@shouks.test` with a dev-mode log instead of a real provider call.
+ */
+const TEST_RECIPIENT = /(@shouks\.test|\.test)$/i;
+
 export async function sendEmail({
   to,
   subject,
@@ -35,6 +43,13 @@ export async function sendEmail({
       );
     }
     return { ok: false, reason: "no-provider" };
+  }
+
+  if (TEST_RECIPIENT.test(to)) {
+    console.log(
+      `[email:test] → ${to} | ${subject} (${html.length} chars) — test-domain recipient, skipping Resend`,
+    );
+    return { ok: false, reason: "test-recipient" };
   }
 
   try {
