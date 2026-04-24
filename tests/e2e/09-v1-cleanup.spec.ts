@@ -80,4 +80,22 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     ).toBeVisible();
     await expect(page.getByTestId("nav-messages-ping")).toHaveCount(0);
   });
+
+  test("SHK-027: Auction option hidden from new listing type picker", async ({
+    page,
+  }) => {
+    await page.goto("/m/ferrari-frenzy/new");
+    await expect(page.getByTestId("listing-type-fixed")).toBeVisible();
+    await expect(page.getByTestId("listing-type-auction")).toHaveCount(0);
+  });
+
+  test("SHK-027: Auction toggle hidden from create-marketplace wizard", async ({
+    page,
+  }) => {
+    await page.goto("/owner/create");
+    // Walk to the Rules & behavior card by scrolling; it's on the final step.
+    // The auctions-toggle must not render at all.
+    await expect(page.getByTestId("auctions-toggle")).toHaveCount(0);
+    await expect(page.getByTestId("anti-snipe-toggle")).toHaveCount(0);
+  });
 });

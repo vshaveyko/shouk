@@ -202,7 +202,7 @@ export function NewListingForm({ slug, auctionsEnabled, currency, schemaFields }
         <div
           role="radiogroup"
           aria-label="Listing type"
-          className="grid gap-3 sm:grid-cols-3"
+          className="grid gap-3 sm:grid-cols-2"
         >
           <TypeCard
             active={type === "FIXED"}
@@ -212,16 +212,20 @@ export function NewListingForm({ slug, auctionsEnabled, currency, schemaFields }
             desc="Buy now at a set price."
             testid="listing-type-fixed"
           />
-          <TypeCard
-            active={type === "AUCTION"}
-            onSelect={() => setType("AUCTION")}
-            icon={<Gavel size={16} />}
-            title="Auction"
-            desc="Let the market set the price."
-            disabled={!auctionsEnabled}
-            disabledHint={!auctionsEnabled ? "Auctions not enabled" : undefined}
-            testid="listing-type-auction"
-          />
+          {/* Auctions are hidden for V1 (SHK-027). Kept in the data model
+              so we can re-enable later without a migration. */}
+          {false && (
+            <TypeCard
+              active={type === "AUCTION"}
+              onSelect={() => setType("AUCTION")}
+              icon={<Gavel size={16} />}
+              title="Auction"
+              desc="Let the market set the price."
+              disabled={!auctionsEnabled}
+              disabledHint={!auctionsEnabled ? "Auctions not enabled" : undefined}
+              testid="listing-type-auction"
+            />
+          )}
           <TypeCard
             active={type === "ISO"}
             onSelect={() => setType("ISO")}

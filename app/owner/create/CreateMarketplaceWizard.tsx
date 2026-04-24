@@ -1463,7 +1463,7 @@ function MonetizationStep({
       <Card>
         <CardHeader>
           <CardTitle>Rules & behavior</CardTitle>
-          <CardDescription>Tune moderation, auctions, and sniping protection.</CardDescription>
+          <CardDescription>Tune moderation for new listings.</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
@@ -1474,22 +1474,8 @@ function MonetizationStep({
               checked={state.moderationRequired}
               onChange={(v) => setState((s) => ({ ...s, moderationRequired: v }))}
             />
-            <ToggleRow
-              testid="auctions-toggle"
-              title="Enable auctions"
-              body="Sellers can list items for timed bidding instead of fixed prices."
-              checked={state.auctionsEnabled}
-              onChange={(v) => setState((s) => ({ ...s, auctionsEnabled: v }))}
-            />
-            <ToggleRow
-              testid="anti-snipe-toggle"
-              title="Anti-snipe protection"
-              body="Extend auction end time when a bid arrives near the close."
-              checked={state.antiSnipe}
-              onChange={(v) => setState((s) => ({ ...s, antiSnipe: v }))}
-              disabled={!state.auctionsEnabled}
-              disabledHint="Turn on auctions to configure anti-snipe."
-            />
+            {/* Auctions and anti-snipe are hidden for V1 (SHK-027). Retained
+                in state so migrations stay intact. */}
           </div>
         </CardContent>
       </Card>
