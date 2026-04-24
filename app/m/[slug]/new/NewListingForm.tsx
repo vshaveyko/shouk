@@ -467,33 +467,42 @@ export function NewListingForm({
                     <Plus size={14} /> Upload
                     <input
                       type="file"
-                      accept="image/*"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
                       multiple
                       className="hidden"
                       onChange={async (e) => {
                         const files = Array.from(e.target.files ?? []);
                         if (files.length === 0) return;
-                        const readers = files.map(
-                          (f) =>
-                            new Promise<string>((resolve, reject) => {
-                              const fr = new FileReader();
-                              fr.onload = () => resolve(String(fr.result ?? ""));
-                              fr.onerror = reject;
-                              fr.readAsDataURL(f);
-                            }),
-                        );
+                        setError(null);
                         try {
-                          const dataUrls = await Promise.all(readers);
+                          const uploaded = await Promise.all(
+                            files.slice(0, maxImages).map(async (file) => {
+                              const res = await fetch("/api/upload", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ contentType: file.type, size: file.size }),
+                              });
+                              if (!res.ok) {
+                                const { error } = await res.json().catch(() => ({}));
+                                throw new Error(error ?? "Upload failed");
+                              }
+                              const { uploadUrl, publicUrl } = await res.json();
+                              await fetch(uploadUrl, {
+                                method: "PUT",
+                                headers: { "Content-Type": file.type },
+                                body: file,
+                              });
+                              return publicUrl as string;
+                            }),
+                          );
                           setImageUrls((prev) => {
                             const filtered = prev.filter(Boolean);
-                            const combined = [...filtered, ...dataUrls].slice(0, maxImages);
-                            // Keep a trailing empty slot so "Add URL" still works.
+                            const combined = [...filtered, ...uploaded].slice(0, maxImages);
                             return combined.length < maxImages ? [...combined, ""] : combined;
                           });
-                        } catch {
-                          setError("Couldn't read one of the images.");
+                        } catch (err) {
+                          setError(err instanceof Error ? err.message : "Couldn't upload image.");
                         } finally {
-                          // Reset the input so the same file can be re-picked.
                           e.target.value = "";
                         }
                       }}
@@ -519,8 +528,7 @@ export function NewListingForm({
                 </div>
                 <Input
                   type="url"
-                  value={u.startsWith("data:") ? "(uploaded file)" : u}
-                  readOnly={u.startsWith("data:")}
+                  value={u}
                   onChange={(e) =>
                     setImageUrls((prev) => prev.map((v, idx) => (idx === i ? e.target.value : v)))
                   }
