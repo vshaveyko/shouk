@@ -31,4 +31,10 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     await expect(page.getByText(/typically approve/i)).toHaveCount(0);
     await expect(page.getByText(/~70%/)).toHaveCount(0);
   });
+
+  test("SHK-026: Share marketplace button hidden on owner dashboard", async ({ page }) => {
+    await page.goto("/owner/ferrari-frenzy/dashboard");
+    await expect(page.getByRole("heading", { name: /welcome back/i }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: /share marketplace/i })).toHaveCount(0);
+  });
 });
