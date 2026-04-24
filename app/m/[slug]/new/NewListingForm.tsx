@@ -105,13 +105,12 @@ export function NewListingForm({ slug, auctionsEnabled, currency, schemaFields }
 
     const images = imageUrls.map((s) => s.trim()).filter(Boolean);
 
-    // Validate required schema fields client-side
-    for (const f of nonImageFields) {
-      if (f.required && (schemaValues[f.name] == null || schemaValues[f.name] === "")) {
-        setError(`"${f.label}" is required.`);
-        return;
-      }
-    }
+    // V1: the form is a single watches form (SHK-020); legacy dynamic
+    // schema fields aren't rendered and therefore can't be filled in by
+    // the seller. Don't enforce `required` on fields the UI never
+    // surfaced — that would make listings un-submittable on any
+    // marketplace with required non-watch fields.
+    void nonImageFields;
     if (imageField?.required) {
       const min = imageField.minImages ?? 1;
       if (images.length < min) {
@@ -464,8 +463,112 @@ export function NewListingForm({ slug, auctionsEnabled, currency, schemaFields }
         </section>
       )}
 
-      {/* Schema fields */}
-      {nonImageFields.length > 0 && (
+      {/* V1 watch details (SHK-020). The per-marketplace dynamic schema
+          stays in the data model and on the form's data path (schemaValues
+          maps straight through), but the UI is a single hardcoded watches
+          form. All fields here are optional — mandatory stuff (Title,
+          Price, Images) lives in the Basics / Pricing / Images sections
+          above. */}
+      <section
+        className="bg-surface border border-line rounded-[14px] p-5 space-y-4"
+        data-testid="watch-details-section"
+      >
+        <h2 className="text-[14px] font-semibold">Details</h2>
+        <p className="text-[12.5px] text-muted -mt-3">
+          All optional — fill in what you know.
+        </p>
+
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="watch-brand">Brand</Label>
+            <Input
+              id="watch-brand"
+              value={(schemaValues.brand as string) ?? ""}
+              onChange={(e) => setField("brand", e.target.value)}
+              placeholder="Rolex"
+              data-testid="watch-field-brand"
+            />
+          </div>
+          <div>
+            <Label htmlFor="watch-model">Model</Label>
+            <Input
+              id="watch-model"
+              value={(schemaValues.model as string) ?? ""}
+              onChange={(e) => setField("model", e.target.value)}
+              placeholder="Submariner 124060"
+              data-testid="watch-field-model"
+            />
+          </div>
+          <div>
+            <Label htmlFor="watch-case-size">Case size</Label>
+            <Input
+              id="watch-case-size"
+              value={(schemaValues.case_size as string) ?? ""}
+              onChange={(e) => setField("case_size", e.target.value)}
+              placeholder="41mm"
+              data-testid="watch-field-case-size"
+            />
+          </div>
+          <div>
+            <Label htmlFor="watch-dial-color">Dial color</Label>
+            <Input
+              id="watch-dial-color"
+              value={(schemaValues.dial_color as string) ?? ""}
+              onChange={(e) => setField("dial_color", e.target.value)}
+              placeholder="Black"
+              data-testid="watch-field-dial-color"
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <Label htmlFor="watch-case-material">Case material</Label>
+            <Select
+              value={(schemaValues.case_material as string) ?? ""}
+              onValueChange={(v) => setField("case_material", v)}
+            >
+              <SelectTrigger id="watch-case-material" data-testid="watch-field-case-material">
+                <SelectValue placeholder="Select a material" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Stainless Steel">Stainless Steel</SelectItem>
+                <SelectItem value="Yellow Gold">Yellow Gold</SelectItem>
+                <SelectItem value="White Gold">White Gold</SelectItem>
+                <SelectItem value="Rose Gold">Rose Gold</SelectItem>
+                <SelectItem value="Titanium">Titanium</SelectItem>
+                <SelectItem value="Platinum">Platinum</SelectItem>
+                <SelectItem value="Two-tone">Two-tone</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-4 pt-1">
+          <label className="flex items-center gap-2 text-[13px]">
+            <input
+              type="checkbox"
+              checked={Boolean(schemaValues.box)}
+              onChange={(e) => setField("box", e.target.checked)}
+              data-testid="watch-field-box"
+            />
+            Original box
+          </label>
+          <label className="flex items-center gap-2 text-[13px]">
+            <input
+              type="checkbox"
+              checked={Boolean(schemaValues.papers)}
+              onChange={(e) => setField("papers", e.target.checked)}
+              data-testid="watch-field-papers"
+            />
+            Original papers
+          </label>
+        </div>
+      </section>
+
+      {/* Fallback: if this marketplace has legacy non-watch fields that
+          aren't already covered above, render them so we don't silently
+          drop data. The V1 design is a single watch form, but this keeps
+          data-entry parity with the existing schema mechanism.*/}
+      {false && nonImageFields.length > 0 && (
         <section className="bg-surface border border-line rounded-[14px] p-5 space-y-5">
           <h2 className="text-[14px] font-semibold">Details</h2>
           {nonImageFields.map((f) => (

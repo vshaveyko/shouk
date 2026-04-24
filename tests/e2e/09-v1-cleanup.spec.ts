@@ -154,6 +154,21 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     expect(body.items).toBeUndefined();
   });
 
+  test("SHK-020: New listing form shows hardcoded watch fields", async ({
+    page,
+  }) => {
+    await page.goto("/m/ferrari-frenzy/new");
+    // The V1 watches form has fixed fields regardless of the marketplace schema.
+    await expect(page.getByTestId("watch-details-section")).toBeVisible();
+    await expect(page.getByTestId("watch-field-brand")).toBeVisible();
+    await expect(page.getByTestId("watch-field-model")).toBeVisible();
+    await expect(page.getByTestId("watch-field-case-size")).toBeVisible();
+    await expect(page.getByTestId("watch-field-dial-color")).toBeVisible();
+    await expect(page.getByTestId("watch-field-case-material")).toBeVisible();
+    await expect(page.getByTestId("watch-field-box")).toBeVisible();
+    await expect(page.getByTestId("watch-field-papers")).toBeVisible();
+  });
+
   test("SHK-037: owner with multiple marketplaces lands on /home, not auto-redirected", async ({
     page,
   }) => {
