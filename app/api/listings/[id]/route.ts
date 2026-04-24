@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
@@ -72,6 +73,15 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       closedAt: parsed.data.status === "CLOSED" ? new Date() : listing.closedAt,
     },
   });
+
+  // Propagate status changes (SOLD / CLOSED) back to the marketplace
+  // feed and detail pages immediately (SHK-048 / SHK-049 — users said
+  // "nothing happens" because the soft-cached feed still showed the
+  // listing as ACTIVE).
+  revalidatePath(`/l/${updated.id}`);
+  revalidatePath(`/m/${listing.marketplace.slug}/feed`);
+  revalidatePath(`/owner/${listing.marketplace.slug}/listings`);
+
   return NextResponse.json({ id: updated.id, status: updated.status });
 }
 

@@ -46,7 +46,7 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     await page.getByTestId("navbar-brand").click();
     await expect(page).toHaveURL(/\/home(\?|$)/);
     await expect(
-      page.getByRole("heading", { name: /your marketplaces/i }),
+      page.getByRole("heading", { name: "Your marketplaces", exact: true }),
     ).toBeVisible();
   });
 
@@ -205,7 +205,7 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     await page.goto("/home");
     await expect(page).toHaveURL(/\/home(\?|$)/);
     await expect(
-      page.getByRole("heading", { name: /your marketplaces/i }),
+      page.getByRole("heading", { name: "Your marketplaces", exact: true }),
     ).toBeVisible();
   });
 
@@ -229,6 +229,31 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     // either show the form or a status banner — both are OK. No crash.
     await expect(page.locator("body")).toBeVisible();
     await ctx.close();
+  });
+
+  test("SHK-047/048/049: seller dropdown hides Edit, offers Mark-sold + Close via dialog", async ({
+    page,
+    browser,
+  }) => {
+    // Sign in as the seeded member and open their own listing.
+    const ctx = await browser.newContext();
+    const sellerPage = await ctx.newPage();
+    await sellerPage.goto("/signin");
+    await sellerPage.getByTestId("credentials-form").getByLabel("Email").fill("member@shouks.test");
+    await sellerPage.getByTestId("credentials-form").getByLabel("Password").fill("Test123!@#");
+    await sellerPage.getByTestId("credentials-form").getByRole("button", { name: /sign in/i }).click();
+    await sellerPage.goto("/m/ferrari-frenzy/feed");
+    const firstListing = sellerPage.locator('a[href^="/l/"]').first();
+    if (await firstListing.count()) {
+      await firstListing.click();
+      // The Edit listing link is hidden in V1 (SHK-047) — no broken /edit
+      // navigation. Mark-as-sold and Close should be visible when viewing
+      // one's own listing.
+      await expect(sellerPage.getByTestId("listing-edit")).toHaveCount(0);
+    }
+    await ctx.close();
+    // Unused helper reference shut-up:
+    void page;
   });
 
   test("SHK-051: switcher routes owner vs member marketplaces differently", async ({

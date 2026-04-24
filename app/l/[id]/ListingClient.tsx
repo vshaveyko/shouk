@@ -16,7 +16,6 @@ import {
   Gavel,
   Clock,
   Trash2,
-  Pencil,
   Lock,
 } from "lucide-react";
 import { Avatar } from "@/components/ui/Avatar";
@@ -98,6 +97,11 @@ export function ListingClient(props: Props) {
   const [activeImage, setActiveImage] = React.useState(0);
   const [bidOpen, setBidOpen] = React.useState(false);
   const [reportOpen, setReportOpen] = React.useState(false);
+  // SHK-048 / SHK-049: seller confirms Mark-as-sold / Close via a
+  // Dialog instead of window.confirm (which was occasionally blocked
+  // or misfiring, making the actions feel like no-ops).
+  const [statusConfirm, setStatusConfirm] = React.useState<"SOLD" | "CLOSED" | null>(null);
+  const [statusBusy, setStatusBusy] = React.useState(false);
 
   const isAuction = listing.type === "AUCTION";
   const isISO = listing.type === "ISO";
@@ -136,19 +140,24 @@ export function ListingClient(props: Props) {
   }
 
   async function changeStatus(status: "SOLD" | "CLOSED") {
-    if (!confirm(`Mark this listing ${status === "SOLD" ? "as sold" : "closed"}?`)) return;
-    const res = await fetch(`/api/listings/${listing.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    });
-    if (res.ok) {
-      toast.success(status === "SOLD" ? "Marked as sold." : "Listing closed.");
-      setListing((l) => ({ ...l, status }));
-      router.refresh();
-    } else {
-      const data = await res.json().catch(() => ({}));
-      toast.error(data.error ?? "Couldn't update listing.");
+    setStatusBusy(true);
+    try {
+      const res = await fetch(`/api/listings/${listing.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (res.ok) {
+        toast.success(status === "SOLD" ? "Marked as sold." : "Listing closed.");
+        setListing((l) => ({ ...l, status }));
+        setStatusConfirm(null);
+        router.refresh();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error ?? "Couldn't update listing.");
+      }
+    } finally {
+      setStatusBusy(false);
     }
   }
 
@@ -497,24 +506,25 @@ export function ListingClient(props: Props) {
                     >
                       {props.isSeller && !isLocked && (
                         <>
-                          <DropdownMenu.Item asChild>
-                            <Link
-                              href={`/l/${listing.id}/edit`}
-                              className="flex items-center gap-2 px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[14px]"
-                              data-testid="listing-edit"
-                            >
-                              <Pencil size={14} /> Edit listing
-                            </Link>
-                          </DropdownMenu.Item>
+                          {/* Edit listing is hidden for V1 — /l/[id]/edit
+                              route isn't built yet, so the link was going
+                              to a 404 (SHK-047). We'll surface it again
+                              once the edit page ships. */}
                           <DropdownMenu.Item
-                            onSelect={() => changeStatus("SOLD")}
+                            onSelect={(e) => {
+                              e.preventDefault();
+                              setStatusConfirm("SOLD");
+                            }}
                             className="flex items-center gap-2 px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[14px] cursor-pointer"
                             data-testid="listing-sold"
                           >
                             <CheckCircle2 size={14} /> Mark as sold
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
-                            onSelect={() => changeStatus("CLOSED")}
+                            onSelect={(e) => {
+                              e.preventDefault();
+                              setStatusConfirm("CLOSED");
+                            }}
                             className="flex items-center gap-2 px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[14px] cursor-pointer"
                             data-testid="listing-close"
                           >
@@ -610,6 +620,50 @@ export function ListingClient(props: Props) {
         onOpenChange={setReportOpen}
         listingId={listing.id}
       />
+
+      {/* Seller status-change confirmation (SHK-048 / SHK-049) */}
+      <Dialog
+        open={statusConfirm !== null}
+        onOpenChange={(o) => !o && setStatusConfirm(null)}
+      >
+        <DialogContent width={420}>
+          <DialogHeader>
+            <DialogTitle>
+              {statusConfirm === "SOLD" ? "Mark as sold?" : "Close listing?"}
+            </DialogTitle>
+          </DialogHeader>
+          <DialogBody>
+            <p className="text-[13px] text-ink-soft">
+              {statusConfirm === "SOLD"
+                ? "Buyers will no longer be able to contact or purchase this listing."
+                : "The listing is taken offline. You can delete it later if needed."}
+            </p>
+          </DialogBody>
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => setStatusConfirm(null)}
+              disabled={statusBusy}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant={statusConfirm === "SOLD" ? "primary" : "danger"}
+              onClick={() =>
+                statusConfirm && changeStatus(statusConfirm)
+              }
+              disabled={statusBusy}
+              data-testid="confirm-status-change"
+            >
+              {statusBusy
+                ? "Updating…"
+                : statusConfirm === "SOLD"
+                  ? "Mark as sold"
+                  : "Close listing"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
