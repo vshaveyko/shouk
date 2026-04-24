@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
@@ -96,6 +97,15 @@ export async function POST(req: Request, { params }: { params: { slug: string } 
       publishedAt: status === "ACTIVE" ? new Date() : null,
     },
   });
+
+  // Make the new listing visible on the marketplace feed + detail pages
+  // immediately (SHK-050). The feed already uses dynamic="force-dynamic",
+  // but the client-router keeps a soft cache of recently-visited server
+  // components — without a revalidate, hitting Back from /l/<id> to
+  // /m/<slug>/feed shows the stale pre-create snapshot.
+  revalidatePath(`/m/${params.slug}/feed`);
+  revalidatePath(`/m/${params.slug}`);
+  revalidatePath(`/owner/${params.slug}/listings`);
 
   return NextResponse.json({ id: listing.id, status: listing.status });
 }
