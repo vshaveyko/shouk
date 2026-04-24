@@ -13,7 +13,7 @@ test.describe("Flow 1 · Auth & Onboarding", () => {
     const email = uniqueEmail("auth");
     await signUp(page, { email, password: "Test123!@#", displayName: "New Tester" });
     await completeRole(page, "MEMBER");
-    await expect(page.getByRole("heading", { name: /your marketplaces/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Your marketplaces", exact: true })).toBeVisible();
   });
 
   test("sign up choose owner → lands on create marketplace", async ({ page }) => {
@@ -25,7 +25,7 @@ test.describe("Flow 1 · Auth & Onboarding", () => {
 
   test("sign in with seeded credentials works", async ({ page }) => {
     await signIn(page, "member@shouks.test", "Test123!@#");
-    await expect(page.getByRole("heading", { name: /your marketplaces/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Your marketplaces", exact: true })).toBeVisible();
   });
 
   test("sign in with wrong password shows error", async ({ page }) => {
