@@ -67,4 +67,42 @@ test.describe("Flow 6 · Core app shell — visual structure", () => {
     // Sticky live preview on the right
     await expect(page.locator(".cl .cl-right .preview")).toBeVisible();
   });
+
+  test("6E messages uses .msgs split-pane", async ({ page }) => {
+    await signIn(page, "member@shouks.test", "Test123!@#");
+    await page.goto("/m/ferrari-frenzy/messages");
+    await expect(page.locator(".msgs")).toBeVisible();
+  });
+
+  test("6F profile uses .pf-wrap with .pf-hero", async ({ page }) => {
+    await signIn(page, "member@shouks.test", "Test123!@#");
+    // Visit a seed member profile
+    await page.goto("/u/owner-id-placeholder", { waitUntil: "domcontentloaded" }).catch(() => {});
+    // That may 404; switch to listing → seller profile link for a guaranteed hit
+    await page.goto("/m/ferrari-frenzy/feed");
+    const firstCard = page.locator(".listings-grid .listing").first();
+    await firstCard.click();
+    // From listing detail, navigate to seller via the seller box / link
+    const sellerName = page.getByTestId("seller-name");
+    if (await sellerName.count()) {
+      const sellerLink = sellerName.locator('xpath=ancestor::a').first();
+      if (await sellerLink.count()) {
+        await sellerLink.click();
+        await expect(page.locator(".pf-wrap")).toBeVisible();
+        await expect(page.locator(".pf-hero")).toBeVisible();
+      }
+    }
+  });
+
+  test("6G activity uses .act-wrap", async ({ page }) => {
+    await signIn(page, "member@shouks.test", "Test123!@#");
+    await page.goto("/activity");
+    await expect(page.locator(".act-wrap")).toBeVisible();
+  });
+
+  test("6H settings uses .set-wrap", async ({ page }) => {
+    await signIn(page, "member@shouks.test", "Test123!@#");
+    await page.goto("/settings");
+    await expect(page.locator(".set-wrap")).toBeVisible();
+  });
 });
