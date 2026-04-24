@@ -13,6 +13,11 @@ export default function SignInPage({
   const callbackUrl = searchParams?.callbackUrl ?? "/home";
   const error = searchParams?.error;
 
+  // V1 is OAuth-only (SHK-019). The credentials provider stays wired up in
+  // auth.ts so we can re-enable the email/password form later without a
+  // redeploy — e2e tests opt in via SHOUKS_ENABLE_CREDENTIALS_AUTH=1.
+  const credentialsEnabled = process.env.SHOUKS_ENABLE_CREDENTIALS_AUTH === "1";
+
   async function googleSignIn() {
     "use server";
     await signIn("google", { redirectTo: callbackUrl });
@@ -71,20 +76,24 @@ export default function SignInPage({
             Continue with Instagram
           </button>
 
-          <div className="my-5 flex items-center gap-3 text-[12px] text-muted">
-            <div className="h-px bg-line-soft flex-1" />
-            or email
-            <div className="h-px bg-line-soft flex-1" />
-          </div>
+          {credentialsEnabled && (
+            <>
+              <div className="my-5 flex items-center gap-3 text-[12px] text-muted">
+                <div className="h-px bg-line-soft flex-1" />
+                or email
+                <div className="h-px bg-line-soft flex-1" />
+              </div>
 
-          <SignInForm callbackUrl={callbackUrl} />
+              <SignInForm callbackUrl={callbackUrl} />
 
-          <p className="mt-6 text-center text-[13px] text-muted">
-            New to Shouks?{" "}
-            <Link href="/signup" className="text-blue-ink hover:underline font-medium">
-              Create an account
-            </Link>
-          </p>
+              <p className="mt-6 text-center text-[13px] text-muted">
+                New to Shouks?{" "}
+                <Link href="/signup" className="text-blue-ink hover:underline font-medium">
+                  Create an account
+                </Link>
+              </p>
+            </>
+          )}
         </div>
         <p className="text-center text-[12px] text-muted mt-5">
           By continuing you agree to our{" "}

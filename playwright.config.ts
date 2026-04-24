@@ -39,6 +39,9 @@ export default defineConfig({
           AUTH_SECRET: "e2e-secret-key",
           AUTH_GOOGLE_ID: "",
           AUTH_GOOGLE_SECRET: "",
+          // V1 UI hides email/password forms (SHK-019) but e2e tests still
+          // sign in via seeded credentials — opt into the legacy forms.
+          SHOUKS_ENABLE_CREDENTIALS_AUTH: "1",
         },
       },
 });

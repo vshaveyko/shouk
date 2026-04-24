@@ -1,9 +1,18 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { SignUpForm } from "./SignUpForm";
 
 export const metadata = { title: "Create your account" };
 
 export default function SignUpPage() {
+  // V1 creates accounts implicitly on first OAuth sign-in (SHK-019).
+  // If the credentials flow isn't enabled, bounce signup requests to the
+  // signin page where the OAuth button lives. Set
+  // SHOUKS_ENABLE_CREDENTIALS_AUTH=1 to surface the form again.
+  if (process.env.SHOUKS_ENABLE_CREDENTIALS_AUTH !== "1") {
+    redirect("/signin");
+  }
+
   return (
     <main className="min-h-[calc(100vh-64px)] grid place-items-center py-12 px-4">
       <div className="w-full max-w-[440px]">

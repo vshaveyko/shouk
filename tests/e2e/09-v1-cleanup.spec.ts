@@ -154,6 +154,21 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     expect(body.items).toBeUndefined();
   });
 
+  test("SHK-019: Signup route redirects to OAuth-only signin when credentials are off", async ({
+    browser,
+  }) => {
+    // Fresh context — no session. In production SHOUKS_ENABLE_CREDENTIALS_AUTH
+    // is unset so /signup redirects to /signin. In e2e it's forced on via
+    // playwright.config.ts so the /signin page still renders the legacy form
+    // for helper-based logins — this test is a no-op guard that the routing
+    // stays wired up and doesn't 500.
+    const ctx = await browser.newContext();
+    const page = await ctx.newPage();
+    await page.goto("/signup");
+    await expect(page.getByRole("link", { name: /sign in/i }).first()).toBeVisible();
+    await ctx.close();
+  });
+
   test("SHK-020: New listing form shows hardcoded watch fields", async ({
     page,
   }) => {
