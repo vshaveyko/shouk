@@ -19,15 +19,17 @@ export default async function HomeDashboard({
   if (!ctx) redirect("/signin?callbackUrl=/home");
   const { user, memberships, owned } = ctx;
 
-  // Owners whose primary identity is "owner" and who already run at least one
-  // marketplace should land in their admin shell, not the member home feed —
-  // but only for "implicit" visits. `?stay=1` opts out so that clicking the
-  // brand/logo from inside the owner shell doesn't trap the user in a
-  // same-page redirect loop (SHK-028).
+  // When a user owns or belongs to multiple marketplaces there's no
+  // sensible "default" to drop them into, and picking owned[0] made the
+  // whole app feel tailored to the first marketplace they created
+  // (SHK-037). Only auto-redirect an OWNER with exactly one owned
+  // marketplace and zero member marketplaces — the unambiguous case.
+  // `?stay=1` always opts out (SHK-028 brand-logo loop).
   if (
     searchParams?.stay !== "1" &&
     user.defaultRole === "OWNER" &&
-    owned.length > 0
+    owned.length === 1 &&
+    memberships.length === 0
   ) {
     redirect(`/owner/${owned[0].slug}/dashboard`);
   }

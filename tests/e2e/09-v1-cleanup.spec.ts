@@ -154,6 +154,19 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     expect(body.items).toBeUndefined();
   });
 
+  test("SHK-037: owner with multiple marketplaces lands on /home, not auto-redirected", async ({
+    page,
+  }) => {
+    // Seed's "owner" runs Ferrari Frenzy + Gooners United — two marketplaces.
+    // /home should render the cross-marketplace overview instead of
+    // auto-bouncing to the first owned marketplace.
+    await page.goto("/home");
+    await expect(page).toHaveURL(/\/home(\?|$)/);
+    await expect(
+      page.getByRole("heading", { name: /your marketplaces/i }),
+    ).toBeVisible();
+  });
+
   test("SHK-039: apply page loads for a pending applicant (smoke)", async ({
     browser,
   }) => {
