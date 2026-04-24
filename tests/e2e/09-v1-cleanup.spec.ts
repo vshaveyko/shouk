@@ -24,4 +24,11 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     await expect(sidebar).toBeVisible();
     await expect(sidebar.getByRole("link", { name: /payouts/i })).toHaveCount(0);
   });
+
+  test("SHK-025: applications page drops approval-rate marketing copy", async ({ page }) => {
+    await page.goto("/owner/ferrari-frenzy/applications");
+    await expect(page.getByRole("heading", { name: /applications/i }).first()).toBeVisible();
+    await expect(page.getByText(/typically approve/i)).toHaveCount(0);
+    await expect(page.getByText(/~70%/)).toHaveCount(0);
+  });
 });

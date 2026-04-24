@@ -138,12 +138,11 @@ export default async function ApplicationsLayout({
         <div className="page-head">
           <div>
             <h1>Applications</h1>
-            <div className="lead">
-              {pendingCount} pending
-              {pendingOver48h > 0 ? ` · ${pendingOver48h} waiting over 48h` : ""}.
-              Owners typically approve <b style={{ color: "var(--ink)" }}>~70%</b> of
-              qualified applicants.
-            </div>
+            {pendingOver48h > 0 ? (
+              <div className="lead">
+                {pendingCount} pending · {pendingOver48h} waiting over 48h.
+              </div>
+            ) : null}
           </div>
         </div>
         {children}
