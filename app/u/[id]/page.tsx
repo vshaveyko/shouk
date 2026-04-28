@@ -45,25 +45,35 @@ const profileCss = `
 .pf-card .p-p { font-family: "Instrument Serif", serif; font-weight: 400; font-size: 18px; margin-top: 4px; }
 .pf-card .p-s { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
 .pf-empty { padding: 60px 24px; text-align: center; color: var(--muted); font-size: 13px; background: #fff; border: 1px solid var(--line); border-radius: 12px; }
+
+.pf-section-label { font-size: 10px; color: var(--muted); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+.pf-shared-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.pf-community-card { background: #fff; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; text-decoration: none; color: inherit; display: block; }
+.pf-community-card:hover { border-color: oklch(0.8 0.02 230); box-shadow: var(--shadow); }
+.pf-community-card .pc-cover { height: 48px; background: linear-gradient(135deg, oklch(0.48 0.2 28), oklch(0.26 0.14 25)); }
+.pf-community-card .pc-body { padding: 10px 12px; }
+.pf-community-card .pc-name { font-size: 12.5px; font-weight: 600; letter-spacing: -0.005em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 `;
 
 export default async function PublicProfilePage({ params }: { params: { id: string } }) {
+  const session = await auth();
+  const sessionUserId = session?.user?.id;
+
   const user = await prisma.user.findUnique({
     where: { id: params.id },
     include: {
       verifiedAccounts: { select: { provider: true, handle: true, verifiedAt: true } },
+      memberships: {
+        where: { status: "ACTIVE" },
+        select: { marketplace: { select: { id: true, name: true, slug: true, coverImageUrl: true } } },
+      },
       listings: {
         where: { status: { in: ["ACTIVE", "SOLD"] } },
         orderBy: { createdAt: "desc" },
         take: 20,
         select: {
-          id: true,
-          title: true,
-          images: true,
-          priceCents: true,
-          currency: true,
-          status: true,
-          createdAt: true,
+          id: true, title: true, images: true, priceCents: true,
+          currency: true, status: true, createdAt: true,
           marketplace: { select: { name: true, slug: true } },
         },
       },
@@ -72,16 +82,21 @@ export default async function PublicProfilePage({ params }: { params: { id: stri
 
   if (!user) notFound();
 
-  const session = await auth();
-  const sessionUserId = session?.user?.id;
   const ctx = sessionUserId ? await getUserContext() : null;
   const unread = sessionUserId
-    ? await prisma.notification.count({
-        where: { userId: sessionUserId, readAt: null },
-      })
+    ? await prisma.notification.count({ where: { userId: sessionUserId, readAt: null } })
     : 0;
 
   const displayName = user.displayName ?? user.name ?? "Member";
+
+  // Compute shared communities (marketplaces both users are in)
+  const viewerMarketplaceIds = new Set([
+    ...(ctx?.owned ?? []).map((m) => m.id),
+    ...(ctx?.memberships ?? []).map((m) => m.id),
+  ]);
+  const sharedCommunities = user.memberships
+    .filter((m) => viewerMarketplaceIds.has(m.marketplace.id))
+    .map((m) => m.marketplace);
   const initials = displayName
     .split(" ")
     .map((p) => p[0])
@@ -145,12 +160,32 @@ export default async function PublicProfilePage({ params }: { params: { id: stri
           </div>
         </div>
 
-        <nav className="pf-tabs" aria-label="Profile sections">
-          <a href="#listings" className="on">Listings</a>
-          <a href="#sold">Sold</a>
-          <a href="#reviews">Reputation</a>
-        </nav>
+        {/* Shared communities section */}
+        {sessionUserId && sessionUserId !== params.id && (
+          <div className="mb-8">
+            <div className="pf-section-label">Shared communities</div>
+            {sharedCommunities.length === 0 ? (
+              <div className="pf-empty">No shared communities.</div>
+            ) : (
+              <div className="pf-shared-grid">
+                {sharedCommunities.map((mp) => (
+                  <Link key={mp.id} href={`/m/${mp.slug}/feed`} className="pf-community-card">
+                    <div
+                      className="pc-cover"
+                      style={mp.coverImageUrl ? { backgroundImage: `url(${mp.coverImageUrl})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
+                    />
+                    <div className="pc-body">
+                      <div className="pc-name">{mp.name}</div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
+        {/* Listings */}
+        <div className="pf-section-label">Listings</div>
         {user.listings.length === 0 ? (
           <div className="pf-empty">No listings yet.</div>
         ) : (
@@ -158,7 +193,7 @@ export default async function PublicProfilePage({ params }: { params: { id: stri
             {user.listings.map((l) => (
               <Link key={l.id} href={`/l/${l.id}`} className="pf-card">
                 <div className="p-img">
-                  {l.images[0] && <img src={l.images[0]} alt="" />}
+                  {(l.images as string[])[0] && <img src={(l.images as string[])[0]} alt="" />}
                 </div>
                 <div className="p-body">
                   <div className="p-t">{l.title}</div>

@@ -133,7 +133,7 @@ export function NewListingForm({
       title: title.trim(),
       type,
       description: description.trim() || undefined,
-      schemaValues,
+      schemaValues: { ...schemaValues, title: title.trim() },
       images,
       currency,
     };
@@ -145,6 +145,7 @@ export function NewListingForm({
         return;
       }
       body.priceCents = Math.round(price * 100);
+      (body.schemaValues as Record<string, unknown>).price = Math.round(price * 100);
     } else if (type === "AUCTION") {
       const start = parseFloat(auctionStart);
       const increment = parseFloat(auctionIncrement);

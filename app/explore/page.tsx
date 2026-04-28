@@ -36,6 +36,7 @@ export default async function ExplorePage({
   const marketplaces = await prisma.marketplace.findMany({
     where: {
       status: "ACTIVE",
+      entryMethod: { not: "INVITE" },
       ...(q
         ? {
             OR: [
@@ -66,8 +67,7 @@ export default async function ExplorePage({
           <div className="h-full max-w-[1280px] mx-auto px-6 flex items-center justify-between">
             <BrandLockup href="/" size={24} />
             <div className="flex items-center gap-2">
-              <Link href="/signin"><Button variant="ghost" size="md">Log in</Button></Link>
-              <Link href="/signin"><Button variant="primary" size="md">Get started</Button></Link>
+              <Link href="/signin"><Button variant="primary" size="md">Log in</Button></Link>
             </div>
           </div>
         </header>

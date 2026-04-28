@@ -55,10 +55,11 @@ const activityCss = `
 .bid-state.iso-active { background: oklch(0.55 0.15 60); color: #fff; }
 `;
 
-export default async function ActivityPage() {
+export default async function ActivityPage({ searchParams }: { searchParams?: { tab?: string } }) {
   const ctx = await getUserContext();
   if (!ctx) redirect("/signin?callbackUrl=/activity");
   const { user, memberships, owned } = ctx;
+  const initialTab = searchParams?.tab ?? "bids";
 
   const unread = await prisma.notification.count({
     where: { userId: user.id, readAt: null },
@@ -88,14 +89,14 @@ export default async function ActivityPage() {
 
         <div className="act-layout">
           <nav className="act-nav" aria-label="Activity sections">
-            <button type="button" data-act="saved">
+            <button type="button" className={initialTab === "saved" ? "active" : ""} data-act="saved">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
               </svg>
               Saved
               <span className="ct">0</span>
             </button>
-            <button type="button" className="active" data-act="bids">
+            <button type="button" className={initialTab === "bids" ? "active" : ""} data-act="bids">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 11l3 3L22 4" />
                 <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
@@ -103,7 +104,7 @@ export default async function ActivityPage() {
               Bids &amp; offers
               <span className="ct">0</span>
             </button>
-            <button type="button" data-act="alerts">
+            <button type="button" className={initialTab === "alerts" ? "active" : ""} data-act="alerts">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8" />
                 <path d="m21 21-4.3-4.3" />

@@ -224,7 +224,15 @@ export default async function FeedPage({
               </svg>
               Post a listing
             </Link>
-            <Link href="/activity" className="btn btn-ghost">
+            {isAdmin && (
+              <Link href={`/owner/${mp.slug}/dashboard`} className="btn btn-ghost" data-testid="admin-button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                </svg>
+                Admin
+              </Link>
+            )}
+            <Link href="/activity?tab=alerts" className="btn btn-ghost">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
               </svg>

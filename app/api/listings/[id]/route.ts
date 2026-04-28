@@ -32,7 +32,7 @@ const editSchema = z.object({
   description: z.string().max(5000).optional(),
   priceCents: z.number().int().min(0).optional().nullable(),
   schemaValues: z.record(z.string(), z.unknown()).optional(),
-  images: z.array(z.string().url()).optional(),
+  images: z.array(z.string().min(1)).optional(),
   status: z.enum(["ACTIVE", "SOLD", "CLOSED"]).optional(),
 });
 

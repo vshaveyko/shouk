@@ -48,11 +48,8 @@ export default async function LandingPage() {
             <Link href="/explore" className="px-3 py-2 rounded-lg text-[14px] text-ink-soft hover:bg-hover hover:text-ink">Explore</Link>
           </nav>
           <div className="flex items-center gap-2">
-            <Link href="/signin" className="hidden sm:inline-flex">
-              <Button variant="ghost" size="md">Log in</Button>
-            </Link>
             <Link href="/signin">
-              <Button variant="dark" size="md">Get started</Button>
+              <Button variant="dark" size="md">Log in</Button>
             </Link>
           </div>
         </div>

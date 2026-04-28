@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { Check, ShieldCheck, Users, Package, ArrowRight } from "lucide-react";
 import { auth } from "@/auth";
@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/Badge";
 import { BrandLockup } from "@/components/brand/Logo";
 import { verifyProviders } from "@/lib/utils";
 import { StatusBanner } from "./StatusBanner";
+import { JoinNowButton } from "./JoinNowButton";
 
 export const dynamic = "force-dynamic";
 
@@ -92,6 +93,7 @@ export default async function MarketplaceLanding({ params }: { params: Params })
   }
 
   const isActiveMember = membership?.status === "ACTIVE";
+  if (isActiveMember) redirect(`/m/${mp.slug}/feed`);
   const verifiedSet = new Set(verifiedAccounts.map((v) => v.provider));
   const requirements = mp.requiredVerifications;
   const missingRequirements = requirements.filter((r) => !verifiedSet.has(r));
@@ -105,27 +107,32 @@ export default async function MarketplaceLanding({ params }: { params: Params })
   let primaryBlock: React.ReactNode = null;
 
   if (!userId) {
+    const callbackUrl = mp.entryMethod === "PUBLIC" ? `/m/${mp.slug}` : `/apply/${mp.slug}`;
     primaryBlock = (
       <div
         className="rounded-[14px] border border-line bg-surface shadow-sm p-5 space-y-3"
         data-testid="cta-unauthenticated"
       >
         <div>
-          <h2 className="text-[17px] font-semibold">Apply to join</h2>
+          <h2 className="text-[17px] font-semibold">
+            {mp.entryMethod === "PUBLIC" ? "Join" : "Apply to join"}
+          </h2>
           <p className="text-[13px] text-muted mt-1">
-            Create your Shouks account and submit an application to{" "}
-            <span className="font-medium text-ink">{mp.name}</span>.
+            {mp.entryMethod === "PUBLIC"
+              ? "Sign in to join instantly."
+              : `Create your Shouks account and submit an application to ${mp.name}.`}
           </p>
         </div>
-        <Link href={`/signin?callbackUrl=/apply/${mp.slug}`}>
+        <Link href={`/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
           <Button size="lg" className="w-full">
-            Sign in to apply <ArrowRight size={16} />
+            {mp.entryMethod === "PUBLIC" ? "Sign in to join" : "Sign in to apply"}{" "}
+            <ArrowRight size={16} />
           </Button>
         </Link>
         <p className="text-[12px] text-muted text-center">
           New to Shouks?{" "}
           <Link
-            href={`/signup?callbackUrl=/apply/${mp.slug}`}
+            href={`/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`}
             className="text-blue-ink hover:underline"
           >
             Create an account
@@ -159,6 +166,23 @@ export default async function MarketplaceLanding({ params }: { params: Params })
         reviewerNote={latestApplication.reviewerNote}
         rejectionReason={latestApplication.rejectionReason}
       />
+    );
+  } else if (mp.entryMethod === "PUBLIC") {
+    primaryBlock = (
+      <div
+        className="rounded-[14px] border border-line bg-surface shadow-sm p-5 space-y-4"
+        data-testid="cta-join-public"
+      >
+        <div>
+          <h2 className="text-[18px] font-semibold tracking-[-0.01em]">
+            Join <em className="serif italic text-blue-ink">{mp.name}</em>
+          </h2>
+          <p className="text-[13px] text-muted mt-1">
+            Open community — join instantly with one click.
+          </p>
+        </div>
+        <JoinNowButton slug={mp.slug} />
+      </div>
     );
   } else {
     primaryBlock = (
@@ -217,14 +241,8 @@ export default async function MarketplaceLanding({ params }: { params: Params })
           <div className="max-w-[1280px] mx-auto px-6 h-14 flex items-center justify-between">
             <BrandLockup href="/" size={22} />
             <div className="flex items-center gap-2">
-              <Link
-                href={`/signin?callbackUrl=/m/${mp.slug}`}
-                className="text-[13px] text-ink-soft hover:text-ink"
-              >
-                Sign in
-              </Link>
-              <Link href={`/signin?callbackUrl=/apply/${mp.slug}`}>
-                <Button size="sm">Get started</Button>
+              <Link href={`/signin?callbackUrl=/m/${mp.slug}`}>
+                <Button size="sm">Log in</Button>
               </Link>
             </div>
           </div>

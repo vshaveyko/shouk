@@ -39,8 +39,10 @@ export async function POST(req: Request) {
   });
 
   const uploadUrl = await getSignedUrl(s3, command, { expiresIn: 300 });
-  // Serve images via proxy route so no public bucket access is needed.
-  const publicUrl = `/api/images/${key}`;
+  // Build an absolute URL so Zod's z.string().url() validation passes when
+  // the caller includes this in a listing's `images` array.
+  const origin = process.env.NEXT_PUBLIC_APP_URL ?? new URL(req.url).origin;
+  const publicUrl = `${origin}/api/images/${key}`;
 
   return NextResponse.json({ uploadUrl, publicUrl });
 }

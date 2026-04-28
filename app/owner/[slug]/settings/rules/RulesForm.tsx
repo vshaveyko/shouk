@@ -81,12 +81,11 @@ export function RulesForm({
   };
 }) {
   const router = useRouter();
-  const [entryMethod, setEntryMethod] = React.useState<EntryMethod>(
-    initial.entryMethod,
-  );
+  // entryMethod is managed in Identity > Privacy — read-only here so we can
+  // conditionally show application questions.
+  const entryMethod = initial.entryMethod;
   const [requiredVerifications, setRequiredVerifications] =
     React.useState<VerifyProviderId[]>(initial.requiredVerifications);
-  const [autoApprove, setAutoApprove] = React.useState(initial.autoApprove);
   const [questions, setQuestions] = React.useState<Question[]>(() =>
     initial.questions.map((q) => ({
       uid: uid(),
@@ -166,11 +165,7 @@ export function RulesForm({
       const mpRes = await fetch(`/api/marketplaces/${slug}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          entryMethod,
-          requiredVerifications,
-          autoApprove: entryMethod === "REFERRAL" ? autoApprove : false,
-        }),
+        body: JSON.stringify({ requiredVerifications }),
       });
       if (!mpRes.ok) {
         const j = await mpRes.json().catch(() => ({}));
@@ -214,109 +209,11 @@ export function RulesForm({
     }
   }
 
-  const entryOptions: {
-    id: EntryMethod;
-    title: string;
-    body: string;
-    testid: string;
-  }[] = [
-    {
-      id: "PUBLIC",
-      title: "Open",
-      body: "Anyone signed in can join with one click. No approval needed.",
-      testid: "rules-entry-public",
-    },
-    {
-      id: "APPLICATION",
-      title: "Application",
-      body: "People apply with a short form. You review and approve.",
-      testid: "rules-entry-application",
-    },
-    {
-      id: "INVITE",
-      title: "Invite link or code",
-      body: "Share a link or code. Holders can join instantly.",
-      testid: "rules-entry-invite",
-    },
-    {
-      id: "REFERRAL",
-      title: "Referral",
-      body: "Existing members vouch for newcomers.",
-      testid: "rules-entry-referral",
-    },
-  ];
-
   return (
     <form onSubmit={save} data-testid="rules-form" className="space-y-5">
       <h2 className="text-[18px] font-semibold tracking-[-0.01em]">
         Membership rules
       </h2>
-      <Card>
-        <CardHeader>
-          <CardTitle>How do people join?</CardTitle>
-          <CardDescription>Pick a single entry method.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div
-            className="grid grid-cols-1 md:grid-cols-3 gap-3"
-            role="radiogroup"
-            aria-label="Entry method"
-          >
-            {entryOptions.map((opt) => {
-              const selected = entryMethod === opt.id;
-              return (
-                <button
-                  key={opt.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={selected}
-                  data-testid={opt.testid}
-                  onClick={() => setEntryMethod(opt.id)}
-                  className={cn(
-                    "text-left rounded-[10px] border p-4 transition",
-                    selected
-                      ? "border-blue bg-blue-soft ring-[3px] ring-[var(--blue-softer)]"
-                      : "border-line bg-surface hover:bg-hover",
-                  )}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[14px] font-semibold">{opt.title}</span>
-                    <span
-                      className={cn(
-                        "h-4 w-4 rounded-full border-2",
-                        selected ? "border-blue bg-blue" : "border-line",
-                      )}
-                      aria-hidden
-                    >
-                      {selected && (
-                        <span className="block h-full w-full rounded-full bg-white scale-50" />
-                      )}
-                    </span>
-                  </div>
-                  <p className="text-[12.5px] text-muted">{opt.body}</p>
-                </button>
-              );
-            })}
-          </div>
-
-          {entryMethod === "REFERRAL" && (
-            <label className="mt-4 flex items-center gap-3 rounded-[10px] border border-line-soft bg-bg-panel px-3 py-2.5">
-              <Switch
-                checked={autoApprove}
-                onCheckedChange={(v) => setAutoApprove(!!v)}
-                data-testid="rules-auto-approve"
-              />
-              <span className="text-[13px]">
-                <span className="font-medium">Auto-approve referrals</span>
-                <span className="block text-muted text-[12px]">
-                  Skip manual review once a vouch is received.
-                </span>
-              </span>
-            </label>
-          )}
-        </CardContent>
-      </Card>
-
       <Card>
         <CardHeader>
           <CardTitle>Required verifications</CardTitle>

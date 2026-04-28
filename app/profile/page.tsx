@@ -32,7 +32,7 @@ export default async function ProfilePage() {
   });
 
   const [listingCount, saveCount] = await Promise.all([
-    prisma.listing.count({ where: { sellerId: user.id } }),
+    prisma.listing.count({ where: { sellerId: user.id, status: { notIn: ["DRAFT", "REMOVED", "SHADOW_HIDDEN"] } } }),
     prisma.listingSave.count({ where: { userId: user.id } }),
   ]);
 

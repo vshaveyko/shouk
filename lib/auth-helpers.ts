@@ -45,7 +45,7 @@ export async function getUserContext() {
   const owned = user.ownedMarketplaces.map((m) => ({ ...m, isOwner: true }));
   const memberships = user.memberships
     .map((m) => m.marketplace)
-    .filter((mp) => !ownedIds.has(mp.id))
+    .filter((mp) => !ownedIds.has(mp.id) && mp.status === "ACTIVE")
     .map((m) => ({ ...m, isOwner: false }));
 
   return { user, memberships, owned };
