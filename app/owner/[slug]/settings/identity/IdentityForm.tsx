@@ -39,12 +39,47 @@ type Initial = {
   entryMethod: EntryMethod;
 };
 
-const ENTRY_OPTIONS: { id: EntryMethod; title: string; body: string }[] = [
-  { id: "PUBLIC", title: "Open", body: "Anyone signed in can join with one click." },
-  { id: "APPLICATION", title: "Application", body: "People apply and you approve them." },
-  { id: "INVITE", title: "Invite only", body: "Only people you invite can join." },
-  { id: "REFERRAL", title: "Referral", body: "Existing members vouch for newcomers." },
+type Visibility = "PUBLIC" | "CLOSED" | "PRIVATE";
+
+const VISIBILITY_OPTIONS: { id: Visibility; title: string; body: string; tag: string }[] = [
+  {
+    id: "PUBLIC",
+    title: "Public",
+    body: "Anyone can discover the marketplace and browse listings. Best for open communities and merchants who want organic traffic.",
+    tag: "OPEN",
+  },
+  {
+    id: "CLOSED",
+    title: "Closed",
+    body: 'Marketplace is listed publicly, but only members can browse listings. Non-members see a "Request to join" page. Best for most curated communities.',
+    tag: "GATED",
+  },
+  {
+    id: "PRIVATE",
+    title: "Private",
+    body: "Hidden from Explore and search. Only direct invite links lead to the marketplace. Best for small trusted groups and beta launches.",
+    tag: "HIDDEN",
+  },
 ];
+
+const JOIN_OPTIONS: { id: "APPLICATION" | "REFERRAL"; title: string; body: string }[] = [
+  {
+    id: "APPLICATION",
+    title: "Application",
+    body: "Prospective members answer questions you define. You review and approve or reject each one.",
+  },
+  {
+    id: "REFERRAL",
+    title: "Referral",
+    body: "Existing members vouch for newcomers. Optionally auto-approve referrals.",
+  },
+];
+
+function visibilityFromEntry(em: EntryMethod): Visibility {
+  if (em === "PUBLIC") return "PUBLIC";
+  if (em === "INVITE") return "PRIVATE";
+  return "CLOSED";
+}
 
 export function IdentityForm({ slug, initial }: { slug: string; initial: Initial }) {
   const router = useRouter();
@@ -293,38 +328,88 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
           <CardTitle>Privacy</CardTitle>
           <CardDescription>Control who can discover and join your marketplace.</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" role="radiogroup" aria-label="Entry method">
-            {ENTRY_OPTIONS.map((opt) => {
-              const selected = entryMethod === opt.id;
-              return (
-                <button
-                  key={opt.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={selected}
-                  data-testid={`identity-entry-${opt.id.toLowerCase()}`}
-                  onClick={() => setEntryMethod(opt.id)}
-                  className={`text-left rounded-[10px] border p-4 transition ${
-                    selected
-                      ? "border-blue bg-blue-soft ring-[3px] ring-[var(--blue-softer)]"
-                      : "border-line bg-surface hover:bg-hover"
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[14px] font-semibold">{opt.title}</span>
+        <CardContent className="space-y-5">
+          <div>
+            <div className="text-[12px] font-semibold uppercase tracking-wide text-muted mb-2">Visibility</div>
+            <div className="space-y-2" role="radiogroup" aria-label="Visibility">
+              {VISIBILITY_OPTIONS.map((opt) => {
+                const selected = visibilityFromEntry(entryMethod) === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    data-testid={`identity-visibility-${opt.id.toLowerCase()}`}
+                    onClick={() => {
+                      if (opt.id === "PUBLIC") setEntryMethod("PUBLIC");
+                      else if (opt.id === "PRIVATE") setEntryMethod("INVITE");
+                      else {
+                        const keep = entryMethod === "APPLICATION" || entryMethod === "REFERRAL";
+                        setEntryMethod(keep ? entryMethod : "APPLICATION");
+                      }
+                    }}
+                    className={`flex items-start gap-3 w-full text-left rounded-[10px] border p-4 transition ${
+                      selected
+                        ? "border-blue bg-blue-soft ring-[3px] ring-[var(--blue-softer)]"
+                        : "border-line bg-surface hover:bg-hover"
+                    }`}
+                  >
                     <span
-                      className={`h-4 w-4 rounded-full border-2 ${selected ? "border-blue bg-blue" : "border-line"}`}
+                      className={`mt-0.5 h-4 w-4 rounded-full border-2 shrink-0 ${selected ? "border-blue bg-blue" : "border-line"}`}
                       aria-hidden
                     >
                       {selected && <span className="block h-full w-full rounded-full bg-white scale-50" />}
                     </span>
-                  </div>
-                  <p className="text-[12.5px] text-muted">{opt.body}</p>
-                </button>
-              );
-            })}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className="text-[14px] font-semibold">{opt.title}</span>
+                        <span className="text-[10.5px] font-semibold tracking-wide text-muted">{opt.tag}</span>
+                      </div>
+                      <p className="text-[12.5px] text-muted">{opt.body}</p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
+
+          {visibilityFromEntry(entryMethod) === "CLOSED" && (
+            <div>
+              <div className="text-[12px] font-semibold uppercase tracking-wide text-muted mb-2">Ways to join</div>
+              <div className="space-y-2" role="radiogroup" aria-label="Ways to join">
+                {JOIN_OPTIONS.map((opt) => {
+                  const selected = entryMethod === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={selected}
+                      data-testid={`identity-join-${opt.id.toLowerCase()}`}
+                      onClick={() => setEntryMethod(opt.id)}
+                      className={`flex items-start gap-3 w-full text-left rounded-[10px] border p-4 transition ${
+                        selected
+                          ? "border-blue bg-blue-soft ring-[3px] ring-[var(--blue-softer)]"
+                          : "border-line bg-surface hover:bg-hover"
+                      }`}
+                    >
+                      <span
+                        className={`mt-0.5 h-4 w-4 rounded-full border-2 shrink-0 ${selected ? "border-blue bg-blue" : "border-line"}`}
+                        aria-hidden
+                      >
+                        {selected && <span className="block h-full w-full rounded-full bg-white scale-50" />}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[14px] font-semibold mb-1">{opt.title}</div>
+                        <p className="text-[12.5px] text-muted">{opt.body}</p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </CardContent>
         <CardFooter className="justify-end">
           <Button

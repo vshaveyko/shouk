@@ -213,3 +213,30 @@ test.describe("SHK-038: Cover image is upload not URL input", () => {
     await expect(page.locator('input[type="url"]')).toHaveCount(0);
   });
 });
+
+// SHK-039: Admin Privacy section uses Visibility (Public/Closed/Private)
+//   tab separate from Ways-to-join (Application/Referral), mirroring the wizard.
+test.describe("SHK-039: Admin Privacy has visibility selector separate from entry method", () => {
+  test("identity Privacy shows Visibility radio cards", async ({ page }) => {
+    await signIn(page, "owner@shouks.test", "Test123!@#");
+    await page.goto("/owner/ferrari-frenzy/settings/identity");
+    await expect(page.getByTestId("identity-visibility-public")).toBeVisible();
+    await expect(page.getByTestId("identity-visibility-closed")).toBeVisible();
+    await expect(page.getByTestId("identity-visibility-private")).toBeVisible();
+  });
+
+  test("Closed visibility reveals Ways to join sub-section", async ({ page }) => {
+    await signIn(page, "owner@shouks.test", "Test123!@#");
+    await page.goto("/owner/ferrari-frenzy/settings/identity");
+    await page.getByTestId("identity-visibility-closed").click();
+    await expect(page.getByTestId("identity-join-application")).toBeVisible();
+    await expect(page.getByTestId("identity-join-referral")).toBeVisible();
+  });
+
+  test("Public visibility hides Ways to join sub-section", async ({ page }) => {
+    await signIn(page, "owner@shouks.test", "Test123!@#");
+    await page.goto("/owner/ferrari-frenzy/settings/identity");
+    await page.getByTestId("identity-visibility-public").click();
+    await expect(page.getByTestId("identity-join-application")).toHaveCount(0);
+  });
+});
