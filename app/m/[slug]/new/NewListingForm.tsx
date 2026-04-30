@@ -47,6 +47,19 @@ type Props = {
   auctionsEnabled: boolean;
   currency: string;
   schemaFields: SchemaField[];
+  // When set, the form switches into edit mode: prefills from the
+  // existing listing, locks the type toggle (the API rejects type
+  // changes), PATCHes the listing instead of POSTing a new one, and
+  // routes Cancel back to the listing detail page.
+  existing?: {
+    id: string;
+    type: ListingType;
+    title: string;
+    description: string | null;
+    priceCents: number | null;
+    images: string[];
+    schemaValues: Record<string, unknown>;
+  };
 };
 
 const DURATION_PRESETS = [
@@ -65,17 +78,33 @@ export function NewListingForm({
   auctionsEnabled,
   currency,
   schemaFields,
+  existing,
 }: Props) {
   const router = useRouter();
+  const isEditing = Boolean(existing);
 
-  const [type, setType] = React.useState<ListingType>("FIXED");
-  const [title, setTitle] = React.useState("");
-  const [description, setDescription] = React.useState("");
-  const [priceDollars, setPriceDollars] = React.useState("");
-  const [budgetDollars, setBudgetDollars] = React.useState("");
-  const [alertFrequency, setAlertFrequency] = React.useState("INSTANT");
-  const [schemaValues, setSchemaValues] = React.useState<Record<string, unknown>>({});
-  const [imageUrls, setImageUrls] = React.useState<string[]>([""]);
+  const [type, setType] = React.useState<ListingType>(existing?.type ?? "FIXED");
+  const [title, setTitle] = React.useState(existing?.title ?? "");
+  const [description, setDescription] = React.useState(existing?.description ?? "");
+  const [priceDollars, setPriceDollars] = React.useState(
+    existing && existing.type === "FIXED" && existing.priceCents != null
+      ? (existing.priceCents / 100).toFixed(2).replace(/\.00$/, "")
+      : "",
+  );
+  const [budgetDollars, setBudgetDollars] = React.useState(
+    existing && existing.type === "ISO" && existing.priceCents != null
+      ? (existing.priceCents / 100).toFixed(2).replace(/\.00$/, "")
+      : "",
+  );
+  const [alertFrequency, setAlertFrequency] = React.useState(
+    (existing?.schemaValues?._alertFrequency as string) ?? "INSTANT",
+  );
+  const [schemaValues, setSchemaValues] = React.useState<Record<string, unknown>>(
+    existing?.schemaValues ?? {},
+  );
+  const [imageUrls, setImageUrls] = React.useState<string[]>(
+    existing && existing.images.length > 0 ? [...existing.images, ""] : [""],
+  );
   const [auctionStart, setAuctionStart] = React.useState("");
   const [auctionReserve, setAuctionReserve] = React.useState("");
   const [auctionIncrement, setAuctionIncrement] = React.useState("50");
@@ -178,18 +207,36 @@ export function NewListingForm({
 
     setSubmitting(true);
     try {
-      const res = await fetch(`/api/marketplaces/${slug}/listings`, {
-        method: "POST",
+      // PATCH only accepts a subset of fields; type and auction config
+      // are immutable post-create. Strip them before sending.
+      const editBody: Record<string, unknown> = isEditing
+        ? {
+            title: body.title,
+            description: body.description ?? "",
+            schemaValues: body.schemaValues,
+            images: body.images,
+            ...(type === "FIXED" || type === "ISO"
+              ? { priceCents: body.priceCents ?? null }
+              : {}),
+          }
+        : body;
+
+      const url = isEditing
+        ? `/api/listings/${existing!.id}`
+        : `/api/marketplaces/${slug}/listings`;
+      const res = await fetch(url, {
+        method: isEditing ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify(editBody),
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? "Couldn't create listing.");
+        setError(data.error ?? (isEditing ? "Couldn't save listing." : "Couldn't create listing."));
         return;
       }
-      toast.success("Listing created.");
-      router.push(`/l/${data.id}`);
+      toast.success(isEditing ? "Listing updated." : "Listing created.");
+      router.push(`/l/${isEditing ? existing!.id : data.id}`);
+      router.refresh();
     } catch {
       setError("Network error. Try again.");
     } finally {
@@ -214,12 +261,23 @@ export function NewListingForm({
           <div className="breadcrumb">
             <Link href={`/m/${slug}/feed`}>{marketplaceName}</Link>
             <span>·</span>
-            <span>New post</span>
+            {isEditing ? (
+              <>
+                <Link href={`/l/${existing!.id}`}>Listing</Link>
+                <span>·</span>
+                <span>Edit</span>
+              </>
+            ) : (
+              <span>New post</span>
+            )}
           </div>
-          <h1>Post to {marketplaceName}</h1>
+          <h1>{isEditing ? "Edit listing" : `Post to ${marketplaceName}`}</h1>
           <p>
-            Choose what kind of post this is. Fields marked{" "}
-            <span className="req">*</span> are required by this marketplace.
+            {isEditing
+              ? "Update your listing. Type can't be changed after posting."
+              : "Choose what kind of post this is. Fields marked "}
+            {!isEditing && <span className="req">*</span>}
+            {!isEditing && " are required by this marketplace."}
           </p>
         </div>
 
@@ -230,7 +288,9 @@ export function NewListingForm({
           }}
           data-testid="create-listing-form"
         >
-          {/* Mode toggle — Sell vs ISO (Auctions hidden for V1 per SHK-027) */}
+          {/* Mode toggle — Sell vs ISO (Auctions hidden for V1 per SHK-027).
+              Locked when editing: the API rejects type changes. */}
+          {!isEditing && (
           <div className="mode-toggle" role="tablist" aria-label="Post mode">
             <button
               type="button"
@@ -265,6 +325,7 @@ export function NewListingForm({
               </div>
             </button>
           </div>
+          )}
 
           {isISO && (
             <div className="iso-banner">
@@ -682,12 +743,16 @@ export function NewListingForm({
         <Button
           type="button"
           variant="secondary"
-          onClick={() => router.push(`/m/${slug}/feed`)}
+          onClick={() =>
+            router.push(isEditing ? `/l/${existing!.id}` : `/m/${slug}/feed`)
+          }
         >
           Cancel
         </Button>
         <Button type="submit" disabled={submitting} data-testid="submit-listing">
-          {submitting ? "Publishing…" : "Publish listing"}
+          {submitting
+            ? isEditing ? "Saving…" : "Publishing…"
+            : isEditing ? "Save changes" : "Publish listing"}
         </Button>
       </div>
         </form>

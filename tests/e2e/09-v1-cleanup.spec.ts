@@ -254,12 +254,8 @@ test.describe("Listing detail seller actions", () => {
     await page.getByTestId("listing-type-fixed").click();
     await page.getByTestId("listing-field-title").fill(`Edit-menu test ${Date.now()}`);
     await page.getByTestId("price-input").fill("100");
-    const model = page.getByTestId("listing-field-model");
-    if (await model.count()) await model.fill("EditTest");
-    const year = page.getByTestId("listing-field-year");
-    if (await year.count()) await year.fill("2010");
-    const cond = page.getByTestId("listing-field-condition");
-    if (await cond.count()) { await cond.click(); await page.getByRole("option").first().click(); }
+    await page.getByTestId("watch-field-brand").fill("Rolex");
+    await page.getByTestId("watch-field-model").fill("EditTest");
     await page.getByTestId("images-input-0").fill("https://picsum.photos/seed/edit-menu/800/600");
     await page.getByTestId("submit-listing").click();
     await page.waitForURL(/\/l\/[^/]+$/, { timeout: 15_000 });
@@ -272,6 +268,18 @@ test.describe("Listing detail seller actions", () => {
 
     await page.getByTestId("listing-edit").click();
     await expect(page).toHaveURL(/\/l\/[^/]+\/edit$/);
-    await expect(page.getByTestId("edit-title")).toBeVisible();
+    // Edit must render the same form layout as create — same testids,
+    // not a parallel mini-form. Title and price come back prefilled.
+    await expect(page.getByTestId("create-listing-form")).toBeVisible();
+    await expect(page.getByTestId("watch-details-section")).toBeVisible();
+    await expect(page.getByTestId("listing-field-title")).toHaveValue(/Edit-menu test/);
+    await expect(page.getByTestId("price-input")).toHaveValue("100");
+    await expect(page.getByTestId("watch-field-model")).toHaveValue("EditTest");
+
+    // Edit a field, save, and confirm the value persists on the detail page.
+    await page.getByTestId("listing-field-title").fill("Edited title");
+    await page.getByTestId("submit-listing").click();
+    await page.waitForURL(/\/l\/[^/]+$/, { timeout: 15_000 });
+    await expect(page.getByTestId("listing-title")).toContainText("Edited title");
   });
 });
