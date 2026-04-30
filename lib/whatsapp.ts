@@ -13,6 +13,8 @@
  */
 
 import { createRequire } from "module";
+import { existsSync } from "fs";
+import { execSync } from "child_process";
 import { toDataURL as qrToDataURL } from "qrcode";
 
 const _require = createRequire(import.meta.url);
@@ -20,7 +22,22 @@ const _require = createRequire(import.meta.url);
 const SESSION_TTL_MS = 5 * 60 * 1000; // 5 minutes idle → destroy
 
 export const WHATSAPP_ENABLED = process.env.WHATSAPP_ENABLED === "true";
-const CHROME_PATH = process.env.WHATSAPP_CHROME_PATH || undefined;
+
+function resolveChromePath(): string | undefined {
+  const fromEnv = process.env.WHATSAPP_CHROME_PATH;
+  if (fromEnv && existsSync(fromEnv)) return fromEnv;
+  for (const cmd of ["chromium", "chromium-browser", "google-chrome"]) {
+    try {
+      const found = execSync(`command -v ${cmd}`, { encoding: "utf8" }).trim();
+      if (found && existsSync(found)) return found;
+    } catch {
+      // not on PATH, try next
+    }
+  }
+  return undefined;
+}
+
+const CHROME_PATH = resolveChromePath();
 
 // ── Types ────────────────────────────────────────────────────────────────
 
