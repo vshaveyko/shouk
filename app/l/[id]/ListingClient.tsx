@@ -503,14 +503,12 @@ export function ListingClient(props: Props) {
                     >
                       {props.isSeller && !isLocked && (
                         <>
-                          <DropdownMenu.Item asChild>
-                            <Link
-                              href={`/l/${listing.id}/edit`}
-                              className="flex items-center gap-2 px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[14px] cursor-pointer"
-                              data-testid="listing-edit"
-                            >
-                              <Pencil size={14} /> Edit listing
-                            </Link>
+                          <DropdownMenu.Item
+                            onSelect={() => router.push(`/l/${listing.id}/edit`)}
+                            className="flex items-center gap-2 px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[14px] cursor-pointer"
+                            data-testid="listing-edit"
+                          >
+                            <Pencil size={14} /> Edit listing
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
                             onSelect={(e) => {
