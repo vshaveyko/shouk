@@ -42,6 +42,10 @@ export default defineConfig({
           // V1 UI hides email/password forms (SHK-019) but e2e tests still
           // sign in via seeded credentials — opt into the legacy forms.
           SHOUKS_ENABLE_CREDENTIALS_AUTH: "1",
+          // Enable WhatsApp flows for tests; the test-inject endpoint
+          // bypasses Puppeteer so no real browser/phone is needed.
+          WHATSAPP_ENABLED: "true",
+          WHATSAPP_TEST_INJECT: "1",
         },
       },
 });

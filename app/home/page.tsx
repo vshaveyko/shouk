@@ -2,6 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getUserContext } from "@/lib/auth-helpers";
 import { Navbar } from "@/components/app/Navbar";
+import { JoinViaWhatsAppButton } from "@/components/whatsapp/JoinViaWhatsAppButton";
+import { RecentlyViewedSection } from "@/components/app/RecentlyViewed";
 import { prisma } from "@/lib/prisma";
 import { countUnreadThreads } from "@/lib/messages";
 
@@ -219,7 +221,7 @@ export default async function HomeDashboard({
         },
       },
     }),
-    prisma.listing.count({ where: { sellerId: user.id, status: "ACTIVE" } }),
+    prisma.listing.count({ where: { sellerId: user.id, status: { notIn: ["DRAFT", "REMOVED", "SHADOW_HIDDEN"] } } }),
     prisma.bid.count({
       where: {
         userId: { not: user.id },
@@ -271,12 +273,18 @@ export default async function HomeDashboard({
                 <div className="kicker">Welcome back, {firstName}</div>
                 <h1>Your marketplaces</h1>
               </div>
-              <Link href="/owner/create" className="btn btn-dark">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
-                Create a marketplace
-              </Link>
+              <div style={{ display: "inline-flex", gap: 8 }}>
+                <JoinViaWhatsAppButton
+                  enabled={process.env.WHATSAPP_ENABLED === "true"}
+                  className="btn btn-outline"
+                />
+                <Link href="/owner/create" className="btn btn-dark">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                  Create a marketplace
+                </Link>
+              </div>
             </div>
 
             <div className="mp-filter">
@@ -577,6 +585,9 @@ export default async function HomeDashboard({
               </div>
             </aside>
           </div>
+        </div>
+        <div className="px-6 pb-10 max-w-[1440px] mx-auto">
+          <RecentlyViewedSection />
         </div>
       </div>
     </div>

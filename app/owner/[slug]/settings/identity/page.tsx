@@ -14,6 +14,7 @@ export default async function IdentitySettingsPage({ params }: { params: { slug:
       coverImageUrl: true,
       primaryColor: true,
       status: true,
+      entryMethod: true,
     },
   });
   if (!mp) return null;

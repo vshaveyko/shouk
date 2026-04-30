@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Info, Lock, AlertTriangle } from "lucide-react";
+import { Info, Lock, AlertTriangle, Upload, X } from "lucide-react";
 import {
   Button,
   Input,
@@ -26,6 +26,8 @@ import {
   DialogClose,
 } from "@/components/ui";
 
+type EntryMethod = "APPLICATION" | "INVITE" | "REFERRAL" | "PUBLIC";
+
 type Initial = {
   name: string;
   slug: string;
@@ -34,7 +36,15 @@ type Initial = {
   coverImageUrl: string | null;
   primaryColor: string | null;
   status: "DRAFT" | "ACTIVE" | "INACTIVE" | "SCHEDULED_DELETION";
+  entryMethod: EntryMethod;
 };
+
+const ENTRY_OPTIONS: { id: EntryMethod; title: string; body: string }[] = [
+  { id: "PUBLIC", title: "Open", body: "Anyone signed in can join with one click." },
+  { id: "APPLICATION", title: "Application", body: "People apply and you approve them." },
+  { id: "INVITE", title: "Invite only", body: "Only people you invite can join." },
+  { id: "REFERRAL", title: "Referral", body: "Existing members vouch for newcomers." },
+];
 
 export function IdentityForm({ slug, initial }: { slug: string; initial: Initial }) {
   const router = useRouter();
@@ -42,7 +52,26 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
   const [description, setDescription] = React.useState(initial.description ?? "");
   const [coverImageUrl, setCoverImageUrl] = React.useState(initial.coverImageUrl ?? "");
   const [primaryColor, setPrimaryColor] = React.useState(initial.primaryColor ?? "#4DB7E8");
+  const [entryMethod, setEntryMethod] = React.useState<EntryMethod>(initial.entryMethod);
   const [saving, setSaving] = React.useState(false);
+  const [uploading, setUploading] = React.useState(false);
+  const coverFileRef = React.useRef<HTMLInputElement>(null);
+
+  async function uploadCover(file: File) {
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) { toast.error(json?.error ?? "Upload failed."); return; }
+      setCoverImageUrl(json.url);
+    } catch {
+      toast.error("Network error during upload.");
+    } finally {
+      setUploading(false);
+    }
+  }
   const [deactivateOpen, setDeactivateOpen] = React.useState(false);
   const [deactivating, setDeactivating] = React.useState(false);
 
@@ -66,6 +95,7 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
           description: description.trim() || null,
           coverImageUrl: coverImageUrl.trim() || null,
           primaryColor: primaryColor || null,
+          entryMethod,
         }),
       });
       const json = await res.json().catch(() => ({}));
@@ -170,16 +200,50 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
           </div>
 
           <div>
-            <Label htmlFor="identity-cover">Cover image URL</Label>
-            <Input
-              id="identity-cover"
-              data-testid="identity-cover"
-              value={coverImageUrl}
-              onChange={(e) => setCoverImageUrl(e.target.value)}
-              placeholder="https://…"
-              type="url"
+            <Label>Cover image</Label>
+            <input
+              ref={coverFileRef}
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              data-testid="identity-cover-file"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) void uploadCover(f); }}
             />
-            <Help>Paste a public URL. Shown as the banner on your landing page.</Help>
+            {coverImageUrl ? (
+              <div className="relative rounded-[10px] overflow-hidden border border-line" style={{ height: 120 }}>
+                <img src={coverImageUrl} alt="Cover" className="w-full h-full object-cover" />
+                <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 hover:opacity-100 bg-black/40 transition-opacity">
+                  <button
+                    type="button"
+                    onClick={() => coverFileRef.current?.click()}
+                    disabled={uploading}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-ink text-[12px] font-medium rounded-[7px]"
+                  >
+                    <Upload size={13} /> {uploading ? "Uploading…" : "Replace"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCoverImageUrl("")}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-danger text-[12px] font-medium rounded-[7px]"
+                    aria-label="Remove cover image"
+                  >
+                    <X size={13} /> Remove
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                data-testid="identity-cover"
+                onClick={() => coverFileRef.current?.click()}
+                disabled={uploading}
+                className="w-full h-[100px] rounded-[10px] border border-dashed border-line bg-bg-soft flex flex-col items-center justify-center gap-1.5 text-muted hover:border-ink-soft hover:text-ink transition"
+              >
+                <Upload size={18} />
+                <span className="text-[12.5px] font-medium">{uploading ? "Uploading…" : "Upload cover image"}</span>
+                <span className="text-[11px]">Shown as the banner on your landing page.</span>
+              </button>
+            )}
           </div>
 
           <div>
@@ -217,6 +281,56 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
             type="submit"
             variant="primary"
             data-testid="identity-save"
+            disabled={saving}
+          >
+            {saving ? "Saving…" : "Save changes"}
+          </Button>
+        </CardFooter>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Privacy</CardTitle>
+          <CardDescription>Control who can discover and join your marketplace.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" role="radiogroup" aria-label="Entry method">
+            {ENTRY_OPTIONS.map((opt) => {
+              const selected = entryMethod === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  data-testid={`identity-entry-${opt.id.toLowerCase()}`}
+                  onClick={() => setEntryMethod(opt.id)}
+                  className={`text-left rounded-[10px] border p-4 transition ${
+                    selected
+                      ? "border-blue bg-blue-soft ring-[3px] ring-[var(--blue-softer)]"
+                      : "border-line bg-surface hover:bg-hover"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[14px] font-semibold">{opt.title}</span>
+                    <span
+                      className={`h-4 w-4 rounded-full border-2 ${selected ? "border-blue bg-blue" : "border-line"}`}
+                      aria-hidden
+                    >
+                      {selected && <span className="block h-full w-full rounded-full bg-white scale-50" />}
+                    </span>
+                  </div>
+                  <p className="text-[12.5px] text-muted">{opt.body}</p>
+                </button>
+              );
+            })}
+          </div>
+        </CardContent>
+        <CardFooter className="justify-end">
+          <Button
+            type="submit"
+            variant="primary"
+            data-testid="identity-privacy-save"
             disabled={saving}
           >
             {saving ? "Saving…" : "Save changes"}

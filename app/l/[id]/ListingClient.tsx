@@ -17,6 +17,7 @@ import {
   Clock,
   Trash2,
   Lock,
+  Pencil,
 } from "lucide-react";
 import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
@@ -39,6 +40,7 @@ import {
   SelectValue,
 } from "@/components/ui/Select";
 import { cn, durationUntil, formatCents, timeAgo } from "@/lib/utils";
+import { TrackListingView } from "@/components/app/RecentlyViewed";
 
 type Listing = {
   id: string;
@@ -181,8 +183,17 @@ export function ListingClient(props: Props) {
     }
   }
 
+  const firstImage = (listing.images as string[])[0] ?? null;
+
   return (
     <>
+      <TrackListingView
+        id={listing.id}
+        title={listing.title}
+        priceCents={listing.priceCents}
+        currency={listing.currency ?? "USD"}
+        image={firstImage}
+      />
       {/* Locked state banner */}
       {isLocked && (
         <div className="mb-5 rounded-[12px] border border-line bg-bg-panel px-4 py-3 flex items-center gap-2.5 text-[13px] text-ink-soft" data-testid="listing-locked-banner">
@@ -492,10 +503,13 @@ export function ListingClient(props: Props) {
                     >
                       {props.isSeller && !isLocked && (
                         <>
-                          {/* Edit listing is hidden for V1 — /l/[id]/edit
-                              route isn't built yet, so the link was going
-                              to a 404 (SHK-047). We'll surface it again
-                              once the edit page ships. */}
+                          <DropdownMenu.Item
+                            onSelect={() => router.push(`/l/${listing.id}/edit`)}
+                            className="flex items-center gap-2 px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[14px] cursor-pointer"
+                            data-testid="listing-edit"
+                          >
+                            <Pencil size={14} /> Edit listing
+                          </DropdownMenu.Item>
                           <DropdownMenu.Item
                             onSelect={(e) => {
                               e.preventDefault();
@@ -550,12 +564,14 @@ export function ListingClient(props: Props) {
               Listed by
             </div>
             <div className="flex items-start gap-3">
-              <Avatar src={props.seller.image} name={props.seller.displayName} size={44} />
+              <Link href={`/u/${props.seller.id}`}>
+                <Avatar src={props.seller.image} name={props.seller.displayName} size={44} />
+              </Link>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <div className="text-[15px] font-semibold truncate" data-testid="seller-name">
+                  <Link href={`/u/${props.seller.id}`} className="text-[15px] font-semibold truncate hover:underline" data-testid="seller-name">
                     {props.seller.displayName}
-                  </div>
+                  </Link>
                   {props.seller.verifiedProviders.length > 0 && (
                     <CheckCircle2 size={14} className="text-blue flex-none" aria-label="Verified" />
                   )}

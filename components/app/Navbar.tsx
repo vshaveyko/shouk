@@ -79,11 +79,9 @@ export function Navbar({
   const isOwnerMode = mode === "owner";
   const slug = activeMarketplace?.slug ?? "";
 
-  // Messages are marketplace-scoped. Link to the active marketplace when
-  // we're already inside one; otherwise fall back to the first marketplace
-  // the user belongs to, or the global redirector at /messages.
-  const messagesSlug = slug || marketplaces[0]?.slug || "";
-  const messagesHref = messagesSlug ? `/m/${messagesSlug}/messages` : "/messages";
+  // Messages is a global concept — always link to /messages so the user sees
+  // all threads across all their marketplaces (SHK-028).
+  const messagesHref = "/messages";
   const messagesActive =
     pathname.startsWith("/messages") || /^\/m\/[^/]+\/messages/.test(pathname);
 
@@ -241,15 +239,7 @@ function MarketplaceSwitcher({
             marketplaces.map((m) => (
               <DropdownMenu.Item key={m.id} asChild>
                 <Link
-                  href={
-                    // Owner-owned marketplaces always go to the owner shell;
-                    // member-only marketplaces go to /m/<slug> regardless of
-                    // the current navbar mode so members don't get bounced
-                    // to /home by requireOwnerOf (SHK-051).
-                    m.isOwner
-                      ? `/owner/${m.slug}/dashboard`
-                      : `/m/${m.slug}`
-                  }
+                  href={`/m/${m.slug}/feed`}
                   className="flex items-center gap-2 px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[14px]"
                 >
                   <span

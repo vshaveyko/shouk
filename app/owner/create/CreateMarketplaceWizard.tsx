@@ -427,41 +427,47 @@ export function CreateMarketplaceWizard() {
         </form>
 
         <aside className="wiz-preview">
-          <div className="preview-card">
-            <div className="preview-label">Preview</div>
-            <div
-              className="preview-hero"
-              style={{
-                background: state.primaryColor
-                  ? `linear-gradient(135deg, ${state.primaryColor}, color-mix(in oklab, ${state.primaryColor} 60%, black))`
-                  : "linear-gradient(135deg, oklch(0.48 0.2 28), oklch(0.26 0.14 25))",
-              }}
-            />
-            <div className="preview-body">
-              <div className="preview-name">
-                {state.name || "Marketplace name"}
-              </div>
-              <div className="preview-url">
-                shouks.com/m/{state.slug || "your-slug"}
-              </div>
-              {state.tagline && (
-                <div className="preview-tagline">{state.tagline}</div>
-              )}
-              <div className="preview-stats">
-                <span>{state.schemaFields.length} listing fields</span>
-                <span>·</span>
-                <span>
-                  {state.entryMethod === "APPLICATION"
-                    ? "Application"
-                    : state.entryMethod === "INVITE"
-                      ? "Invite only"
-                      : "Referral"}
-                </span>
-                <span>·</span>
-                <span>{state.isPaid ? "Paid membership" : "Free"}</span>
+          {step === 2 ? (
+            <SchemaPreview fields={state.schemaFields} marketplaceName={state.name} />
+          ) : (
+            <div className="preview-card">
+              <div className="preview-label">Preview</div>
+              <div
+                className="preview-hero"
+                style={{
+                  background: state.primaryColor
+                    ? `linear-gradient(135deg, ${state.primaryColor}, color-mix(in oklab, ${state.primaryColor} 60%, black))`
+                    : "linear-gradient(135deg, oklch(0.48 0.2 28), oklch(0.26 0.14 25))",
+                }}
+              />
+              <div className="preview-body">
+                <div className="preview-name">
+                  {state.name || "Marketplace name"}
+                </div>
+                <div className="preview-url">
+                  shouks.com/m/{state.slug || "your-slug"}
+                </div>
+                {state.tagline && (
+                  <div className="preview-tagline">{state.tagline}</div>
+                )}
+                <div className="preview-stats">
+                  <span>{state.schemaFields.length} listing fields</span>
+                  <span>·</span>
+                  <span>
+                    {state.entryMethod === "PUBLIC"
+                      ? "Open"
+                      : state.entryMethod === "APPLICATION"
+                        ? "Application"
+                        : state.entryMethod === "INVITE"
+                          ? "Invite only"
+                          : "Referral"}
+                  </span>
+                  <span>·</span>
+                  <span>{state.isPaid ? "Paid membership" : "Free"}</span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </aside>
       </div>
 
@@ -510,7 +516,103 @@ const wizardCss = `
 .preview-url { font-family: ui-monospace, monospace; font-size: 11px; color: var(--muted); margin-top: 2px; }
 .preview-tagline { font-size: 12.5px; color: var(--ink-soft); margin-top: 10px; }
 .preview-stats { display: flex; gap: 6px; align-items: center; font-size: 11px; color: var(--muted); margin-top: 10px; flex-wrap: wrap; }
+
+.section-label { font-size: 10px; color: var(--muted); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; margin-top: 0; }
+.radio-card { width: 100%; display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; text-align: left; transition: border-color 120ms, background 120ms; font: inherit; }
+.radio-card:hover { background: var(--hover); }
+.radio-card.on { border-color: var(--blue); background: var(--blue-soft); box-shadow: 0 0 0 3px var(--blue-softer); }
+.radio-card .rc-ball { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--line); flex: none; margin-top: 2px; position: relative; display: grid; place-items: center; }
+.radio-card.on .rc-ball { border-color: var(--blue); background: var(--blue); }
+.radio-card.on .rc-ball::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+.radio-card .rc-t { font-size: 13.5px; font-weight: 600; letter-spacing: -0.005em; color: var(--ink); }
+.radio-card .rc-s { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+.radio-card .rc-tag { margin-left: auto; flex: none; font-size: 9.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 7px; border-radius: 5px; background: var(--bg-soft); border: 1px solid var(--line-soft); color: var(--muted); align-self: flex-start; }
+.radio-card.on .rc-tag { background: var(--blue-softer); border-color: var(--blue-soft); color: var(--blue-ink); }
+
+.pv-label { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; color: var(--muted); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px; }
+.pv-frame { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 14px; padding: 14px; box-shadow: var(--shadow); }
+.pv-card { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+.pv-title { font-size: 12px; font-weight: 600; margin-bottom: 10px; letter-spacing: -0.005em; }
+.pv-field { margin-bottom: 10px; }
+.pv-field .fl { font-size: 10.5px; color: var(--muted); font-weight: 500; margin-bottom: 4px; display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.pv-field .fl .req { color: var(--blue-ink); }
+.pv-field .fl .tip { color: var(--muted); font-weight: 400; font-size: 10px; margin-left: 6px; }
+.pv-field .fake-input { height: 24px; background: var(--bg-soft); border-radius: 5px; border: 1px solid var(--line-soft); }
+.pv-field .fake-ta { height: 44px; background: var(--bg-soft); border-radius: 5px; border: 1px solid var(--line-soft); }
+.pv-field .fake-num { height: 24px; width: 96px; background: var(--bg-soft); border-radius: 5px; border: 1px solid var(--line-soft); }
+.pv-field .fake-upload { height: 48px; background: var(--bg-soft); border-radius: 5px; border: 1px dashed var(--line); display: grid; place-items: center; color: var(--muted); font-size: 10px; }
+.pv-field .fake-opts { display: flex; flex-wrap: wrap; gap: 4px; }
+.pv-field .fake-opt { font-size: 10.5px; padding: 2px 8px; border-radius: 999px; background: #fff; border: 1px solid var(--line); color: var(--muted); }
+.pv-field .fake-switch { display: inline-flex; align-items: center; gap: 6px; font-size: 10.5px; color: var(--muted); }
+.pv-field .fake-switch::before { content: ""; width: 22px; height: 12px; border-radius: 7px; background: var(--line); display: inline-block; }
 `;
+
+// ---------- Schema Preview ----------
+
+function fakeMockFor(type: FieldType, options?: string[]) {
+  switch (type) {
+    case "LONG_TEXT": return <div className="fake-ta" />;
+    case "NUMBER": return <div className="fake-num" />;
+    case "CURRENCY": return <div className="fake-num" />;
+    case "DATE": return <div className="fake-num" />;
+    case "IMAGE": return <div className="fake-upload">+ Upload</div>;
+    case "SELECT":
+    case "MULTI_SELECT": {
+      const opts = (options ?? []).filter((o) => o.trim()).slice(0, 4);
+      return (
+        <div className="fake-opts">
+          {opts.map((o) => <span key={o} className="fake-opt">{o}</span>)}
+          {(options ?? []).length > 4 && <span className="fake-opt">+{(options ?? []).length - 4} more</span>}
+        </div>
+      );
+    }
+    default: return <div className="fake-input" />;
+  }
+}
+
+function SchemaPreview({ fields, marketplaceName }: { fields: SchemaField[]; marketplaceName: string }) {
+  return (
+    <>
+      <div className="pv-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 10, height: 10 }}>
+          <circle cx="12" cy="12" r="3" />
+          <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
+        </svg>
+        Seller&rsquo;s create-listing form
+      </div>
+      <div className="pv-frame">
+        <div className="pv-card">
+          <div className="pv-title">New listing · {marketplaceName || "Your marketplace"}</div>
+          <div className="pv-field">
+            <div className="fl">Title <span className="req">*</span></div>
+            <div className="fake-input" />
+          </div>
+          <div className="pv-field">
+            <div className="fl">Price <span className="req">*</span></div>
+            <div className="fake-num" />
+          </div>
+          <div className="pv-field">
+            <div className="fl">Images <span className="req">*</span></div>
+            <div className="fake-upload">+ Upload</div>
+          </div>
+          {fields.map((f) => (
+            <div key={f.uid} className="pv-field">
+              <div className="fl">
+                {f.label || "Field"}
+                {f.required && <span className="req">*</span>}
+                {f.helpText && <span className="tip">{f.helpText}</span>}
+              </div>
+              {fakeMockFor(f.type, f.options)}
+            </div>
+          ))}
+          {fields.length === 0 && (
+            <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 4 }}>Add fields above to preview them here.</div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
 
 // ---------- Step Rail ----------
 
@@ -1077,40 +1179,62 @@ function MembershipStep({
     });
   }
 
-  const entryOptions: {
-    id: EntryMethod;
-    title: string;
-    body: string;
-    testid: string;
-    kind: "Public" | "Closed" | "Private";
-  }[] = [
+  type Visibility = "PUBLIC" | "CLOSED" | "PRIVATE";
+
+  function visibilityOf(em: EntryMethod): Visibility {
+    if (em === "PUBLIC") return "PUBLIC";
+    if (em === "INVITE") return "PRIVATE";
+    return "CLOSED";
+  }
+
+  function setVisibility(v: Visibility) {
+    setState((s) => {
+      if (v === "PUBLIC") return { ...s, entryMethod: "PUBLIC" };
+      if (v === "PRIVATE") return { ...s, entryMethod: "INVITE" };
+      // CLOSED — keep APPLICATION/REFERRAL if already set, else default to APPLICATION
+      const keep = s.entryMethod === "APPLICATION" || s.entryMethod === "REFERRAL";
+      return { ...s, entryMethod: keep ? s.entryMethod : "APPLICATION" };
+    });
+  }
+
+  const visibility = visibilityOf(state.entryMethod);
+
+  const visibilityOptions: { id: Visibility; title: string; body: string; tag: string; testid: string }[] = [
     {
       id: "PUBLIC",
-      title: "Open",
-      body: "Anyone signed in can join with one click. No approval needed.",
+      title: "Public",
+      body: "Anyone can discover the marketplace and browse listings. Best for open communities and merchants who want organic traffic.",
+      tag: "OPEN",
       testid: "entry-method-public",
-      kind: "Public",
     },
+    {
+      id: "CLOSED",
+      title: "Closed",
+      body: 'Marketplace is listed publicly, but only members can browse listings. Non-members see a "Request to join" page. Best for most curated communities.',
+      tag: "GATED",
+      testid: "entry-method-closed",
+    },
+    {
+      id: "PRIVATE",
+      title: "Private",
+      body: "Hidden from Explore and search. Only direct invite links lead to the marketplace. Best for small trusted groups and beta launches.",
+      tag: "HIDDEN",
+      testid: "entry-method-invite",
+    },
+  ];
+
+  const joinOptions: { id: "APPLICATION" | "REFERRAL"; title: string; body: string; testid: string }[] = [
     {
       id: "APPLICATION",
       title: "Application",
-      body: "People apply with a short form. You review and approve.",
-      testid: "entry-method-application",
-      kind: "Closed",
-    },
-    {
-      id: "INVITE",
-      title: "Invite link or code",
-      body: "Share a link or code. Holders can join instantly.",
-      testid: "entry-method-invite",
-      kind: "Private",
+      body: "Prospective members answer questions you define. You review and approve or reject each one.",
+      testid: "join-method-application",
     },
     {
       id: "REFERRAL",
       title: "Referral",
-      body: "Existing members vouch for newcomers.",
-      testid: "entry-method-referral",
-      kind: "Closed",
+      body: "Existing members vouch for newcomers. Optionally auto-approve referrals.",
+      testid: "join-method-referral",
     },
   ];
 
@@ -1118,71 +1242,78 @@ function MembershipStep({
     <div className="space-y-5">
       <Card>
         <CardHeader>
-          <CardTitle>Marketplace type</CardTitle>
+          <CardTitle>Who belongs here?</CardTitle>
           <CardDescription>
-            Public marketplaces are discoverable and anyone can join. Closed
-            marketplaces gate new members through application or referral.
-            Private marketplaces are invite-only. (SHK-021)
+            Choose how members find and join your marketplace. All settings can be changed later.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3" role="radiogroup" aria-label="Marketplace type">
-            {entryOptions.map((opt) => {
-              const selected = state.entryMethod === opt.id;
-              return (
-                <button
-                  key={opt.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={selected}
-                  data-testid={opt.testid}
-                  onClick={() => setState((s) => ({ ...s, entryMethod: opt.id }))}
-                  className={cn(
-                    "text-left rounded-[10px] border p-4 transition",
-                    selected
-                      ? "border-blue bg-blue-soft ring-[3px] ring-[var(--blue-softer)]"
-                      : "border-line bg-surface hover:bg-hover",
-                  )}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[14px] font-semibold">{opt.title}</span>
-                    <span
-                      className={cn(
-                        "h-4 w-4 rounded-full border-2",
-                        selected ? "border-blue bg-blue" : "border-line",
-                      )}
-                      aria-hidden
-                    >
-                      {selected && (
-                        <span className="block h-full w-full rounded-full bg-white scale-50" />
-                      )}
-                    </span>
-                  </div>
-                  <span
-                    className="inline-flex items-center rounded-full border border-line px-2 py-px text-[10px] font-semibold uppercase tracking-[0.08em] text-muted mb-1.5"
-                    data-testid={`marketplace-type-label-${opt.id.toLowerCase()}`}
+        <CardContent className="space-y-5">
+          <div>
+            <div className="section-label">Visibility</div>
+            <div className="space-y-2" role="radiogroup" aria-label="Visibility">
+              {visibilityOptions.map((opt) => {
+                const selected = visibility === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    data-testid={opt.testid}
+                    onClick={() => setVisibility(opt.id)}
+                    className={cn("radio-card", selected && "on")}
                   >
-                    {opt.kind}
-                  </span>
-                  <p className="text-[12.5px] text-muted">{opt.body}</p>
-                </button>
-              );
-            })}
+                    <div className="rc-ball" aria-hidden />
+                    <div className="flex-1 min-w-0">
+                      <div className="rc-t">{opt.title}</div>
+                      <div className="rc-s">{opt.body}</div>
+                    </div>
+                    <span className="rc-tag">{opt.tag}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          {state.entryMethod === "REFERRAL" && (
-            <label className="mt-4 flex items-center gap-3 rounded-[10px] border border-line-soft bg-bg-panel px-3 py-2.5">
-              <Switch
-                checked={state.autoApprove}
-                onCheckedChange={(v) => setState((s) => ({ ...s, autoApprove: !!v }))}
-              />
-              <span className="text-[13px]">
-                <span className="font-medium">Auto-approve referrals</span>
-                <span className="block text-muted text-[12px]">
-                  Skip manual review once a vouch is received.
-                </span>
-              </span>
-            </label>
+          {visibility === "CLOSED" && (
+            <div>
+              <div className="section-label" style={{ marginTop: 8 }}>Ways to join</div>
+              <div className="space-y-2" role="radiogroup" aria-label="Ways to join">
+                {joinOptions.map((opt) => {
+                  const selected = state.entryMethod === opt.id;
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={selected}
+                      data-testid={opt.testid}
+                      onClick={() => setState((s) => ({ ...s, entryMethod: opt.id }))}
+                      className={cn("radio-card", selected && "on")}
+                    >
+                      <div className="rc-ball" aria-hidden />
+                      <div className="flex-1 min-w-0">
+                        <div className="rc-t">{opt.title}</div>
+                        <div className="rc-s">{opt.body}</div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {state.entryMethod === "REFERRAL" && (
+                <label className="mt-3 flex items-center gap-3 rounded-[10px] border border-line-soft bg-bg-panel px-3 py-2.5">
+                  <Switch
+                    checked={state.autoApprove}
+                    onCheckedChange={(v) => setState((s) => ({ ...s, autoApprove: !!v }))}
+                  />
+                  <span className="text-[13px]">
+                    <span className="font-medium">Auto-approve referrals</span>
+                    <span className="block text-muted text-[12px]">Skip manual review once a vouch is received.</span>
+                  </span>
+                </label>
+              )}
+            </div>
           )}
         </CardContent>
       </Card>
@@ -1279,15 +1410,11 @@ function MembershipStep({
                     ...s,
                     applicationQuestions: [
                       ...s.applicationQuestions,
-                      {
-                        uid: uid(),
-                        label: "",
-                        type: "SHORT_TEXT",
-                        required: true,
-                      },
+                      { uid: uid(), label: "", type: "SHORT_TEXT", required: true },
                     ],
                   }))
                 }
+                disabled={state.applicationQuestions.length >= 10}
                 className="gap-1.5"
               >
                 <Plus size={16} /> Add question

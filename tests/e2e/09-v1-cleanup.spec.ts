@@ -231,31 +231,6 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     await ctx.close();
   });
 
-  test("SHK-047/048/049: seller dropdown hides Edit, offers Mark-sold + Close via dialog", async ({
-    page,
-    browser,
-  }) => {
-    // Sign in as the seeded member and open their own listing.
-    const ctx = await browser.newContext();
-    const sellerPage = await ctx.newPage();
-    await sellerPage.goto("/signin");
-    await sellerPage.getByTestId("credentials-form").getByLabel("Email").fill("member@shouks.test");
-    await sellerPage.getByTestId("credentials-form").getByLabel("Password").fill("Test123!@#");
-    await sellerPage.getByTestId("credentials-form").getByRole("button", { name: /sign in/i }).click();
-    await sellerPage.goto("/m/ferrari-frenzy/feed");
-    const firstListing = sellerPage.locator('a[href^="/l/"]').first();
-    if (await firstListing.count()) {
-      await firstListing.click();
-      // The Edit listing link is hidden in V1 (SHK-047) — no broken /edit
-      // navigation. Mark-as-sold and Close should be visible when viewing
-      // one's own listing.
-      await expect(sellerPage.getByTestId("listing-edit")).toHaveCount(0);
-    }
-    await ctx.close();
-    // Unused helper reference shut-up:
-    void page;
-  });
-
   test("SHK-051: switcher routes owner vs member marketplaces differently", async ({
     page,
   }) => {
@@ -266,5 +241,37 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     await page.getByTestId("marketplace-switcher").click();
     const ferrari = page.getByRole("menuitem", { name: /ferrari frenzy/i });
     await expect(ferrari).toHaveAttribute("href", /\/owner\/ferrari-frenzy/);
+  });
+});
+
+test.describe("Listing detail seller actions", () => {
+  test("SHK-047 (re-enabled): seller menu shows Edit, navigates to edit form", async ({ page }) => {
+    // Create a listing as the seeded member, then open it. Edit was
+    // originally hidden (SHK-047) because /l/<id>/edit didn't exist; the
+    // edit page now ships, so Edit should appear next to Mark-sold/Close.
+    await signIn(page, "member@shouks.test", "Test123!@#");
+    await page.goto("/m/ferrari-frenzy/new");
+    await page.getByTestId("listing-type-fixed").click();
+    await page.getByTestId("listing-field-title").fill(`Edit-menu test ${Date.now()}`);
+    await page.getByTestId("price-input").fill("100");
+    const model = page.getByTestId("listing-field-model");
+    if (await model.count()) await model.fill("EditTest");
+    const year = page.getByTestId("listing-field-year");
+    if (await year.count()) await year.fill("2010");
+    const cond = page.getByTestId("listing-field-condition");
+    if (await cond.count()) { await cond.click(); await page.getByRole("option").first().click(); }
+    await page.getByTestId("images-input-0").fill("https://picsum.photos/seed/edit-menu/800/600");
+    await page.getByTestId("submit-listing").click();
+    await page.waitForURL(/\/l\/[^/]+$/, { timeout: 15_000 });
+
+    await page.getByTestId("listing-menu").click();
+    await expect(page.getByTestId("listing-edit")).toBeVisible();
+    await expect(page.getByTestId("listing-sold")).toBeVisible();
+    await expect(page.getByTestId("listing-close")).toBeVisible();
+    await expect(page.getByTestId("listing-delete")).toBeVisible();
+
+    await page.getByTestId("listing-edit").click();
+    await expect(page).toHaveURL(/\/l\/[^/]+\/edit$/);
+    await expect(page.getByTestId("edit-title")).toBeVisible();
   });
 });

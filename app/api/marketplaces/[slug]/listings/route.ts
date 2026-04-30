@@ -11,7 +11,7 @@ const listingCreate = z.object({
   type: z.enum(["FIXED", "AUCTION", "ISO"]).default("FIXED"),
   description: z.string().max(5000).optional(),
   schemaValues: z.record(z.string(), z.unknown()).default({}),
-  images: z.array(z.string().url()).default([]),
+  images: z.array(z.string().min(1)).default([]),
   priceCents: z.number().int().min(0).optional().nullable(),
   currency: z.string().length(3).default("USD"),
   auctionStartCents: z.number().int().min(0).optional().nullable(),
@@ -71,11 +71,8 @@ export async function POST(req: Request, { params }: { params: { slug: string } 
     }
   }
 
-  const status = d.draft
-    ? "DRAFT"
-    : mp.moderationRequired
-      ? "PENDING_REVIEW"
-      : "ACTIVE";
+  // Content moderation removed from V1 — all published listings go ACTIVE immediately.
+  const status = d.draft ? "DRAFT" : "ACTIVE";
 
   const listing = await prisma.listing.create({
     data: {
