@@ -5,7 +5,8 @@ import { whatsappSessions, sessionBelongsTo, WHATSAPP_ENABLED } from "@/lib/what
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET(_req: Request, { params }: { params: { id: string } }) {
+export async function GET(_req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   if (!WHATSAPP_ENABLED) {
     return NextResponse.json({ error: "WhatsApp not enabled" }, { status: 503 });
   }
@@ -19,7 +20,8 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
   return NextResponse.json(whatsappSessions.getStatus(params.id));
 }
 
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_req: Request, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });

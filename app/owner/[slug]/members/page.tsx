@@ -54,11 +54,12 @@ const membersCss = `
 .mem-body .empty-state { padding: 60px 24px; text-align: center; color: var(--muted); font-size: 13px; }
 `;
 
-export default async function MembersDirectoryPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function MembersDirectoryPage(
+  props: {
+    params: Promise<{ slug: string }>;
+  }
+) {
+  const params = await props.params;
   const { marketplace } = await requireOwnerOf(params.slug);
 
   const memberships = await prisma.membership.findMany({

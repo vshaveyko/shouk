@@ -55,7 +55,8 @@ const activityCss = `
 .bid-state.iso-active { background: oklch(0.55 0.15 60); color: #fff; }
 `;
 
-export default async function ActivityPage({ searchParams }: { searchParams?: { tab?: string } }) {
+export default async function ActivityPage(props: { searchParams?: Promise<{ tab?: string }> }) {
+  const searchParams = await props.searchParams;
   const ctx = await getUserContext();
   if (!ctx) redirect("/signin?callbackUrl=/activity");
   const { user, memberships, owned } = ctx;

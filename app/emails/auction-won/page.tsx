@@ -3,17 +3,18 @@ import { auctionWonHtml } from "../emailHtml";
 
 export const dynamic = "force-dynamic";
 
-export default function AuctionWonPreview({
-  searchParams,
-}: {
-  searchParams: {
-    listing?: string;
-    bidder?: string;
-    amount?: string;
-    seller?: string;
-    payBy?: string;
-  };
-}) {
+export default async function AuctionWonPreview(
+  props: {
+    searchParams: Promise<{
+      listing?: string;
+      bidder?: string;
+      amount?: string;
+      seller?: string;
+      payBy?: string;
+    }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const listing = searchParams.listing ?? "1997 Ferrari F355 Spider · 6-speed";
   const bidder = searchParams.bidder ?? "Jane";
   const amount = searchParams.amount ?? "$94,000";

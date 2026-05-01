@@ -3,11 +3,12 @@ import { welcomeEmailHtml } from "../emailHtml";
 
 export const dynamic = "force-dynamic";
 
-export default function WelcomeEmailPreview({
-  searchParams,
-}: {
-  searchParams: { name?: string };
-}) {
+export default async function WelcomeEmailPreview(
+  props: {
+    searchParams: Promise<{ name?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const name = searchParams.name ?? "Jane";
   const html = welcomeEmailHtml({ name });
   return (

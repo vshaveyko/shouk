@@ -117,11 +117,12 @@ function linePath(
   return d;
 }
 
-export default async function AnalyticsPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function AnalyticsPage(
+  props: {
+    params: Promise<{ slug: string }>;
+  }
+) {
+  const params = await props.params;
   const { marketplace } = await requireOwnerOf(params.slug);
   const now = new Date();
   const WINDOW_DAYS = 30;

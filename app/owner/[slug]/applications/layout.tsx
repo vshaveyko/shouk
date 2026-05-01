@@ -109,13 +109,18 @@ const applicationsCss = `
 .apps-body .empty-state { padding: 80px 24px; text-align: center; color: var(--muted); font-size: 13px; }
 `;
 
-export default async function ApplicationsLayout({
-  params,
-  children,
-}: {
-  params: { slug: string };
-  children: React.ReactNode;
-}) {
+export default async function ApplicationsLayout(
+  props: {
+    params: Promise<{ slug: string }>;
+    children: React.ReactNode;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    children
+  } = props;
+
   const { marketplace } = await requireOwnerOf(params.slug);
 
   const [pendingCount, pendingOver48h] = await Promise.all([

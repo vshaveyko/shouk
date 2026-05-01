@@ -5,11 +5,12 @@ import { SignInForm } from "./SignInForm";
 
 export const metadata = { title: "Sign in" };
 
-export default function SignInPage({
-  searchParams,
-}: {
-  searchParams?: { callbackUrl?: string; error?: string };
-}) {
+export default async function SignInPage(
+  props: {
+    searchParams?: Promise<{ callbackUrl?: string; error?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const callbackUrl = searchParams?.callbackUrl ?? "/home";
   const error = searchParams?.error;
 

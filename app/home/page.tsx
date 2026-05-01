@@ -135,11 +135,12 @@ const dashCss = `
 
 type ScopeValue = "all" | "owner" | "member";
 
-export default async function HomeDashboard({
-  searchParams,
-}: {
-  searchParams?: { stay?: string; scope?: string };
-}) {
+export default async function HomeDashboard(
+  props: {
+    searchParams?: Promise<{ stay?: string; scope?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const ctx = await getUserContext();
   if (!ctx) redirect("/signin?callbackUrl=/home");
   const { user, memberships, owned } = ctx;

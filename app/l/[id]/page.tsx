@@ -47,7 +47,8 @@ const ldCss = `
 .ld-locked { padding: 10px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-panel); font-size: 13px; color: var(--ink-soft); display: flex; align-items: center; gap: 8px; }
 `;
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
+export async function generateMetadata(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const listing = await prisma.listing.findUnique({
     where: { id: params.id },
     select: { title: true },
@@ -55,7 +56,8 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
   return { title: listing?.title ?? "Listing" };
 }
 
-export default async function ListingPage({ params }: { params: { id: string } }) {
+export default async function ListingPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await auth();
 
   const listing = await prisma.listing.findUnique({

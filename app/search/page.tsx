@@ -29,11 +29,12 @@ const searchCss = `
 .search-empty { padding: 60px 24px; text-align: center; color: var(--muted); font-size: 13px; }
 `;
 
-export default async function SearchPage({
-  searchParams,
-}: {
-  searchParams?: { q?: string };
-}) {
+export default async function SearchPage(
+  props: {
+    searchParams?: Promise<{ q?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const ctx = await getUserContext();
   if (!ctx) redirect("/signin?callbackUrl=/search");
   const { user, memberships, owned } = ctx;

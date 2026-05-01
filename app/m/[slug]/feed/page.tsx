@@ -58,7 +58,8 @@ const mpShellCss = `
 .manage-card .m-actions .btn-dark:hover { background: oklch(0.24 0.03 240); }
 `;
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const mp = await prisma.marketplace.findUnique({
     where: { slug: params.slug },
     select: { name: true },
@@ -66,13 +67,14 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   return { title: mp ? `${mp.name} · Feed` : "Feed" };
 }
 
-export default async function FeedPage({
-  params,
-  searchParams,
-}: {
-  params: { slug: string };
-  searchParams?: { q?: string; type?: string; sort?: string };
-}) {
+export default async function FeedPage(
+  props: {
+    params: Promise<{ slug: string }>;
+    searchParams?: Promise<{ q?: string; type?: string; sort?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const session = await auth();
   if (!session?.user?.id) redirect(`/signin?callbackUrl=/m/${params.slug}/feed`);
 

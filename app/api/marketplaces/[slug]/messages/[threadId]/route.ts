@@ -22,8 +22,9 @@ async function loadParticipantThread(threadId: string, userId: string, slug: str
 
 export async function GET(
   _req: Request,
-  { params }: { params: { slug: string; threadId: string } },
+  props: { params: Promise<{ slug: string; threadId: string }> }
 ) {
+  const params = await props.params;
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -49,8 +50,9 @@ const sendSchema = z.object({ body: z.string().trim().min(1).max(4000) });
 
 export async function POST(
   req: Request,
-  { params }: { params: { slug: string; threadId: string } },
+  props: { params: Promise<{ slug: string; threadId: string }> }
 ) {
+  const params = await props.params;
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 

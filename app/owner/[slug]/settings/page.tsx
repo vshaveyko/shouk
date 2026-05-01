@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
-export default function SettingsIndex({ params }: { params: { slug: string } }) {
+export default async function SettingsIndex(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   redirect(`/owner/${params.slug}/settings/identity`);
 }

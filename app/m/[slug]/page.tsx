@@ -17,11 +17,12 @@ export const dynamic = "force-dynamic";
 
 type Params = { slug: string };
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Params;
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<Params>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   const mp = await prisma.marketplace.findUnique({
     where: { slug: params.slug },
     select: { name: true, tagline: true, description: true },
@@ -37,7 +38,8 @@ function providerLabel(p: string) {
   return verifyProviders.find((v) => v.id === p)?.label ?? p;
 }
 
-export default async function MarketplaceLanding({ params }: { params: Params }) {
+export default async function MarketplaceLanding(props: { params: Promise<Params> }) {
+  const params = await props.params;
   const mp = await prisma.marketplace.findUnique({
     where: { slug: params.slug },
     include: {

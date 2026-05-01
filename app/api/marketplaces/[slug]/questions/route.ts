@@ -28,7 +28,8 @@ const bodySchema = z.object({
   fields: z.array(questionSchema).max(30),
 });
 
-export async function PATCH(req: Request, { params }: { params: { slug: string } }) {
+export async function PATCH(req: Request, props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 

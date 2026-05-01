@@ -8,13 +8,14 @@ import { MessagesClient, type ThreadSummary, type MessageItem } from "./Messages
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Messages" };
 
-export default async function MarketplaceMessagesPage({
-  params,
-  searchParams,
-}: {
-  params: { slug: string };
-  searchParams?: { t?: string; seller?: string; listing?: string };
-}) {
+export default async function MarketplaceMessagesPage(
+  props: {
+    params: Promise<{ slug: string }>;
+    searchParams?: Promise<{ t?: string; seller?: string; listing?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const ctx = await getUserContext();
   const destination = `/m/${params.slug}/messages`;
   if (!ctx) redirect(`/signin?callbackUrl=${encodeURIComponent(destination)}`);

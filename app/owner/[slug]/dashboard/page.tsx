@@ -86,11 +86,12 @@ function initials(name?: string | null) {
   return (parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "");
 }
 
-export default async function OwnerDashboardPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function OwnerDashboardPage(
+  props: {
+    params: Promise<{ slug: string }>;
+  }
+) {
+  const params = await props.params;
   const { marketplace, userId } = await requireOwnerOf(params.slug);
   const ownerUser = await prisma.user.findUnique({
     where: { id: userId },

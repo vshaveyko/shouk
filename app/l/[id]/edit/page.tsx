@@ -10,12 +10,14 @@ import { clCss } from "@/app/m/[slug]/new/listingFormCss";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
+export async function generateMetadata(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const listing = await prisma.listing.findUnique({ where: { id: params.id }, select: { title: true } });
   return { title: listing ? `Edit · ${listing.title}` : "Edit listing" };
 }
 
-export default async function EditListingPage({ params }: { params: { id: string } }) {
+export default async function EditListingPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await auth();
   if (!session?.user?.id) redirect(`/signin?callbackUrl=/l/${params.id}/edit`);
 

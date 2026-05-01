@@ -2,10 +2,8 @@ import { s3, S3_BUCKET } from "@/lib/s3";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { NextResponse } from "next/server";
 
-export async function GET(
-  _req: Request,
-  { params }: { params: { key: string[] } },
-) {
+export async function GET(_req: Request, props: { params: Promise<{ key: string[] }> }) {
+  const params = await props.params;
   if (!s3 || !S3_BUCKET) {
     return new NextResponse("Storage not configured", { status: 503 });
   }

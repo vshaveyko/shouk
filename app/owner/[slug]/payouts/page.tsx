@@ -17,11 +17,12 @@ const payoutsCss = `
 .pay-body .cta { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: 8px; font-size: 13px; font-weight: 500; background: var(--ink); color: #fff; border: 0; cursor: pointer; }
 `;
 
-export default async function PayoutsPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function PayoutsPage(
+  props: {
+    params: Promise<{ slug: string }>;
+  }
+) {
+  const params = await props.params;
   await requireOwnerOf(params.slug);
 
   return (

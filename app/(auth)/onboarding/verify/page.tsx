@@ -5,11 +5,12 @@ import { VerificationPanel } from "./VerificationPanel";
 
 export const metadata = { title: "Verify your identity" };
 
-export default async function VerifyPage({
-  searchParams,
-}: {
-  searchParams?: { redirect?: string };
-}) {
+export default async function VerifyPage(
+  props: {
+    searchParams?: Promise<{ redirect?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const session = await auth();
   if (!session?.user?.id) redirect("/signin?callbackUrl=/onboarding/verify");
 

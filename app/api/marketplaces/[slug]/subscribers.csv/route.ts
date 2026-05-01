@@ -9,7 +9,8 @@ function csvEscape(v: string | null | undefined): string {
   return s;
 }
 
-export async function GET(_req: Request, { params }: { params: { slug: string } }) {
+export async function GET(_req: Request, props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const session = await auth();
   if (!session?.user?.id) return new Response("Unauthorized", { status: 401 });
 

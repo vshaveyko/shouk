@@ -9,7 +9,8 @@ import { timeAgo, verifyProviders, formatCents } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
+export async function generateMetadata(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const u = await prisma.user.findUnique({
     where: { id: params.id },
     select: { displayName: true, name: true },
@@ -55,7 +56,8 @@ const profileCss = `
 .pf-community-card .pc-name { font-size: 12.5px; font-weight: 600; letter-spacing: -0.005em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 `;
 
-export default async function PublicProfilePage({ params }: { params: { id: string } }) {
+export default async function PublicProfilePage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const session = await auth();
   const sessionUserId = session?.user?.id;
 

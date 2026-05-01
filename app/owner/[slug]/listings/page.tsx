@@ -83,13 +83,14 @@ function initials(name: string) {
   return (parts[0]?.[0] ?? "") + (parts[1]?.[0] ?? "");
 }
 
-export default async function ListingsModerationPage({
-  params,
-  searchParams,
-}: {
-  params: { slug: string };
-  searchParams?: { tab?: string };
-}) {
+export default async function ListingsModerationPage(
+  props: {
+    params: Promise<{ slug: string }>;
+    searchParams?: Promise<{ tab?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const { marketplace } = await requireOwnerOf(params.slug);
   const tab = parseTab(searchParams?.tab);
 

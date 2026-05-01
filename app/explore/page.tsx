@@ -16,11 +16,12 @@ const entryLabels: Record<string, string> = {
   REFERRAL: "By referral",
 };
 
-export default async function ExplorePage({
-  searchParams,
-}: {
-  searchParams?: { q?: string };
-}) {
+export default async function ExplorePage(
+  props: {
+    searchParams?: Promise<{ q?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const ctx = await getUserContext();
   const user = ctx?.user ?? null;
   const memberships = ctx?.memberships ?? [];

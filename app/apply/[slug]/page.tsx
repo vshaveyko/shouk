@@ -15,11 +15,12 @@ export const dynamic = "force-dynamic";
 
 type Params = { slug: string };
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Params;
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<Params>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   const mp = await prisma.marketplace.findUnique({
     where: { slug: params.slug },
     select: { name: true },
@@ -31,7 +32,8 @@ function providerLabel(p: string) {
   return verifyProviders.find((v) => v.id === p)?.label ?? p;
 }
 
-export default async function ApplyPage({ params }: { params: Params }) {
+export default async function ApplyPage(props: { params: Promise<Params> }) {
+  const params = await props.params;
   const session = await auth();
   if (!session?.user?.id) {
     redirect(`/signin?callbackUrl=/apply/${params.slug}`);

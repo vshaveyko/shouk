@@ -2,11 +2,12 @@ import { requireOwnerOf } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { BillingPanel } from "./BillingPanel";
 
-export default async function BillingSettingsPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function BillingSettingsPage(
+  props: {
+    params: Promise<{ slug: string }>;
+  }
+) {
+  const params = await props.params;
   await requireOwnerOf(params.slug);
   const mp = await prisma.marketplace.findUnique({
     where: { slug: params.slug },

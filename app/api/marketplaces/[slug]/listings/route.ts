@@ -21,7 +21,8 @@ const listingCreate = z.object({
   draft: z.boolean().default(false),
 });
 
-export async function POST(req: Request, { params }: { params: { slug: string } }) {
+export async function POST(req: Request, props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -107,7 +108,8 @@ export async function POST(req: Request, { params }: { params: { slug: string } 
   return NextResponse.json({ id: listing.id, status: listing.status });
 }
 
-export async function GET(req: Request, { params }: { params: { slug: string } }) {
+export async function GET(req: Request, props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const mp = await prisma.marketplace.findUnique({ where: { slug: params.slug } });
   if (!mp) return NextResponse.json({ error: "Not found" }, { status: 404 });
 

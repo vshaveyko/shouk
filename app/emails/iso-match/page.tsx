@@ -3,20 +3,21 @@ import { isoMatchHtml } from "../emailHtml";
 
 export const dynamic = "force-dynamic";
 
-export default function IsoMatchPreview({
-  searchParams,
-}: {
-  searchParams: {
-    iso?: string;
-    listing?: string;
-    marketplace?: string;
-    budget?: string;
-    price?: string;
-    specs?: string;
-    recipient?: string;
-    seller?: string;
-  };
-}) {
+export default async function IsoMatchPreview(
+  props: {
+    searchParams: Promise<{
+      iso?: string;
+      listing?: string;
+      marketplace?: string;
+      budget?: string;
+      price?: string;
+      specs?: string;
+      recipient?: string;
+      seller?: string;
+    }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const iso = searchParams.iso ?? "1987–1991 Testarossa · Nero or Rosso Corsa";
   const listing = searchParams.listing ?? "1987 Testarossa · Nero";
   const marketplace = searchParams.marketplace ?? "Ferrari Frenzy";

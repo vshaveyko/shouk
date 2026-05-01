@@ -1,5 +1,6 @@
 import "@/styles/globals.css";
 import type { Metadata, Viewport } from "next";
+import { ViewTransition } from "react";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
@@ -55,7 +56,9 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <div id="app-root">{children}</div>
+        <div id="app-root">
+          <ViewTransition>{children}</ViewTransition>
+        </div>
         <Toaster
           position="top-center"
           toastOptions={{

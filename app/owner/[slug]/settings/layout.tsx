@@ -8,13 +8,18 @@ export const dynamic = "force-dynamic";
 
 export const metadata = { title: "Settings" };
 
-export default async function OwnerSettingsLayout({
-  params,
-  children,
-}: {
-  params: { slug: string };
-  children: React.ReactNode;
-}) {
+export default async function OwnerSettingsLayout(
+  props: {
+    params: Promise<{ slug: string }>;
+    children: React.ReactNode;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    children
+  } = props;
+
   await requireOwnerOf(params.slug);
 
   const mp = await prisma.marketplace.findUnique({

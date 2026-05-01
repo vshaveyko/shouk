@@ -11,6 +11,7 @@ const nextConfig = {
   },
   experimental: {
     serverActions: { bodySizeLimit: "10mb" },
+    viewTransition: true,
   },
   async headers() {
     return [

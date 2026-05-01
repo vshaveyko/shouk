@@ -2,11 +2,12 @@ import { requireOwnerOf } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { IntegrationsForm } from "./IntegrationsForm";
 
-export default async function IntegrationsSettingsPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function IntegrationsSettingsPage(
+  props: {
+    params: Promise<{ slug: string }>;
+  }
+) {
+  const params = await props.params;
   await requireOwnerOf(params.slug);
   const mp = await prisma.marketplace.findUnique({
     where: { slug: params.slug },

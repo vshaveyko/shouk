@@ -14,13 +14,14 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export default async function ApplicationsQueuePage({
-  params,
-  searchParams,
-}: {
-  params: { slug: string };
-  searchParams?: Record<string, string | string[] | undefined>;
-}) {
+export default async function ApplicationsQueuePage(
+  props: {
+    params: Promise<{ slug: string }>;
+    searchParams?: Promise<Record<string, string | string[] | undefined>>;
+  }
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const { marketplace } = await requireOwnerOf(params.slug);
   const filters = parseQueueFilters(searchParams);
 

@@ -10,7 +10,8 @@ import { clCss } from "./listingFormCss";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const mp = await prisma.marketplace.findUnique({
     where: { slug: params.slug },
     select: { name: true },
@@ -18,7 +19,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   return { title: mp ? `New listing · ${mp.name}` : "New listing" };
 }
 
-export default async function NewListingPage({ params }: { params: { slug: string } }) {
+export default async function NewListingPage(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const session = await auth();
   if (!session?.user?.id) redirect(`/signin?callbackUrl=/m/${params.slug}/new`);
 
