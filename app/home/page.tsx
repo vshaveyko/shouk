@@ -317,7 +317,7 @@ export default async function HomeDashboard(
                 return (
                   <Link
                     key={m.id}
-                    href={isOwner ? `/owner/${m.slug}/dashboard` : `/m/${m.slug}`}
+                    href={`/m/${m.slug}`}
                     className={`mp-chip${favorited ? " favorited" : ""}`}
                     data-testid={`marketplace-chip-${m.slug}`}
                   >
@@ -515,7 +515,7 @@ export default async function HomeDashboard(
                           <div className="rv-title">{l.title}</div>
                           <div className="rv-sub">
                             <span className="mp-pill">{l.marketplace.name}</span>
-                            <span>· {formatMoneyShort(l.priceCents ?? l.auctionStartCents ?? 0)}</span>
+                            <span>· {formatMoneyFull(l.priceCents ?? l.auctionStartCents ?? 0)}</span>
                           </div>
                         </div>
                         {bids > 0 && (
@@ -578,7 +578,7 @@ export default async function HomeDashboard(
                             <span>· Saved {shortAgo(s.createdAt)}</span>
                           </div>
                         </div>
-                        <div className="rv-price">{formatMoneyShort(price)}</div>
+                        <div className="rv-price">{formatMoneyFull(price)}</div>
                       </Link>
                     );
                   })
@@ -605,6 +605,16 @@ function formatMoneyShort(cents: number) {
   if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(1)}M`;
   if (v >= 1_000) return `$${(v / 1_000).toFixed(v >= 10_000 ? 0 : 1)}k`;
   return `$${Math.round(v).toLocaleString()}`;
+}
+
+// SHK-048: in side cards (My listings, Saved listings) show the actual
+// price down to the cent rather than rounding/abbreviating.
+function formatMoneyFull(cents: number) {
+  const hasCents = cents % 100 !== 0;
+  return `$${(cents / 100).toLocaleString(undefined, {
+    minimumFractionDigits: hasCents ? 2 : 0,
+    maximumFractionDigits: hasCents ? 2 : 0,
+  })}`;
 }
 
 function timeUntilShort(to: Date) {
