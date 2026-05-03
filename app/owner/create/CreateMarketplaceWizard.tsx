@@ -704,7 +704,7 @@ function IdentityStep({
           </Label>
           <div className="flex items-stretch rounded-[10px] border border-line bg-surface overflow-hidden focus-within:border-blue focus-within:ring-[3px] focus-within:ring-[var(--blue-softer)]">
             <span className="inline-flex items-center px-3 text-[13px] text-muted bg-bg-panel border-r border-line select-none">
-              shouks.co/m/
+              shouks.com/m/
             </span>
             <input
               id="mp-slug"

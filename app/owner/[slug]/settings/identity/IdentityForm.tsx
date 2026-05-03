@@ -210,7 +210,7 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
                 title="Slug is locked — changing it would break existing links."
               >
                 <Lock size={13} className="text-muted" />
-                <span className="truncate">shouks.co/m/{initial.slug}</span>
+                <span className="truncate">shouks.com/m/{initial.slug}</span>
               </div>
               <Help>Locked — changing it would break every existing link.</Help>
             </div>
