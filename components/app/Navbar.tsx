@@ -110,6 +110,11 @@ export function Navbar({
           label: "Explore",
           active: pathname.startsWith("/explore"),
         },
+        {
+          href: "/activity",
+          label: "Dashboard",
+          active: pathname.startsWith("/activity"),
+        },
       ];
 
   const searchLabel = inMarketplace

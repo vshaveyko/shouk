@@ -4,7 +4,7 @@ import { Navbar } from "@/components/app/Navbar";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Activity" };
+export const metadata = { title: "Dashboard" };
 
 // Ported from design Flow 6 screen 6G.
 // TODO: wire live data — counts, saved listings, bids, alerts, ISO matches.
@@ -60,7 +60,7 @@ export default async function ActivityPage(props: { searchParams?: Promise<{ tab
   const ctx = await getUserContext();
   if (!ctx) redirect("/signin?callbackUrl=/activity");
   const { user, memberships, owned } = ctx;
-  const initialTab = searchParams?.tab ?? "bids";
+  const initialTab = searchParams?.tab ?? "saved";
 
   const unread = await prisma.notification.count({
     where: { userId: user.id, readAt: null },
@@ -84,7 +84,7 @@ export default async function ActivityPage(props: { searchParams?: Promise<{ tab
 
       <div className="act-wrap">
         <div className="act-head">
-          <h1>Activity</h1>
+          <h1>Dashboard</h1>
           <div className="sub">Private — only visible to you.</div>
         </div>
 
@@ -97,14 +97,6 @@ export default async function ActivityPage(props: { searchParams?: Promise<{ tab
               Saved
               <span className="ct">0</span>
             </button>
-            <button type="button" className={initialTab === "bids" ? "active" : ""} data-act="bids">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M9 11l3 3L22 4" />
-                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-              </svg>
-              Bids &amp; offers
-              <span className="ct">0</span>
-            </button>
             <button type="button" className={initialTab === "alerts" ? "active" : ""} data-act="alerts">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8" />
@@ -113,14 +105,6 @@ export default async function ActivityPage(props: { searchParams?: Promise<{ tab
               </svg>
               Alerts
               <span className="ct">0</span>
-            </button>
-            <button type="button" data-act="notifs">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-              </svg>
-              Notifications
-              <span className="ct">{unread}</span>
             </button>
 
             <div className="act-label">Wanted / ISO</div>
@@ -145,15 +129,6 @@ export default async function ActivityPage(props: { searchParams?: Promise<{ tab
                 <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" />
               </svg>
               All my listings
-              <span className="ct">0</span>
-            </button>
-            <button type="button">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <path d="M17 8 12 3 7 8" />
-                <path d="M12 3v12" />
-              </svg>
-              Offers received
               <span className="ct">0</span>
             </button>
             <button type="button">
