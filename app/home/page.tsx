@@ -4,6 +4,7 @@ import { getUserContext } from "@/lib/auth-helpers";
 import { Navbar } from "@/components/app/Navbar";
 import { JoinViaWhatsAppButton } from "@/components/whatsapp/JoinViaWhatsAppButton";
 import { PostListingButton } from "@/components/app/PostListingButton";
+import { HomeFeedSentinel } from "@/components/app/HomeFeedSentinel";
 import { RecentlyViewedSection } from "@/components/app/RecentlyViewed";
 import { prisma } from "@/lib/prisma";
 import { countUnreadThreads } from "@/lib/messages";
@@ -457,12 +458,8 @@ export default async function HomeDashboard(
                       </Link>
                     );
                   })}
-                  {hasAnyMarketplace && (
-                    <div style={{ textAlign: "center", marginTop: 8 }}>
-                      <Link href="/explore" className="btn btn-outline" style={{ height: 34 }}>
-                        Show more →
-                      </Link>
-                    </div>
+                  {hasAnyMarketplace && feed.length >= 8 && (
+                    <HomeFeedSentinel initialCursor={feed[feed.length - 1].id} />
                   )}
                 </>
               )}
