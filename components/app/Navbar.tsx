@@ -42,7 +42,9 @@ const navbarCss = `
 .shouks-navbar .search:hover { background: var(--hover); }
 .shouks-navbar .nav-icon { width: 36px; height: 36px; border-radius: 9px; display: grid; place-items: center; color: var(--ink-soft); position: relative; background: transparent; border: 0; cursor: pointer; }
 .shouks-navbar .nav-icon:hover { background: var(--hover); color: var(--ink); }
+.shouks-navbar .nav-icon.active { color: var(--ink); background: var(--hover); }
 .shouks-navbar .nav-icon .bell-dot { position: absolute; top: 8px; right: 9px; width: 7px; height: 7px; border-radius: 50%; background: var(--danger); border: 2px solid #fff; }
+.shouks-navbar .nav-icon .msg-count { position: absolute; top: 4px; right: 2px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: var(--danger); color: #fff; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; line-height: 1; border: 2px solid #fff; }
 .shouks-navbar .avatar-btn { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 600; font-size: 12px; cursor: pointer; position: relative; background: linear-gradient(135deg, var(--blue), oklch(0.48 0.13 232)); border: 0; overflow: hidden; padding: 0; }
 .shouks-navbar .avatar-btn:hover { box-shadow: 0 0 0 3px var(--blue-soft); }
 .shouks-navbar .avatar-btn img { width: 100%; height: 100%; object-fit: cover; }
@@ -79,8 +81,10 @@ export function Navbar({
   const isOwnerMode = mode === "owner";
   const slug = activeMarketplace?.slug ?? "";
 
-  // Messages is a global concept — always link to /messages so the user sees
-  // all threads across all their marketplaces (SHK-028).
+  // SHK-028/SHK-051: Messages is a global concept — always link to /messages
+  // and render it as a speech-bubble icon next to the bell, not a tab inside
+  // primary nav. The count is unreadMessagesCount, computed across every
+  // marketplace the user belongs to.
   const messagesHref = "/messages";
   const messagesActive =
     pathname.startsWith("/messages") || /^\/m\/[^/]+\/messages/.test(pathname);
@@ -99,22 +103,12 @@ export function Navbar({
             pathname.startsWith(`/m/${slug}`) &&
             !pathname.startsWith(`/m/${slug}/messages`),
         },
-        {
-          href: messagesHref,
-          label: "Messages",
-          active: messagesActive,
-        },
       ]
     : [
         {
           href: "/explore",
           label: "Explore",
           active: pathname.startsWith("/explore"),
-        },
-        {
-          href: messagesHref,
-          label: "Messages",
-          active: messagesActive,
         },
       ];
 
@@ -150,11 +144,6 @@ export function Navbar({
                 className={l.active ? "active" : ""}
               >
                 {l.label}
-                {l.label === "Messages" && unreadMessagesCount > 0 ? (
-                  <span className="ping" data-testid="nav-messages-ping">
-                    {unreadMessagesCount}
-                  </span>
-                ) : null}
               </Link>
             ))}
           </nav>
@@ -175,6 +164,31 @@ export function Navbar({
             <path d="m21 21-4.3-4.3" />
           </svg>
           <span>{searchLabel}</span>
+        </Link>
+
+        <Link
+          href={messagesHref}
+          aria-label="Messages"
+          className={cn("nav-icon", messagesActive && "active")}
+          data-testid="nav-messages"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+          </svg>
+          {unreadMessagesCount > 0 ? (
+            <span className="msg-count" data-testid="nav-messages-ping">
+              {unreadMessagesCount > 9 ? "9+" : unreadMessagesCount}
+            </span>
+          ) : null}
         </Link>
 
         <NotificationBell initialCount={notificationCount} />
