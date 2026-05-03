@@ -324,7 +324,7 @@ function UserMenu({
             </Link>
           </DropdownMenu.Item>
           <DropdownMenu.Item asChild>
-            <Link href="/saved" className="block px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[14px]">
+            <Link href="/activity?tab=saved" className="block px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[14px]">
               Saved
             </Link>
           </DropdownMenu.Item>

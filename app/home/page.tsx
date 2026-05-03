@@ -549,7 +549,7 @@ export default async function HomeDashboard(
                     </svg>
                     Saved listings
                   </h3>
-                  {mySaved.length > 0 && <Link href="/saved">See all</Link>}
+                  {mySaved.length > 0 && <Link href="/activity?tab=saved">See all</Link>}
                 </div>
                 {mySaved.length === 0 ? (
                   <div className="empty-mini">
