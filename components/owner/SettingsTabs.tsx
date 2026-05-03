@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils";
 const TABS = [
   { id: "identity", label: "Identity" },
   { id: "schema", label: "Schema" },
-  { id: "rules", label: "Rules" },
   { id: "monetization", label: "Monetization" },
   { id: "roles", label: "Roles" },
   { id: "integrations", label: "Integrations" },
