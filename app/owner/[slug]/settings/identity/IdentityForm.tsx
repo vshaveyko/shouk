@@ -95,12 +95,21 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
   async function uploadCover(file: File) {
     setUploading(true);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contentType: file.type, size: file.size }),
+      });
       const json = await res.json().catch(() => ({}));
       if (!res.ok) { toast.error(json?.error ?? "Upload failed."); return; }
-      setCoverImageUrl(json.url);
+      const { uploadUrl, publicUrl } = json as { uploadUrl: string; publicUrl: string };
+      const put = await fetch(uploadUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+      if (!put.ok) { toast.error("Upload failed."); return; }
+      setCoverImageUrl(publicUrl);
     } catch {
       toast.error("Network error during upload.");
     } finally {
