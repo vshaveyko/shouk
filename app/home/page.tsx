@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getUserContext } from "@/lib/auth-helpers";
 import { Navbar } from "@/components/app/Navbar";
 import { JoinViaWhatsAppButton } from "@/components/whatsapp/JoinViaWhatsAppButton";
+import { PostListingButton } from "@/components/app/PostListingButton";
 import { RecentlyViewedSection } from "@/components/app/RecentlyViewed";
 import { prisma } from "@/lib/prisma";
 import { countUnreadThreads } from "@/lib/messages";
@@ -527,18 +528,15 @@ export default async function HomeDashboard(
                     );
                   })
                 )}
-                {firstMarketplaceSlug && (
-                  <Link
-                    href={`/m/${firstMarketplaceSlug}/new`}
-                    className="btn btn-dark"
-                    style={{ width: "100%", justifyContent: "center", marginTop: 10, height: 32, fontSize: 12 }}
-                  >
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 5v14M5 12h14" />
-                    </svg>
-                    Post a new listing
-                  </Link>
-                )}
+                <PostListingButton
+                  marketplaces={[...owned, ...memberships].map((m) => ({
+                    id: m.id,
+                    name: m.name,
+                    slug: m.slug,
+                    logoUrl: m.logoUrl,
+                    primaryColor: m.primaryColor,
+                  }))}
+                />
               </div>
 
               <div className="side-card saved" data-testid="saved-listings-card">
