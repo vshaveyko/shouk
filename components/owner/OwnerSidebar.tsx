@@ -30,7 +30,7 @@ export function OwnerSidebar({
   const base = `/owner/${slug}`;
 
   const items = [
-    { href: `${base}/dashboard`, label: "Dashboard", icon: LayoutDashboard },
+    { href: `${base}/dashboard`, label: "Admin", icon: LayoutDashboard },
     {
       href: `${base}/applications`,
       label: "Applications",

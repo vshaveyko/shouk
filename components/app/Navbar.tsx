@@ -89,7 +89,7 @@ export function Navbar({
     ? [
         {
           href: `/owner/${slug}/dashboard`,
-          label: "Dashboard",
+          label: "Admin",
           active: pathname.startsWith(`/owner/${slug}`),
         },
         {
