@@ -257,12 +257,16 @@ export function ListingClient(props: Props) {
           )}
 
           {/* Schema values */}
-          {props.schemaFields.length > 0 && (
+          {(() => {
+            const detailFields = props.schemaFields.filter(
+              (f) => f.type !== "IMAGE" && f.name !== "title" && f.name !== "price",
+            );
+            if (detailFields.length === 0) return null;
+            return (
             <section>
               <h2 className="text-[15px] font-semibold mb-3">Details</h2>
               <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0 bg-surface border border-line rounded-[12px] divide-y sm:divide-y-0 sm:divide-x divide-line-soft overflow-hidden">
-                {props.schemaFields
-                  .filter((f) => f.type !== "IMAGE")
+                {detailFields
                   .map((f) => {
                     const raw = listing.schemaValues[f.name];
                     const val =
@@ -282,7 +286,8 @@ export function ListingClient(props: Props) {
                   })}
               </dl>
             </section>
-          )}
+            );
+          })()}
 
           {/* Bid history */}
           {isAuction && (
