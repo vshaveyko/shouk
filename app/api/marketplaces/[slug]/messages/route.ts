@@ -30,6 +30,9 @@ export async function GET(_req: Request, props: { params: Promise<{ slug: string
     where: {
       marketplaceId: mp.id,
       participants: { some: { userId: session.user.id } },
+      // SHK-047: hide empty threads — only surface conversations that
+      // actually have at least one message.
+      messages: { some: {} },
     },
     orderBy: { lastMessageAt: "desc" },
     include: {
@@ -93,23 +96,42 @@ export async function POST(req: Request, props: { params: Promise<{ slug: string
     }
   }
 
+  // SHK-047: don't materialize a thread until the user actually sends a
+  // message. If body is empty, look up an existing thread (so resuming a
+  // conversation works) but never create an empty placeholder — recipients
+  // shouldn't see "you have a new conversation" with no content.
+  const existing = await prisma.messageThread.findFirst({
+    where: {
+      marketplaceId: mp.id,
+      listingId: parsed.data.listingId ?? null,
+      AND: [
+        { participants: { some: { userId } } },
+        { participants: { some: { userId: parsed.data.recipientId } } },
+      ],
+      messages: { some: {} },
+    },
+    select: { id: true },
+  });
+
+  if (!parsed.data.body) {
+    return NextResponse.json({ threadId: existing?.id ?? null });
+  }
+
   const thread = await findOrCreateThread({
     marketplaceId: mp.id,
     listingId: parsed.data.listingId ?? null,
     userIds: [userId, parsed.data.recipientId],
   });
 
-  if (parsed.data.body) {
-    await prisma.$transaction([
-      prisma.message.create({
-        data: { threadId: thread.id, senderId: userId, body: parsed.data.body },
-      }),
-      prisma.messageThread.update({
-        where: { id: thread.id },
-        data: { lastMessageAt: new Date() },
-      }),
-    ]);
-  }
+  await prisma.$transaction([
+    prisma.message.create({
+      data: { threadId: thread.id, senderId: userId, body: parsed.data.body },
+    }),
+    prisma.messageThread.update({
+      where: { id: thread.id },
+      data: { lastMessageAt: new Date() },
+    }),
+  ]);
 
   return NextResponse.json({ threadId: thread.id });
 }
