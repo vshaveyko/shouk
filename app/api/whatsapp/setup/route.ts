@@ -5,8 +5,9 @@
  * We:
  *   1. Read the group's participant phone numbers from the session.
  *   2. Persist whatsappGroupId/Name on the marketplace.
- *   3. Bulk-create PhoneInvite rows for participants who aren't active members.
- *   4. Log (stub) an SMS notification for each — no actual SMS sent yet.
+ *   3. Upsert a User row for each phone (synthetic email if new) and
+ *      attach an ACTIVE Membership — idempotent, so re-running is a no-op
+ *      for participants already synced.
  */
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -15,7 +16,6 @@ import { prisma } from "@/lib/prisma";
 import {
   whatsappSessions,
   sessionBelongsTo,
-  sendSmsStub,
   WHATSAPP_ENABLED,
 } from "@/lib/whatsapp";
 
@@ -77,38 +77,34 @@ export async function POST(req: Request) {
     throw err;
   }
 
-  let invited = 0;
-  if (phones.length > 0) {
-    // Skip phones belonging to already-active members
-    const active = await prisma.membership.findMany({
-      where: {
-        marketplaceId: mp.id,
-        status: "ACTIVE",
-        user: { phoneNumber: { in: phones } },
+  let synced = 0;
+  const uniquePhones = Array.from(new Set(phones.filter(Boolean)));
+  for (const phone of uniquePhones) {
+    const digits = phone.replace(/[^0-9]/g, "");
+    if (!digits) continue;
+    const user = await prisma.user.upsert({
+      where: { phoneNumber: phone },
+      update: {},
+      create: {
+        phoneNumber: phone,
+        email: `wa-${digits}@phone.local`,
       },
-      select: { user: { select: { phoneNumber: true } } },
     });
-    const skip = new Set(active.map((a) => a.user.phoneNumber).filter(Boolean));
-    const toInvite = phones.filter((p) => p && !skip.has(p));
-
-    if (toInvite.length > 0) {
-      const result = await prisma.phoneInvite.createMany({
-        data: toInvite.map((phone) => ({
-          marketplaceId: mp.id,
-          phone,
-          source: "whatsapp_group_import",
-          issuerId: session.user.id,
-        })),
-        skipDuplicates: true,
-      });
-      invited = result.count;
-
-      // Stubbed SMS — log, don't send
-      const message = `You've been invited to ${mp.name} on Shouks. Visit ${process.env.NEXT_PUBLIC_APP_URL ?? ""}/apply/${mp.slug} to join.`;
-      for (const phone of toInvite) sendSmsStub(phone, message);
-    }
+    const membership = await prisma.membership.upsert({
+      where: {
+        userId_marketplaceId: { userId: user.id, marketplaceId: mp.id },
+      },
+      update: {},
+      create: {
+        userId: user.id,
+        marketplaceId: mp.id,
+        role: "MEMBER",
+        status: "ACTIVE",
+      },
+    });
+    if (membership.joinedAt.getTime() > Date.now() - 5_000) synced++;
   }
 
   whatsappSessions.destroySession(sessionId).catch(() => {});
-  return NextResponse.json({ linked: true, invited });
+  return NextResponse.json({ linked: true, synced });
 }

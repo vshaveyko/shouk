@@ -23,7 +23,7 @@ model User {
   image         String?
   bio           String?
   defaultRole   UserRole  @default(MEMBER)
-  phoneNumber   String?
+  phoneNumber   String?   @unique
   phoneVerified Boolean   @default(false)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

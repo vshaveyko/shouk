@@ -30,7 +30,7 @@ interface SessionStatus {
 interface SetupProps {
   mode: "setup";
   marketplaceId: string;
-  onDone: (groupName: string, invited: number) => void;
+  onDone: (groupName: string, synced: number) => void;
   onClose: () => void;
 }
 
@@ -171,7 +171,7 @@ export function WhatsAppQRModal(props: WhatsAppQRModalProps) {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error ?? "Linking failed");
-      props.onDone(selectedGroup.name, data.invited ?? 0);
+      props.onDone(selectedGroup.name, data.synced ?? 0);
     } catch (e: any) {
       toast.error(e?.message ?? "Linking failed");
     } finally {

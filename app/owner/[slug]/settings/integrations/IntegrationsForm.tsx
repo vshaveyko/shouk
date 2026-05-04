@@ -175,21 +175,18 @@ export function IntegrationsForm({ marketplaceId, initial, inviteStats, whatsapp
           mode="setup"
           marketplaceId={marketplaceId}
           onClose={() => setShowModal(false)}
-          onDone={(groupName, invited) => {
+          onDone={(groupName, synced) => {
             setShowModal(false);
             toast.success(
-              invited > 0
-                ? `Linked "${groupName}" · imported ${invited} invite${invited === 1 ? "" : "s"}`
+              synced > 0
+                ? `Linked "${groupName}" · synced ${synced} member${synced === 1 ? "" : "s"}`
                 : `Linked "${groupName}"`,
             );
-            // Optimistically mark as linked so the Linked card appears
-            // immediately; router.refresh() will pull authoritative state.
             setState((s) => ({
               ...s,
               whatsappGroupName: groupName,
               whatsappGroupId: s.whatsappGroupId ?? "pending-refresh",
             }));
-            setStats((s) => ({ ...s, pending: s.pending + invited }));
             router.refresh();
           }}
         />
