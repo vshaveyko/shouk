@@ -592,8 +592,6 @@ function SchemaListingCardPreview({ fields, marketplaceName, primaryColor }: { f
         return "—";
       case "DATE":
         return new Date().toLocaleDateString();
-      case "BOOLEAN":
-        return "Yes";
       default:
         return "Sample";
     }
