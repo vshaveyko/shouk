@@ -432,6 +432,11 @@ export function CreateMarketplaceWizard() {
         <aside className="wiz-preview">
           {step === 2 ? (
             <SchemaPreview fields={state.schemaFields} marketplaceName={state.name} />
+            <SchemaListingCardPreview
+              fields={state.schemaFields}
+              marketplaceName={state.name}
+              primaryColor={state.primaryColor || "#4DB7E8"}
+            />
           ) : (
             <div className="preview-card">
               <div className="preview-label">Preview</div>
@@ -571,6 +576,92 @@ function fakeMockFor(type: FieldType, options?: string[]) {
     }
     default: return <div className="fake-input" />;
   }
+}
+
+// SHK-054: complementary preview that shows what a generated listing card
+// looks like — title, price, image placeholder, schema-value chips. Sits
+// below the seller's create-form preview so admins can see both at once.
+function SchemaListingCardPreview({ fields, marketplaceName, primaryColor }: { fields: SchemaField[]; marketplaceName: string; primaryColor: string }) {
+  const sampleFor = (f: SchemaField): string => {
+    if (f.options && f.options.length > 0) return f.options[0];
+    switch (f.type) {
+      case "NUMBER":
+      case "CURRENCY":
+        return "—";
+      case "DATE":
+        return new Date().toLocaleDateString();
+      case "BOOLEAN":
+        return "Yes";
+      default:
+        return "Sample";
+    }
+  };
+  const chipFields = fields.filter((f) => f.type !== "IMAGE" && f.name !== "title" && f.name !== "price").slice(0, 4);
+  return (
+    <>
+      <div className="pv-label" style={{ marginTop: 14 }}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 10, height: 10 }}>
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <path d="M3 9h18M9 21V9" />
+        </svg>
+        Generated listing card
+      </div>
+      <div className="pv-frame">
+        <div
+          style={{
+            background: "#fff",
+            border: "1px solid var(--line)",
+            borderRadius: 10,
+            overflow: "hidden",
+            fontSize: 11.5,
+          }}
+        >
+          <div
+            style={{
+              height: 84,
+              background: `linear-gradient(135deg, ${primaryColor || "var(--blue)"} , color-mix(in oklab, ${primaryColor || "var(--blue)"} 50%, black))`,
+              display: "grid",
+              placeItems: "center",
+              color: "rgba(255,255,255,0.7)",
+              fontSize: 10,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+            }}
+          >
+            Image
+          </div>
+          <div style={{ padding: 10 }}>
+            <div style={{ fontSize: 9.5, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--ink-soft)" }}>
+              {marketplaceName || "Your marketplace"}
+            </div>
+            <div style={{ fontWeight: 500, marginTop: 2 }}>Sample listing title</div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4 }}>
+              <span style={{ fontWeight: 600, fontSize: 13 }}>$1,250</span>
+              <span style={{ color: "var(--muted)", fontSize: 10 }}>Posted just now</span>
+            </div>
+            {chipFields.length > 0 && (
+              <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 6 }}>
+                {chipFields.map((f) => (
+                  <span
+                    key={f.uid}
+                    style={{
+                      fontSize: 9.5,
+                      padding: "2px 6px",
+                      borderRadius: 4,
+                      background: "var(--bg-soft)",
+                      color: "var(--ink-soft)",
+                    }}
+                  >
+                    {f.label || "Field"}: {sampleFor(f)}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </>
+  );
 }
 
 function SchemaPreview({ fields, marketplaceName }: { fields: SchemaField[]; marketplaceName: string }) {
