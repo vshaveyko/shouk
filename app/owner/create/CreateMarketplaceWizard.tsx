@@ -84,6 +84,7 @@ type FormState = {
   primaryColor: string;
   schemaFields: SchemaField[];
   entryMethod: EntryMethod;
+  unlisted: boolean;
   requiredVerifications: VerifyProviderId[];
   autoApprove: boolean;
   applicationQuestions: ApplicationQuestion[];
@@ -171,6 +172,7 @@ const INITIAL_STATE: FormState = {
     },
   ],
   entryMethod: "APPLICATION",
+  unlisted: false,
   requiredVerifications: ["GOOGLE"],
   autoApprove: false,
   applicationQuestions: [
@@ -317,6 +319,7 @@ export function CreateMarketplaceWizard() {
       category: state.category,
       primaryColor: state.primaryColor || null,
       entryMethod: state.entryMethod,
+      unlisted: state.unlisted,
       requiredVerifications: state.requiredVerifications,
       autoApprove: state.entryMethod === "REFERRAL" ? state.autoApprove : false,
       auctionsEnabled: state.auctionsEnabled,
@@ -1181,23 +1184,28 @@ function MembershipStep({
 
   type Visibility = "PUBLIC" | "CLOSED" | "PRIVATE";
 
-  function visibilityOf(em: EntryMethod): Visibility {
+  // SHK-041/SHK-045: visibility (Public/Closed/Private) is independent of
+  // the entry method, mirroring the IdentityForm. Private just means
+  // unlisted=true.
+  function visibilityOf(em: EntryMethod, unlisted: boolean): Visibility {
     if (em === "PUBLIC") return "PUBLIC";
-    if (em === "INVITE") return "PRIVATE";
+    if (unlisted) return "PRIVATE";
     return "CLOSED";
   }
 
   function setVisibility(v: Visibility) {
     setState((s) => {
-      if (v === "PUBLIC") return { ...s, entryMethod: "PUBLIC" };
-      if (v === "PRIVATE") return { ...s, entryMethod: "INVITE" };
-      // CLOSED — keep APPLICATION/REFERRAL if already set, else default to APPLICATION
-      const keep = s.entryMethod === "APPLICATION" || s.entryMethod === "REFERRAL";
-      return { ...s, entryMethod: keep ? s.entryMethod : "APPLICATION" };
+      if (v === "PUBLIC") return { ...s, entryMethod: "PUBLIC", unlisted: false };
+      if (v === "PRIVATE") {
+        const em = s.entryMethod === "PUBLIC" ? "APPLICATION" : s.entryMethod;
+        return { ...s, entryMethod: em, unlisted: true };
+      }
+      const em = s.entryMethod === "PUBLIC" ? "APPLICATION" : s.entryMethod;
+      return { ...s, entryMethod: em, unlisted: false };
     });
   }
 
-  const visibility = visibilityOf(state.entryMethod);
+  const visibility = visibilityOf(state.entryMethod, state.unlisted);
 
   const visibilityOptions: { id: Visibility; title: string; body: string; tag: string; testid: string }[] = [
     {
@@ -1223,7 +1231,7 @@ function MembershipStep({
     },
   ];
 
-  const joinOptions: { id: "APPLICATION" | "REFERRAL"; title: string; body: string; testid: string }[] = [
+  const joinOptions: { id: "APPLICATION" | "REFERRAL" | "INVITE"; title: string; body: string; testid: string }[] = [
     {
       id: "APPLICATION",
       title: "Application",
@@ -1235,6 +1243,12 @@ function MembershipStep({
       title: "Referral",
       body: "Existing members vouch for newcomers. Optionally auto-approve referrals.",
       testid: "join-method-referral",
+    },
+    {
+      id: "INVITE",
+      title: "Invite only",
+      body: "Only people you invite (or who follow a direct invite link) can join. No application required.",
+      testid: "join-method-invite",
     },
   ];
 
@@ -1275,7 +1289,7 @@ function MembershipStep({
             </div>
           </div>
 
-          {visibility === "CLOSED" && (
+          {(visibility === "CLOSED" || visibility === "PRIVATE") && (
             <div>
               <div className="section-label" style={{ marginTop: 8 }}>Ways to join</div>
               <div className="space-y-2" role="radiogroup" aria-label="Ways to join">
