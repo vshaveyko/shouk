@@ -37,6 +37,7 @@ type Initial = {
   primaryColor: string | null;
   status: "DRAFT" | "ACTIVE" | "INACTIVE" | "SCHEDULED_DELETION";
   entryMethod: EntryMethod;
+  unlisted: boolean;
 };
 
 type Visibility = "PUBLIC" | "CLOSED" | "PRIVATE";
@@ -62,7 +63,7 @@ const VISIBILITY_OPTIONS: { id: Visibility; title: string; body: string; tag: st
   },
 ];
 
-const JOIN_OPTIONS: { id: "APPLICATION" | "REFERRAL"; title: string; body: string }[] = [
+const JOIN_OPTIONS: { id: "APPLICATION" | "REFERRAL" | "INVITE"; title: string; body: string }[] = [
   {
     id: "APPLICATION",
     title: "Application",
@@ -73,13 +74,12 @@ const JOIN_OPTIONS: { id: "APPLICATION" | "REFERRAL"; title: string; body: strin
     title: "Referral",
     body: "Existing members vouch for newcomers. Optionally auto-approve referrals.",
   },
+  {
+    id: "INVITE",
+    title: "Invite only",
+    body: "Only people you invite (or who follow a direct invite link) can join. No application required.",
+  },
 ];
-
-function visibilityFromEntry(em: EntryMethod): Visibility {
-  if (em === "PUBLIC") return "PUBLIC";
-  if (em === "INVITE") return "PRIVATE";
-  return "CLOSED";
-}
 
 export function IdentityForm({ slug, initial }: { slug: string; initial: Initial }) {
   const router = useRouter();
@@ -88,6 +88,14 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
   const [coverImageUrl, setCoverImageUrl] = React.useState(initial.coverImageUrl ?? "");
   const [primaryColor, setPrimaryColor] = React.useState(initial.primaryColor ?? "#4DB7E8");
   const [entryMethod, setEntryMethod] = React.useState<EntryMethod>(initial.entryMethod);
+  const [unlisted, setUnlisted] = React.useState<boolean>(initial.unlisted);
+
+  // SHK-041: visibility is now an explicit pair (PUBLIC/CLOSED/PRIVATE) where
+  // PRIVATE means unlisted=true; the entry method (application / referral /
+  // invite) is independent so a private marketplace can still require an
+  // application or a referral.
+  const visibility: Visibility =
+    entryMethod === "PUBLIC" ? "PUBLIC" : unlisted ? "PRIVATE" : "CLOSED";
   const [saving, setSaving] = React.useState(false);
   const [uploading, setUploading] = React.useState(false);
   const coverFileRef = React.useRef<HTMLInputElement>(null);
@@ -140,6 +148,7 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
           coverImageUrl: coverImageUrl.trim() || null,
           primaryColor: primaryColor || null,
           entryMethod,
+          unlisted,
         }),
       });
       const json = await res.json().catch(() => ({}));
@@ -342,7 +351,7 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
             <div className="text-[12px] font-semibold uppercase tracking-wide text-muted mb-2">Visibility</div>
             <div className="space-y-2" role="radiogroup" aria-label="Visibility">
               {VISIBILITY_OPTIONS.map((opt) => {
-                const selected = visibilityFromEntry(entryMethod) === opt.id;
+                const selected = visibility === opt.id;
                 return (
                   <button
                     key={opt.id}
@@ -351,11 +360,17 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
                     aria-checked={selected}
                     data-testid={`identity-visibility-${opt.id.toLowerCase()}`}
                     onClick={() => {
-                      if (opt.id === "PUBLIC") setEntryMethod("PUBLIC");
-                      else if (opt.id === "PRIVATE") setEntryMethod("INVITE");
-                      else {
-                        const keep = entryMethod === "APPLICATION" || entryMethod === "REFERRAL";
-                        setEntryMethod(keep ? entryMethod : "APPLICATION");
+                      if (opt.id === "PUBLIC") {
+                        setEntryMethod("PUBLIC");
+                        setUnlisted(false);
+                      } else if (opt.id === "PRIVATE") {
+                        // Stay on whatever entry method the user picked; just
+                        // hide the marketplace from explore.
+                        if (entryMethod === "PUBLIC") setEntryMethod("APPLICATION");
+                        setUnlisted(true);
+                      } else {
+                        if (entryMethod === "PUBLIC") setEntryMethod("APPLICATION");
+                        setUnlisted(false);
                       }
                     }}
                     className={`flex items-start gap-3 w-full text-left rounded-[10px] border p-4 transition ${
@@ -383,7 +398,7 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
             </div>
           </div>
 
-          {visibilityFromEntry(entryMethod) === "CLOSED" && (
+          {(visibility === "CLOSED" || visibility === "PRIVATE") && (
             <div>
               <div className="text-[12px] font-semibold uppercase tracking-wide text-muted mb-2">Ways to join</div>
               <div className="space-y-2" role="radiogroup" aria-label="Ways to join">

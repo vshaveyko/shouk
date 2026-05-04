@@ -35,6 +35,7 @@ const updateSchema = z.object({
   monthlyPriceCents: z.number().int().min(0).optional().nullable(),
   annualPriceCents: z.number().int().min(0).optional().nullable(),
   status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
+  unlisted: z.boolean().optional(),
 });
 
 export async function PATCH(req: Request, props: { params: Promise<{ slug: string }> }) {

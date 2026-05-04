@@ -149,6 +149,10 @@ model Marketplace {
   monthlyPriceCents     Int?
   annualPriceCents      Int?
   status                MarketplaceStatus @default(ACTIVE)
+  // SHK-041: explicit unlisted flag, decoupled from entryMethod. Old code
+  // treated entryMethod=INVITE as Private visibility, which prevented
+  // private marketplaces from also requiring an application or referral.
+  unlisted              Boolean           @default(false)
   publishedAt           DateTime?
   // ── WhatsApp group linking ──
   whatsappGroupId       String?           @unique

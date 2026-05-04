@@ -37,7 +37,7 @@ export default async function ExplorePage(
   const marketplaces = await prisma.marketplace.findMany({
     where: {
       status: "ACTIVE",
-      entryMethod: { not: "INVITE" },
+      unlisted: false,
       ...(q
         ? {
             OR: [

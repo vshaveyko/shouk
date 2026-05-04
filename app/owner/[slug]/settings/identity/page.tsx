@@ -17,6 +17,7 @@ export default async function IdentitySettingsPage(props: { params: Promise<{ sl
       primaryColor: true,
       status: true,
       entryMethod: true,
+      unlisted: true,
       requiredVerifications: true,
       autoApprove: true,
       applicationQuestions: { orderBy: { order: "asc" } },
