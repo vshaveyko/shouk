@@ -29,9 +29,15 @@ export async function getUserContext() {
         where: { status: { in: ["ACTIVE", "DRAFT"] } },
         select: { id: true, name: true, slug: true, logoUrl: true, primaryColor: true, status: true, category: true },
       },
+      marketplaceFavorites: {
+        select: { marketplaceId: true },
+      },
     },
   });
   if (!user) return null;
+
+  // SHK-053: favorited memberships render before non-favorited ones.
+  const favIds = new Set(user.marketplaceFavorites.map((f) => f.marketplaceId));
 
   // Marketplace owners also have an auto-created OWNER Membership (so the
   // usual membership-based queries don't need an `ownerId` special case). For
@@ -42,13 +48,14 @@ export async function getUserContext() {
   // Tag each marketplace with isOwner so the Navbar switcher can route
   // owner-owned entries into /owner/<slug> and member-only entries into
   // /m/<slug> (SHK-051).
-  const owned = user.ownedMarketplaces.map((m) => ({ ...m, isOwner: true }));
+  const owned = user.ownedMarketplaces.map((m) => ({ ...m, isOwner: true, isFavorite: favIds.has(m.id) }));
   const memberships = user.memberships
     .map((m) => m.marketplace)
     .filter((mp) => !ownedIds.has(mp.id) && mp.status === "ACTIVE")
-    .map((m) => ({ ...m, isOwner: false }));
+    .map((m) => ({ ...m, isOwner: false, isFavorite: favIds.has(m.id) }))
+    .sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite));
 
-  return { user, memberships, owned };
+  return { user, memberships, owned, favoriteIds: favIds };
 }
 
 export async function requireOwnerOf(slug: string) {

@@ -45,6 +45,7 @@ model User {
   pushSubscriptions PushSubscription[]
   threadParticipations ThreadParticipant[]
   sentMessages         Message[]          @relation("MessageSender")
+  marketplaceFavorites MarketplaceFavorite[]
 }
 
 model PushSubscription {
@@ -168,9 +169,27 @@ model Marketplace {
   savedSearches        SavedSearch[]
   listingSaves         ListingSave[]
   messageThreads       MessageThread[]
+  favoritedBy          MarketplaceFavorite[]
 
   @@index([ownerId])
   @@index([status])
+}
+
+// SHK-053: per-user marketplace favorites. Owners always render first
+// in the My communities switcher; favorited marketplaces sort next, then
+// the rest of the user's memberships. Also drives a 'Favorites' filter
+// chip on /home.
+model MarketplaceFavorite {
+  id            String   @id @default(cuid())
+  userId        String
+  marketplaceId String
+  createdAt     DateTime @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  marketplace Marketplace @relation(fields: [marketplaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, marketplaceId])
+  @@index([marketplaceId])
 }
 
 // Phone-number-based invitations (e.g. imported from WhatsApp group).

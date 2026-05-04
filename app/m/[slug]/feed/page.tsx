@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getUserContext } from "@/lib/auth-helpers";
+import { FavoriteToggle } from "@/components/app/FavoriteToggle";
 import { Navbar } from "@/components/app/Navbar";
 import { countUnreadThreads } from "@/lib/messages";
 import { FeedClient } from "./FeedClient";
@@ -240,6 +241,11 @@ export default async function FeedPage(
               </svg>
               Alerts
             </Link>
+            <FavoriteToggle
+              slug={mp.slug}
+              initialFavorited={ctx?.favoriteIds?.has(mp.id) ?? false}
+              className="btn btn-ghost"
+            />
           </div>
         </div>
       </div>

@@ -135,7 +135,7 @@ const dashCss = `
 .offer-chip { font-size: 10px; font-weight: 600; padding: 3px 7px; border-radius: 5px; background: var(--blue); color: #fff; }
 `;
 
-type ScopeValue = "all" | "owner" | "member";
+type ScopeValue = "all" | "owner" | "member" | "favorites";
 
 export default async function HomeDashboard(
   props: {
@@ -162,7 +162,7 @@ export default async function HomeDashboard(
     redirect(`/owner/${owned[0].slug}/dashboard`);
   }
 
-  const scope: ScopeValue = ["owner", "member"].includes(searchParams?.scope ?? "")
+  const scope: ScopeValue = ["owner", "member", "favorites"].includes(searchParams?.scope ?? "")
     ? (searchParams!.scope as ScopeValue)
     : "all";
 
@@ -170,15 +170,18 @@ export default async function HomeDashboard(
   const memberIds = memberships.map((m) => m.id);
   const allMarketplaceIds = [...ownedIds, ...memberIds];
 
+  const allTagged = [
+    ...owned.map((m) => ({ ...m, role: "owner" as const })),
+    ...memberships.map((m) => ({ ...m, role: "member" as const })),
+  ];
   const visibleMarketplaces =
     scope === "owner"
       ? owned.map((m) => ({ ...m, role: "owner" as const }))
       : scope === "member"
         ? memberships.map((m) => ({ ...m, role: "member" as const }))
-        : [
-            ...owned.map((m) => ({ ...m, role: "owner" as const })),
-            ...memberships.map((m) => ({ ...m, role: "member" as const })),
-          ];
+        : scope === "favorites"
+          ? allTagged.filter((m) => m.isFavorite)
+          : allTagged;
 
   const [
     unread,
@@ -243,6 +246,7 @@ export default async function HomeDashboard(
     all: owned.length + memberships.length,
     owner: owned.length,
     member: memberships.length,
+    favorites: allTagged.filter((m) => m.isFavorite).length,
   };
 
   const firstName =
@@ -308,14 +312,17 @@ export default async function HomeDashboard(
                 <Link href="/home?stay=1&scope=member" className={scope === "member" ? "on" : ""} data-testid="scope-member">
                   Member <span className="n">{scopeCounts.member}</span>
                 </Link>
+                <Link href="/home?stay=1&scope=favorites" className={scope === "favorites" ? "on" : ""} data-testid="scope-favorites">
+                  Favorites <span className="n">{scopeCounts.favorites}</span>
+                </Link>
               </div>
             </div>
 
             <div className="mp-row">
-              {visibleMarketplaces.map((m, idx) => {
+              {visibleMarketplaces.map((m) => {
                 const isOwner = m.role === "owner";
                 const color = m.primaryColor ?? "oklch(0.55 0.17 25)";
-                const favorited = idx === 0;
+                const favorited = m.isFavorite ?? false;
                 return (
                   <Link
                     key={m.id}
