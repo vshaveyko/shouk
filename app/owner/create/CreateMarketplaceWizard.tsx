@@ -431,12 +431,14 @@ export function CreateMarketplaceWizard() {
 
         <aside className="wiz-preview">
           {step === 2 ? (
-            <SchemaPreview fields={state.schemaFields} marketplaceName={state.name} />
-            <SchemaListingCardPreview
-              fields={state.schemaFields}
-              marketplaceName={state.name}
-              primaryColor={state.primaryColor || "#4DB7E8"}
-            />
+            <>
+              <SchemaPreview fields={state.schemaFields} marketplaceName={state.name} />
+              <SchemaListingCardPreview
+                fields={state.schemaFields}
+                marketplaceName={state.name}
+                primaryColor={state.primaryColor || "#4DB7E8"}
+              />
+            </>
           ) : (
             <div className="preview-card">
               <div className="preview-label">Preview</div>
