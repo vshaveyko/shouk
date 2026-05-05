@@ -15,6 +15,7 @@ import {
   CardFooter,
 } from "@/components/ui";
 import { cn, formatCents } from "@/lib/utils";
+import { i18n } from '@shipeasy/sdk/client'
 
 export function MonetizationForm({
   slug,
@@ -52,15 +53,15 @@ export function MonetizationForm({
       const m = monthly.trim();
       const a = annual.trim();
       if (!m && !a) {
-        toast.error("Enter a monthly or annual price.");
+        toast.error(i18n.t('...monetization.monetizationForm.enterAMonthlyOrAnnual'));
         return;
       }
       if (m && !/^\d+(\.\d{1,2})?$/.test(m)) {
-        toast.error("Monthly price must be a dollar amount, e.g. 9.99");
+        toast.error(i18n.t('...monetization.monetizationForm.monthlyPriceMustBeA'));
         return;
       }
       if (a && !/^\d+(\.\d{1,2})?$/.test(a)) {
-        toast.error("Annual price must be a dollar amount, e.g. 99.00");
+        toast.error(i18n.t('...monetization.monetizationForm.annualPriceMustBeA'));
         return;
       }
     }
@@ -81,13 +82,13 @@ export function MonetizationForm({
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok) {
-        toast.error(json?.error ?? "Couldn't save monetization.");
+        toast.error(json?.error ?? i18n.t('...monetization.monetizationForm.couldntSaveMonetization'));
         return;
       }
-      toast.success("Monetization saved.");
+      toast.success(i18n.t('...monetization.monetizationForm.monetizationSaved'));
       router.refresh();
     } catch {
-      toast.error("Network error. Please try again.");
+      toast.error(i18n.t('common.networkErrorPleaseTryAgain'));
     } finally {
       setSaving(false);
     }
@@ -102,26 +103,26 @@ export function MonetizationForm({
     <form onSubmit={save} data-testid="monetization-form" className="space-y-5">
       <Card>
         <CardHeader>
-          <CardTitle>Membership pricing</CardTitle>
-          <CardDescription>Free or subscription-based.</CardDescription>
+          <CardTitle>{i18n.t('common.membershipPricing')}</CardTitle>
+          <CardDescription>{i18n.t('common.freeOrSubscriptionbased')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div
             className="grid grid-cols-1 md:grid-cols-2 gap-3"
             role="radiogroup"
-            aria-label="Pricing"
+            aria-label={i18n.t('common.pricing')}
           >
             <PricingOption
               testid="monetization-free"
               active={!isPaid}
-              title="Free"
+              title={i18n.t('common.free')}
               body="Anyone approved can join at no cost."
               onClick={() => setIsPaid(false)}
             />
             <PricingOption
               testid="monetization-paid"
               active={isPaid}
-              title="Paid membership"
+              title={i18n.t('common.paidMembership')}
               body="Charge monthly, annually, or both."
               onClick={() => setIsPaid(true)}
             />
@@ -130,7 +131,7 @@ export function MonetizationForm({
           {isPaid && (
             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 rounded-[10px] border border-line-soft bg-bg-panel p-4">
               <div>
-                <Label htmlFor="price-monthly">Monthly price (USD)</Label>
+                <Label htmlFor="price-monthly">{i18n.t('common.monthlyPriceUsd')}</Label>
                 <div className="flex items-stretch rounded-[10px] border border-line bg-surface overflow-hidden focus-within:border-blue focus-within:ring-[3px] focus-within:ring-[var(--blue-softer)]">
                   <span className="inline-flex items-center px-3 text-[13px] text-muted bg-bg-panel border-r border-line select-none">
                     $
@@ -150,7 +151,7 @@ export function MonetizationForm({
                 </div>
               </div>
               <div>
-                <Label htmlFor="price-annual">Annual price (USD)</Label>
+                <Label htmlFor="price-annual">{i18n.t('common.annualPriceUsd')}</Label>
                 <div className="flex items-stretch rounded-[10px] border border-line bg-surface overflow-hidden focus-within:border-blue focus-within:ring-[3px] focus-within:ring-[var(--blue-softer)]">
                   <span className="inline-flex items-center px-3 text-[13px] text-muted bg-bg-panel border-r border-line select-none">
                     $
@@ -179,7 +180,7 @@ export function MonetizationForm({
             data-testid="monetization-save"
             disabled={saving}
           >
-            {saving ? "Saving…" : "Save monetization"}
+            {saving ? i18n.t('common.saving') : i18n.t('...monetization.monetizationForm.saveMonetization')}
           </Button>
         </CardFooter>
       </Card>
@@ -187,16 +188,16 @@ export function MonetizationForm({
       {isPaid && (
         <Card>
           <CardHeader>
-            <CardTitle>Revenue</CardTitle>
+            <CardTitle>{i18n.t('common.revenue')}</CardTitle>
             <CardDescription>
-              Estimated from active paying members — subject to final reconciliation.
+              {i18n.t('...monetization.monetizationForm.estimatedFromActivePayingMembers')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <Stat
                 testid="monetization-active-members"
-                label="Active paying members"
+                label={i18n.t('...monetization.monetizationForm.activePayingMembers')}
                 value={initial.activeMembers.toLocaleString()}
               />
               <Stat
@@ -206,9 +207,9 @@ export function MonetizationForm({
               />
               <Stat
                 testid="monetization-churn"
-                label="Churn"
+                label={i18n.t('...monetization.monetizationForm.churn')}
                 value="—"
-                hint="Coming soon"
+                hint={i18n.t('common.comingSoon')}
               />
             </div>
           </CardContent>
@@ -217,22 +218,22 @@ export function MonetizationForm({
 
       <Card>
         <CardHeader>
-          <CardTitle>Payouts</CardTitle>
+          <CardTitle>{i18n.t('common.payouts')}</CardTitle>
           <CardDescription>
-            Connect Stripe to receive subscription payouts directly.
+            {i18n.t('...monetization.monetizationForm.connectStripeToReceiveSubscription')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div
             className="flex items-center justify-between gap-3 rounded-[10px] border border-line-soft bg-bg-panel px-4 py-3"
-            title="MVP placeholder — Stripe wiring ships in a later release."
+            title={i18n.t('...monetization.monetizationForm.mvpPlaceholderStripeWiringShips')}
           >
             <div className="flex items-start gap-2 min-w-0">
               <Sparkles size={16} className="text-blue-ink mt-0.5 shrink-0" />
               <div className="min-w-0">
-                <div className="text-[14px] font-medium">Stripe</div>
+                <div className="text-[14px] font-medium">{i18n.t('...monetization.monetizationForm.stripe')}</div>
                 <div className="text-[12.5px] text-muted">
-                  MVP placeholder — not yet wired up.
+                  {i18n.t('...monetization.monetizationForm.mvpPlaceholderNotYetWired')}
                 </div>
               </div>
             </div>
@@ -246,7 +247,7 @@ export function MonetizationForm({
                 })
               }
             >
-              Connect Stripe
+              {i18n.t('...monetization.monetizationForm.connectStripe')}
             </Button>
           </div>
         </CardContent>

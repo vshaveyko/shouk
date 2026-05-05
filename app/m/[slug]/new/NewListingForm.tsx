@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/Select";
 import { cn } from "@/lib/utils";
+import { i18n } from '@shipeasy/sdk/client'
 
 type FieldType =
   | "SHORT_TEXT"
@@ -63,12 +64,12 @@ type Props = {
 };
 
 const DURATION_PRESETS = [
-  { value: "1h", label: "1 hour", ms: 60 * 60 * 1000 },
-  { value: "6h", label: "6 hours", ms: 6 * 60 * 60 * 1000 },
-  { value: "12h", label: "12 hours", ms: 12 * 60 * 60 * 1000 },
-  { value: "24h", label: "24 hours", ms: 24 * 60 * 60 * 1000 },
-  { value: "3d", label: "3 days", ms: 3 * 24 * 60 * 60 * 1000 },
-  { value: "7d", label: "7 days", ms: 7 * 24 * 60 * 60 * 1000 },
+  { value: "1h", label: i18n.t('...new.newListingForm.1Hour'), ms: 60 * 60 * 1000 },
+  { value: "6h", label: i18n.t('common.nHours', { n1: 6 }), ms: 6 * 60 * 60 * 1000 },
+  { value: "12h", label: i18n.t('common.nHours', { n1: 12 }), ms: 12 * 60 * 60 * 1000 },
+  { value: "24h", label: i18n.t('common.nHours', { n1: 24 }), ms: 24 * 60 * 60 * 1000 },
+  { value: "3d", label: i18n.t('common.nDays', { n1: 3 }), ms: 3 * 24 * 60 * 60 * 1000 },
+  { value: "7d", label: i18n.t('common.7Days'), ms: 7 * 24 * 60 * 60 * 1000 },
 ];
 
 export function NewListingForm({
@@ -234,7 +235,7 @@ export function NewListingForm({
         setError(data.error ?? (isEditing ? "Couldn't save listing." : "Couldn't create listing."));
         return;
       }
-      toast.success(isEditing ? "Listing updated." : "Listing created.");
+      toast.success(isEditing ? i18n.t('...new.newListingForm.listingUpdated') : i18n.t('...new.newListingForm.listingCreated'));
       router.push(`/l/${isEditing ? existing!.id : data.id}`);
       router.refresh();
     } catch {
@@ -248,10 +249,10 @@ export function NewListingForm({
   const coverImage = imageUrls.find(Boolean) ?? null;
   const previewPrice = isISO
     ? budgetDollars
-      ? `Up to $${Number(budgetDollars).toLocaleString()}`
-      : "Budget open"
+      ? i18n.t('...new.newListingForm.upToVar0', { var0: Number(budgetDollars).toLocaleString() })
+      : i18n.t('common.budgetOpen')
     : priceDollars
-      ? `$${Number(priceDollars).toLocaleString()}`
+      ? i18n.t('...new.newListingForm.var0', { var0: Number(priceDollars).toLocaleString() })
       : "$ —";
 
   return (
@@ -263,19 +264,19 @@ export function NewListingForm({
             <span>·</span>
             {isEditing ? (
               <>
-                <Link href={`/l/${existing!.id}`}>Listing</Link>
+                <Link href={`/l/${existing!.id}`}>{i18n.t('common.listing')}</Link>
                 <span>·</span>
-                <span>Edit</span>
+                <span>{i18n.t('common.edit')}</span>
               </>
             ) : (
-              <span>New post</span>
+              <span>{i18n.t('...new.newListingForm.newPost')}</span>
             )}
           </div>
-          <h1>{isEditing ? "Edit listing" : `Post to ${marketplaceName}`}</h1>
+          <h1>{isEditing ? i18n.t('common.editListing') : i18n.t('...new.newListingForm.postToMarketplacename', { marketplaceName })}</h1>
           <p>
             {isEditing
-              ? "Update your listing. Type can't be changed after posting."
-              : "Choose what kind of post this is. Fields marked "}
+              ? i18n.t('...new.newListingForm.updateYourListingTypeCant')
+              : i18n.t('...new.newListingForm.chooseWhatKindOfPost')}
             {!isEditing && <span className="req">*</span>}
             {!isEditing && " are required by this marketplace."}
           </p>
@@ -291,7 +292,7 @@ export function NewListingForm({
           {/* Mode toggle — Sell vs ISO (Auctions hidden for V1 per SHK-027).
               Locked when editing: the API rejects type changes. */}
           {!isEditing && (
-          <div className="mode-toggle" role="tablist" aria-label="Post mode">
+          <div className="mode-toggle" role="tablist" aria-label={i18n.t('...new.newListingForm.postModeAria-label')}>
             <button
               type="button"
               role="tab"
@@ -304,8 +305,8 @@ export function NewListingForm({
                 <Tag size={16} />
               </div>
               <div>
-                <span className="mt-l">I'm selling</span>
-                <span className="mt-s">Post something you have and want to sell or trade.</span>
+                <span className="mt-l">{i18n.t('...new.newListingForm.imSelling')}</span>
+                <span className="mt-s">{i18n.t('...new.newListingForm.postSomethingYouHaveAnd')}</span>
               </div>
             </button>
             <button
@@ -320,8 +321,8 @@ export function NewListingForm({
                 <Search size={16} />
               </div>
               <div>
-                <span className="mt-l">I'm looking for (ISO)</span>
-                <span className="mt-s">Post a wanted ad. Sellers with a match can DM you.</span>
+                <span className="mt-l">{i18n.t('...new.newListingForm.imLookingForIso')}</span>
+                <span className="mt-s">{i18n.t('...new.newListingForm.postAWantedAdSellers')}</span>
               </div>
             </button>
           </div>
@@ -334,22 +335,22 @@ export function NewListingForm({
                 <path d="M12 8v4M12 16h.01" />
               </svg>
               <div>
-                <strong>Wanted posts are public.</strong> Every {marketplaceName} seller can see this — and Shouks will ping you when a new listing matches your criteria. Your budget is visible; your name and contact stay private until you reply.
+                <strong>{i18n.t('...new.newListingForm.wantedPostsArePublic')}</strong> {i18n.t('...new.newListingForm.every')} {marketplaceName} {i18n.t('...new.newListingForm.sellerCanSeeThisAnd')}
               </div>
             </div>
           )}
 
       {/* Basics */}
       <section className="bg-surface border border-line rounded-[14px] p-5 space-y-4">
-        <h2 className="text-[14px] font-semibold">Basics</h2>
+        <h2 className="text-[14px] font-semibold">{i18n.t('...new.newListingForm.basics')}</h2>
 
         <div>
-          <Label htmlFor="title" required>Title</Label>
+          <Label htmlFor="title" required>{i18n.t('common.title')}</Label>
           <Input
             id="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder={type === "ISO" ? "WTB: 1985 Rolex Submariner 5513" : "1989 Ferrari F40 · Rosso Corsa"}
+            placeholder={type === "ISO" ? i18n.t('...new.newListingForm.wtb1985RolexSubmariner5513') : i18n.t('...new.newListingForm.1989FerrariF40RossoCorsa')}
             maxLength={200}
             data-testid="listing-field-title"
           />
@@ -357,7 +358,7 @@ export function NewListingForm({
 
         <div>
           <Label htmlFor="description">
-            {type === "ISO" ? "What you're looking for" : "Description"}
+            {type === "ISO" ? i18n.t('...new.newListingForm.whatYoureLookingFor') : i18n.t('common.description')}
           </Label>
           <Textarea
             id="description"
@@ -365,8 +366,8 @@ export function NewListingForm({
             onChange={(e) => setDescription(e.target.value)}
             placeholder={
               type === "ISO"
-                ? "Condition, years, specifics — anything that matters."
-                : "History, condition, provenance. More detail = better offers."
+                ? i18n.t('...new.newListingForm.conditionYearsSpecificsAnythingThat')
+                : i18n.t('...new.newListingForm.historyConditionProvenanceMoreDetail')
             }
             data-testid="listing-field-description"
           />
@@ -376,12 +377,12 @@ export function NewListingForm({
       {/* Pricing */}
       <section className="bg-surface border border-line rounded-[14px] p-5 space-y-4">
         <h2 className="text-[14px] font-semibold">
-          {type === "AUCTION" ? "Auction" : type === "ISO" ? "Budget" : "Price"}
+          {type === "AUCTION" ? i18n.t('common.auction') : type === "ISO" ? i18n.t('common.budget') : i18n.t('common.price')}
         </h2>
 
         {type === "FIXED" && (
           <div>
-            <Label htmlFor="price" required>Price (USD)</Label>
+            <Label htmlFor="price" required>{i18n.t('...new.newListingForm.priceUsd')}</Label>
             <div className="relative max-w-[200px]">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-[14px]">$</span>
               <Input
@@ -402,7 +403,7 @@ export function NewListingForm({
         {type === "ISO" && (
           <>
             <div>
-              <Label htmlFor="budget">Budget ceiling (optional)</Label>
+              <Label htmlFor="budget">{i18n.t('...new.newListingForm.budgetCeilingOptional')}</Label>
               <div className="relative max-w-[200px]">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-[14px]">$</span>
                 <Input
@@ -417,23 +418,23 @@ export function NewListingForm({
                   data-testid="price-input"
                 />
               </div>
-              <Help>Leave blank if budget is open.</Help>
+              <Help>{i18n.t('...new.newListingForm.leaveBlankIfBudgetIs')}</Help>
             </div>
             <div>
-              <Label>Alert frequency</Label>
+              <Label>{i18n.t('...new.newListingForm.alertFrequency')}</Label>
               <div className="max-w-[240px]">
                 <Select value={alertFrequency} onValueChange={setAlertFrequency}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="INSTANT">Instant</SelectItem>
-                    <SelectItem value="DAILY">Daily digest</SelectItem>
-                    <SelectItem value="WEEKLY">Weekly digest</SelectItem>
+                    <SelectItem value="INSTANT">{i18n.t('...new.newListingForm.instant')}</SelectItem>
+                    <SelectItem value="DAILY">{i18n.t('...new.newListingForm.dailyDigest')}</SelectItem>
+                    <SelectItem value="WEEKLY">{i18n.t('...new.newListingForm.weeklyDigest')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <Help>We'll notify you when matches are posted.</Help>
+              <Help>{i18n.t('...new.newListingForm.wellNotifyYouWhenMatches')}</Help>
             </div>
           </>
         )}
@@ -441,7 +442,7 @@ export function NewListingForm({
         {type === "AUCTION" && (
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <Label htmlFor="auction-start" required>Starting bid</Label>
+              <Label htmlFor="auction-start" required>{i18n.t('common.startingBid')}</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-[14px]">$</span>
                 <Input
@@ -457,7 +458,7 @@ export function NewListingForm({
               </div>
             </div>
             <div>
-              <Label htmlFor="auction-reserve">Reserve (optional)</Label>
+              <Label htmlFor="auction-reserve">{i18n.t('...new.newListingForm.reserveOptional')}</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-[14px]">$</span>
                 <Input
@@ -471,10 +472,10 @@ export function NewListingForm({
                   data-testid="auction-reserve"
                 />
               </div>
-              <Help>If the top bid doesn't meet this, no sale.</Help>
+              <Help>{i18n.t('...new.newListingForm.ifTheTopBidDoesnt')}</Help>
             </div>
             <div>
-              <Label htmlFor="auction-increment" required>Min increment</Label>
+              <Label htmlFor="auction-increment" required>{i18n.t('...new.newListingForm.minIncrement')}</Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-[14px]">$</span>
                 <Input
@@ -490,7 +491,7 @@ export function NewListingForm({
               </div>
             </div>
             <div>
-              <Label htmlFor="auction-duration" required>Duration</Label>
+              <Label htmlFor="auction-duration" required>{i18n.t('common.duration')}</Label>
               <Select value={duration} onValueChange={setDuration}>
                 <SelectTrigger data-testid="auction-duration">
                   <SelectValue />
@@ -513,10 +514,10 @@ export function NewListingForm({
         <section className="bg-surface border border-line rounded-[14px] p-5 space-y-3">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-[14px] font-semibold">{imageField?.label || "Photos"}</h2>
+              <h2 className="text-[14px] font-semibold">{imageField?.label || i18n.t('...new.newListingForm.photos')}</h2>
               <p className="text-[12px] text-muted mt-0.5">
-                Upload from your device, or paste an image URL.
-                {imageField?.minImages ? ` At least ${imageField.minImages}.` : ""}
+                {i18n.t('...new.newListingForm.uploadFromYourDeviceOr')}
+                {imageField?.minImages ? i18n.t('...new.newListingForm.atLeastMinimages', { minImages: String(imageField.minImages) }) : ""}
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -526,7 +527,7 @@ export function NewListingForm({
                     className="inline-flex items-center h-9 px-3 rounded-[9px] border border-line bg-surface hover:bg-hover text-[13px] font-medium cursor-pointer gap-1.5"
                     data-testid="images-upload"
                   >
-                    <Plus size={14} /> Upload
+                    <Plus size={14} /> {i18n.t('common.upload')}
                     <input
                       type="file"
                       accept="image/jpeg,image/png,image/webp,image/gif"
@@ -546,7 +547,7 @@ export function NewListingForm({
                               });
                               if (!res.ok) {
                                 const { error } = await res.json().catch(() => ({}));
-                                throw new Error(error ?? "Upload failed");
+                                throw new Error(error ?? i18n.t('...new.newListingForm.uploadFailed'));
                               }
                               const { uploadUrl, publicUrl } = await res.json();
                               await fetch(uploadUrl, {
@@ -571,7 +572,7 @@ export function NewListingForm({
                     />
                   </label>
                   <Button type="button" variant="secondary" size="sm" className="gap-1.5" onClick={addImage}>
-                    <Plus size={14} /> Add URL
+                    <Plus size={14} /> {i18n.t('...new.newListingForm.addUrl')}
                   </Button>
                 </>
               )}
@@ -602,7 +603,7 @@ export function NewListingForm({
                     type="button"
                     onClick={() => removeImage(i)}
                     className="h-9 w-9 rounded-[8px] border border-line text-ink-soft hover:bg-hover grid place-items-center flex-none"
-                    aria-label="Remove image"
+                    aria-label={i18n.t('...new.newListingForm.removeImageAria-label')}
                   >
                     <Trash2 size={14} />
                   </button>
@@ -610,7 +611,7 @@ export function NewListingForm({
               </div>
             ))}
           </div>
-          <Help>Up to {maxImages} images. JPEG / PNG / WebP.</Help>
+          <Help>{i18n.t('...new.newListingForm.upTo')} {maxImages} {i18n.t('...new.newListingForm.imagesJpegPngWebp')}</Help>
         </section>
       )}
 
@@ -624,70 +625,70 @@ export function NewListingForm({
         className="bg-surface border border-line rounded-[14px] p-5 space-y-4"
         data-testid="watch-details-section"
       >
-        <h2 className="text-[14px] font-semibold">Details</h2>
+        <h2 className="text-[14px] font-semibold">{i18n.t('common.details')}</h2>
         <p className="text-[12.5px] text-muted -mt-3">
-          All optional — fill in what you know.
+          {i18n.t('...new.newListingForm.allOptionalFillInWhat')}
         </p>
 
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="watch-brand">Brand</Label>
+            <Label htmlFor="watch-brand">{i18n.t('...new.newListingForm.brand')}</Label>
             <Input
               id="watch-brand"
               value={(schemaValues.brand as string) ?? ""}
               onChange={(e) => setField("brand", e.target.value)}
-              placeholder="Rolex"
+              placeholder={i18n.t('...new.newListingForm.rolexPlaceholder')}
               data-testid="watch-field-brand"
             />
           </div>
           <div>
-            <Label htmlFor="watch-model">Model</Label>
+            <Label htmlFor="watch-model">{i18n.t('...new.newListingForm.model')}</Label>
             <Input
               id="watch-model"
               value={(schemaValues.model as string) ?? ""}
               onChange={(e) => setField("model", e.target.value)}
-              placeholder="Submariner 124060"
+              placeholder={i18n.t('...new.newListingForm.submariner124060Placeholder')}
               data-testid="watch-field-model"
             />
           </div>
           <div>
-            <Label htmlFor="watch-case-size">Case size</Label>
+            <Label htmlFor="watch-case-size">{i18n.t('...new.newListingForm.caseSize')}</Label>
             <Input
               id="watch-case-size"
               value={(schemaValues.case_size as string) ?? ""}
               onChange={(e) => setField("case_size", e.target.value)}
-              placeholder="41mm"
+              placeholder={i18n.t('...new.newListingForm.41mmPlaceholder')}
               data-testid="watch-field-case-size"
             />
           </div>
           <div>
-            <Label htmlFor="watch-dial-color">Dial color</Label>
+            <Label htmlFor="watch-dial-color">{i18n.t('...new.newListingForm.dialColor')}</Label>
             <Input
               id="watch-dial-color"
               value={(schemaValues.dial_color as string) ?? ""}
               onChange={(e) => setField("dial_color", e.target.value)}
-              placeholder="Black"
+              placeholder={i18n.t('...new.newListingForm.blackPlaceholder')}
               data-testid="watch-field-dial-color"
             />
           </div>
           <div className="sm:col-span-2">
-            <Label htmlFor="watch-case-material">Case material</Label>
+            <Label htmlFor="watch-case-material">{i18n.t('...new.newListingForm.caseMaterial')}</Label>
             <Select
               value={(schemaValues.case_material as string) ?? ""}
               onValueChange={(v) => setField("case_material", v)}
             >
               <SelectTrigger id="watch-case-material" data-testid="watch-field-case-material">
-                <SelectValue placeholder="Select a material" />
+                <SelectValue placeholder={i18n.t('...new.newListingForm.selectAMaterialPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Stainless Steel">Stainless Steel</SelectItem>
-                <SelectItem value="Yellow Gold">Yellow Gold</SelectItem>
-                <SelectItem value="White Gold">White Gold</SelectItem>
-                <SelectItem value="Rose Gold">Rose Gold</SelectItem>
-                <SelectItem value="Titanium">Titanium</SelectItem>
-                <SelectItem value="Platinum">Platinum</SelectItem>
-                <SelectItem value="Two-tone">Two-tone</SelectItem>
-                <SelectItem value="Other">Other</SelectItem>
+                <SelectItem value="Stainless Steel">{i18n.t('...new.newListingForm.stainlessSteel')}</SelectItem>
+                <SelectItem value="Yellow Gold">{i18n.t('...new.newListingForm.yellowGold')}</SelectItem>
+                <SelectItem value="White Gold">{i18n.t('...new.newListingForm.whiteGold')}</SelectItem>
+                <SelectItem value="Rose Gold">{i18n.t('...new.newListingForm.roseGold')}</SelectItem>
+                <SelectItem value="Titanium">{i18n.t('...new.newListingForm.titanium')}</SelectItem>
+                <SelectItem value="Platinum">{i18n.t('...new.newListingForm.platinum')}</SelectItem>
+                <SelectItem value="Two-tone">{i18n.t('...new.newListingForm.twotone')}</SelectItem>
+                <SelectItem value="Other">{i18n.t('...new.newListingForm.other')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -701,7 +702,7 @@ export function NewListingForm({
               onChange={(e) => setField("box", e.target.checked)}
               data-testid="watch-field-box"
             />
-            Original box
+            {i18n.t('...new.newListingForm.originalBox')}
           </label>
           <label className="flex items-center gap-2 text-[13px]">
             <input
@@ -710,7 +711,7 @@ export function NewListingForm({
               onChange={(e) => setField("papers", e.target.checked)}
               data-testid="watch-field-papers"
             />
-            Original papers
+            {i18n.t('...new.newListingForm.originalPapers')}
           </label>
         </div>
       </section>
@@ -721,7 +722,7 @@ export function NewListingForm({
           data-entry parity with the existing schema mechanism.*/}
       {false && nonImageFields.length > 0 && (
         <section className="bg-surface border border-line rounded-[14px] p-5 space-y-5">
-          <h2 className="text-[14px] font-semibold">Details</h2>
+          <h2 className="text-[14px] font-semibold">{i18n.t('common.details')}</h2>
           {nonImageFields.map((f) => (
             <SchemaFieldInput
               key={f.id}
@@ -747,25 +748,25 @@ export function NewListingForm({
             router.push(isEditing ? `/l/${existing!.id}` : `/m/${slug}/feed`)
           }
         >
-          Cancel
+          {i18n.t('common.cancel')}
         </Button>
         <Button type="submit" disabled={submitting} data-testid="submit-listing">
           {submitting
-            ? isEditing ? "Saving…" : "Publishing…"
-            : isEditing ? "Save changes" : "Publish listing"}
+            ? isEditing ? i18n.t('common.saving') : i18n.t('common.publishing')
+            : isEditing ? i18n.t('common.saveChanges') : i18n.t('...new.newListingForm.publishListing')}
         </Button>
       </div>
         </form>
       </div>
 
-      <aside className="cl-right" aria-label="Live preview">
+      <aside className="cl-right" aria-label={i18n.t('...new.newListingForm.livePreviewAria-label')}>
         <div className="preview">
           <div className="preview-hd">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
               <circle cx="12" cy="12" r="3" />
             </svg>
-            Live preview
+            {i18n.t('...new.newListingForm.livePreviewAria-label')}
           </div>
           <div
             className="preview-img"
@@ -778,7 +779,7 @@ export function NewListingForm({
             }
           />
           <div className="preview-body">
-            {isISO && <div className="iso-preview-tag">Wanted · ISO</div>}
+            {isISO && <div className="iso-preview-tag">{i18n.t('common.wantedIso')}</div>}
             <div className="p-t">{title.trim() || (isISO ? "What you're looking for" : "Your listing title")}</div>
             <div className="p-p">{previewPrice}</div>
             {Object.entries(schemaValues).slice(0, 4).map(([k, v]) => {
@@ -952,7 +953,7 @@ function SchemaFieldInput({
           <div className="max-w-[320px]">
             <Select value={(value as string) ?? ""} onValueChange={onChange}>
               <SelectTrigger data-testid={testid}>
-                <SelectValue placeholder="Choose…" />
+                <SelectValue placeholder={i18n.t('...new.newListingForm.choosePlaceholder')} />
               </SelectTrigger>
               <SelectContent>
                 {(field.options ?? []).map((opt) => (

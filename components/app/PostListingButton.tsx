@@ -4,6 +4,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Plus } from "lucide-react";
+import { i18n } from '@shipeasy/sdk/client'
 
 type Marketplace = {
   id: string;
@@ -36,7 +37,7 @@ export function PostListingButton({ marketplaces }: { marketplaces: Marketplace[
         style={{ width: "100%", justifyContent: "center", marginTop: 10, height: 32, fontSize: 12 }}
         data-testid="post-listing-button"
       >
-        <Plus size={14} /> Post a new listing
+        <Plus size={14} /> {i18n.t('...app.postListingButton.postANewListing')}
       </button>
     );
   }
@@ -50,7 +51,7 @@ export function PostListingButton({ marketplaces }: { marketplaces: Marketplace[
           style={{ width: "100%", justifyContent: "center", marginTop: 10, height: 32, fontSize: 12 }}
           data-testid="post-listing-button"
         >
-          <Plus size={14} /> Post a new listing
+          <Plus size={14} /> {i18n.t('...app.postListingButton.postANewListing')}
         </button>
       </Dialog.Trigger>
       <Dialog.Portal>
@@ -59,9 +60,9 @@ export function PostListingButton({ marketplaces }: { marketplaces: Marketplace[
           className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface rounded-[14px] border border-line shadow-xl w-[420px] max-w-[92vw] p-5 z-50"
           data-testid="post-listing-dialog"
         >
-          <Dialog.Title className="text-[16px] font-semibold mb-1">Post a new listing</Dialog.Title>
+          <Dialog.Title className="text-[16px] font-semibold mb-1">{i18n.t('...app.postListingButton.postANewListing')}</Dialog.Title>
           <Dialog.Description className="text-[13px] text-muted mb-4">
-            Pick which marketplace this listing goes in.
+            {i18n.t('...app.postListingButton.pickWhichMarketplaceThisListing')}
           </Dialog.Description>
 
           <div className="space-y-1.5 max-h-[280px] overflow-y-auto">
@@ -100,7 +101,7 @@ export function PostListingButton({ marketplaces }: { marketplaces: Marketplace[
           <div className="flex justify-end gap-2 mt-5">
             <Dialog.Close asChild>
               <button type="button" className="btn btn-secondary" data-testid="post-listing-cancel">
-                Cancel
+                {i18n.t('common.cancel')}
               </button>
             </Dialog.Close>
             <button
@@ -115,7 +116,7 @@ export function PostListingButton({ marketplaces }: { marketplaces: Marketplace[
                 }
               }}
             >
-              Continue
+              {i18n.t('common.continue')}
             </button>
           </div>
         </Dialog.Content>

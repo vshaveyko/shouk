@@ -16,6 +16,7 @@ import { createRequire } from "module";
 import { existsSync } from "fs";
 import { execSync } from "child_process";
 import { toDataURL as qrToDataURL } from "qrcode";
+import { i18n } from '@shipeasy/sdk/client'
 
 const _require = createRequire(import.meta.url);
 
@@ -141,7 +142,7 @@ class WhatsAppSessionManager {
             );
             return {
               id: c.id?._serialized ?? c.id,
-              name: c.name ?? "Group",
+              name: c.name ?? i18n.t('...lib.whatsapp.group'),
               isAdmin,
               memberCount: (c.participants ?? []).length,
             };

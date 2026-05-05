@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const runtime = "nodejs";
 
@@ -26,7 +27,7 @@ export async function GET(_req: Request, props: { params: Promise<{ slug: string
     orderBy: { joinedAt: "desc" },
   });
 
-  const header = ["Name", "Email", "Role", "Joined"];
+  const header = [i18n.t('common.name'), i18n.t('common.email'), i18n.t('common.role'), i18n.t('common.joined')];
   const rows = members.map((m) => [
     csvEscape(m.user.displayName ?? m.user.name ?? ""),
     csvEscape(m.user.email ?? ""),

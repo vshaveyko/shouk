@@ -2,11 +2,12 @@ import { redirect } from "next/navigation";
 import { getUserContext } from "@/lib/auth-helpers";
 import { Navbar } from "@/components/app/Navbar";
 import { CreateMarketplaceWizard } from "./CreateMarketplaceWizard";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Create a marketplace",
+  title: i18n.t('common.createAMarketplace'),
 };
 
 export default async function CreateMarketplacePage() {

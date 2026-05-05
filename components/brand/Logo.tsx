@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { i18n } from '@shipeasy/sdk/client'
 
 export function ShouksMark({
   size = 28,
@@ -62,7 +63,7 @@ export function BrandLockup({
       style={{ fontSize: size * 0.65, letterSpacing: "-0.02em" }}
     >
       <ShouksMark size={size} />
-      <span>Shouks</span>
+      <span>{i18n.t('common.shouks')}</span>
     </a>
   );
 }

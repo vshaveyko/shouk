@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { OwnerShell } from "@/components/owner/OwnerShell";
 import { Avatar } from "@/components/ui/Avatar";
 import { formatCents, timeAgo } from "@/lib/utils";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
 
@@ -260,10 +261,10 @@ export default async function OwnerDashboardPage(
       const feed: Feed[] = [];
       for (const a of recentApproved) {
         if (!a.reviewedAt) continue;
-        const nm = a.user.displayName ?? a.user.name ?? "Applicant";
+        const nm = a.user.displayName ?? a.user.name ?? i18n.t('common.applicant');
         feed.push(
           a.status === "APPROVED"
-            ? { when: a.reviewedAt, kind: "ok", text: <><b>{nm}</b> approved · auto-notified by email</> }
+            ? { when: a.reviewedAt, kind: "ok", text: <><b>{nm}</b> {i18n.t('...dashboard.page.approvedAutonotifiedByEmail')}</> }
             : { when: a.reviewedAt, kind: "no", text: <><b>{nm}</b> rejected</> },
         );
       }
@@ -272,22 +273,22 @@ export default async function OwnerDashboardPage(
           feed.push({
             when: l.createdAt,
             kind: "bid",
-            text: <>New listing <b>{l.title}</b> needs approval</>,
+            text: <>{i18n.t('...dashboard.page.newListing')} <b>{l.title}</b> {i18n.t('...dashboard.page.needsApproval')}</>,
           });
         } else if (l.status === "ACTIVE") {
           feed.push({
             when: l.createdAt,
             kind: "new",
-            text: <>Listing <b>{l.title}</b> published</>,
+            text: <>{i18n.t('common.listing')} <b>{l.title}</b> published</>,
           });
         }
       }
       for (const a of recentApps2) {
-        const nm = a.user.displayName ?? a.user.name ?? "Applicant";
+        const nm = a.user.displayName ?? a.user.name ?? i18n.t('common.applicant');
         feed.push({
           when: a.createdAt,
           kind: "new",
-          text: <><b>{nm}</b> applied for membership</>,
+          text: <><b>{nm}</b> {i18n.t('...dashboard.page.appliedForMembership')}</>,
         });
       }
       for (const s of soldListings) {
@@ -295,11 +296,11 @@ export default async function OwnerDashboardPage(
         feed.push({
           when: s.soldAt,
           kind: "ok",
-          text: <>Listing <b>{s.title}</b> sold — {formatCents(s.priceCents ?? 0, s.currency ?? "USD")}</>,
+          text: <>{i18n.t('common.listing')} <b>{s.title}</b> {i18n.t('...dashboard.page.sold')} {formatCents(s.priceCents ?? 0, s.currency ?? "USD")}</>,
         });
       }
       for (const b of recentBids) {
-        const bidder = b.user.displayName ?? b.user.name ?? "Bidder";
+        const bidder = b.user.displayName ?? b.user.name ?? i18n.t('...dashboard.page.bidder');
         feed.push({
           when: b.createdAt,
           kind: "bid",
@@ -330,25 +331,25 @@ export default async function OwnerDashboardPage(
               {marketplace.name}
             </h2>
             <h1>
-              Welcome back, <em>{displayOwner}</em>.
+              {i18n.t('common.welcomeBack')} <em>{displayOwner}</em>.
             </h1>
             <div className="lead">
               {pendingApps + totalListingsToApprove > 0 ? (
                 <>
-                  You have{" "}
+                  {i18n.t('...dashboard.page.youHave')}{" "}
                   <b style={{ color: "var(--ink)" }}>{pendingApps} applications</b>
                   {" "}and{" "}
                   <b style={{ color: "var(--ink)" }}>{totalListingsToApprove} listings</b>
-                  {" "}waiting for review. Most owners handle their queue once or twice a day.
+                  {" "}{i18n.t('...dashboard.page.waitingForReviewMostOwners')}
                 </>
               ) : (
-                <>Queue is clear. Check analytics when you have a moment.</>
+                <>{i18n.t('...dashboard.page.queueIsClearCheckAnalytics')}</>
               )}
             </div>
           </div>
           <div className="ph-actions">
             <Link href={`/owner/${marketplace.slug}/applications`} className="btn btn-dark">
-              Review queue
+              {i18n.t('common.reviewQueue')}
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
@@ -366,13 +367,13 @@ export default async function OwnerDashboardPage(
                 <path d="M12 9v4M12 17h.01" />
                 <circle cx="12" cy="12" r="10" />
               </svg>
-              Pending applications
+              {i18n.t('common.pendingApplications')}
             </div>
             <div className="m-num">{pendingApps}</div>
             {pendingAppsAging > 0 ? (
-              <div className="m-delta warn">{pendingAppsAging} waiting over 48h</div>
+              <div className="m-delta warn">{pendingAppsAging} {i18n.t('...dashboard.page.waitingOver48h')}</div>
             ) : (
-              <div className="m-delta">All handled within 48h</div>
+              <div className="m-delta">{i18n.t('...dashboard.page.allHandledWithin48h')}</div>
             )}
             <span className="m-arrow">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -387,11 +388,11 @@ export default async function OwnerDashboardPage(
                 <rect x="3" y="3" width="18" height="18" rx="2" />
                 <path d="M3 9h18" />
               </svg>
-              Listings to approve
+              {i18n.t('...dashboard.page.listingsToApprove')}
             </div>
             <div className="m-num">{totalListingsToApprove}</div>
             <div className="m-delta">
-              {pendingListingsNew} new · {pendingListingsEdited} edited
+              {pendingListingsNew} {i18n.t('...dashboard.page.new')} {pendingListingsEdited} edited
             </div>
             <span className="m-arrow">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -406,13 +407,13 @@ export default async function OwnerDashboardPage(
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                 <circle cx="9" cy="7" r="4" />
               </svg>
-              Active members
+              {i18n.t('...dashboard.page.activeMembers')}
             </div>
             <div className="m-num">{memberCount}</div>
             {activeMembersLast7d > 0 ? (
-              <div className="m-delta up">+{activeMembersLast7d} this week</div>
+              <div className="m-delta up">+{activeMembersLast7d} {i18n.t('...dashboard.page.thisWeek')}</div>
             ) : (
-              <div className="m-delta">No new members this week</div>
+              <div className="m-delta">{i18n.t('...dashboard.page.noNewMembersThisWeek')}</div>
             )}
           </Link>
 
@@ -422,13 +423,13 @@ export default async function OwnerDashboardPage(
                 <path d="M3 3v18h18" />
                 <path d="m7 14 4-4 4 4 5-5" />
               </svg>
-              Gross market value (30d)
+              {i18n.t('...dashboard.page.grossMarketValue30d')}
             </div>
             <div className="m-num">{formatShortCurrency(gmvCents)}</div>
             <div className={gmvDeltaCents >= 0 ? "m-delta up" : "m-delta"}>
               {gmvSalesCount} {gmvSalesCount === 1 ? "sale" : "sales"}
               {gmvPrevCents > 0
-                ? ` · ${gmvDeltaCents >= 0 ? "+" : ""}${formatShortCurrency(gmvDeltaCents)} vs prev`
+                ? i18n.t('...dashboard.page.var0formatshortcurrencyresultVsPrev', { var0: gmvDeltaCents >= 0 ? "+" : "", formatShortCurrencyResult: formatShortCurrency(gmvDeltaCents) })
                 : ""}
             </div>
           </div>
@@ -438,27 +439,27 @@ export default async function OwnerDashboardPage(
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 6h16M4 12h10M4 18h16" />
               </svg>
-              Active listings
+              {i18n.t('common.activeListings')}
             </div>
             <div className="m-num">{activeListingsCount}</div>
-            <div className="m-delta">Currently published</div>
+            <div className="m-delta">{i18n.t('...dashboard.page.currentlyPublished')}</div>
           </Link>
         </div>
 
         <div className="section-grid">
           <div className="panel">
             <div className="panel-hd">
-              <h3>Latest applications</h3>
+              <h3>{i18n.t('...dashboard.page.latestApplications')}</h3>
               <Link
                 href={`/owner/${marketplace.slug}/applications`}
                 className="view-all"
               >
-                View all {pendingApps} →
+                {i18n.t('...dashboard.page.viewAll')} {pendingApps} →
               </Link>
             </div>
             <div>
               {recentApps.length === 0 ? (
-                <div className="empty">Queue is clear.</div>
+                <div className="empty">{i18n.t('...dashboard.page.queueIsClear')}</div>
               ) : (
                 recentApps.map((a, i) => {
                   const nm = a.user.displayName ?? a.user.name ?? a.user.email;
@@ -480,9 +481,9 @@ export default async function OwnerDashboardPage(
                       <div className="ar-body">
                         <div className="ar-name">{nm}</div>
                         <div className="ar-meta">
-                          <span>Applicant</span>
+                          <span>{i18n.t('common.applicant')}</span>
                           <span className="dot"></span>
-                          <span>{verified} verified account{verified === 1 ? "" : "s"}</span>
+                          <span>{verified} {i18n.t('common.verifiedAccount')}{verified === 1 ? "" : "s"}</span>
                         </div>
                       </div>
                       <div className="ar-time">{timeAgo(a.createdAt)}</div>
@@ -500,14 +501,14 @@ export default async function OwnerDashboardPage(
 
           <div className="panel">
             <div className="panel-hd">
-              <h3>Recent activity</h3>
+              <h3>{i18n.t('...dashboard.page.recentActivity')}</h3>
               <Link href={`/owner/${marketplace.slug}/listings`} className="view-all">
-                Full history →
+                {i18n.t('...dashboard.page.fullHistory')}
               </Link>
             </div>
             <div>
               {recentActivity.length === 0 ? (
-                <div className="empty">Activity will show up here.</div>
+                <div className="empty">{i18n.t('...dashboard.page.activityWillShowUpHere')}</div>
               ) : (
                 recentActivity.map((row, i) => (
                   <div key={i} className="feed-row">

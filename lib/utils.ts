@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { i18n } from '@shipeasy/sdk/client'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -81,10 +82,10 @@ export const categories = [
 ];
 
 export const verifyProviders = [
-  { id: "GOOGLE", label: "Google" },
-  { id: "FACEBOOK", label: "Facebook" },
-  { id: "INSTAGRAM", label: "Instagram" },
+  { id: "GOOGLE", label: i18n.t('...lib.utils.google') },
+  { id: "FACEBOOK", label: i18n.t('...lib.utils.facebook') },
+  { id: "INSTAGRAM", label: i18n.t('...lib.utils.instagram') },
   { id: "LINKEDIN", label: "LinkedIn" },
-  { id: "TWITTER", label: "X / Twitter" },
-  { id: "PHONE", label: "Phone (SMS)" },
+  { id: "TWITTER", label: i18n.t('...lib.utils.xTwitter') },
+  { id: "PHONE", label: i18n.t('...lib.utils.phoneSms') },
 ] as const;

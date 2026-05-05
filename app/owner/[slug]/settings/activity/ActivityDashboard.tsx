@@ -15,6 +15,7 @@ import {
   CardContent,
 } from "@/components/ui";
 import { cn, formatCents } from "@/lib/utils";
+import { i18n } from '@shipeasy/sdk/client'
 
 type Analytics = {
   members: { total: number; last30: number; prev30: number };
@@ -74,7 +75,7 @@ export function ActivityDashboard({ slug }: { slug: string }) {
       <Card>
         <CardContent>
           <p className="text-[13px] text-danger" data-testid="activity-error">
-            {error ?? "No data available."}
+            {error ?? i18n.t('...activity.activityDashboard.noDataAvailable')}
           </p>
         </CardContent>
       </Card>
@@ -91,13 +92,13 @@ export function ActivityDashboard({ slug }: { slug: string }) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <StatCard
           testid="analytics-members-total"
-          label="Members"
+          label={i18n.t('common.members')}
           value={data.members.total.toLocaleString()}
           trend={memberDelta}
           trendLabel={
             memberPct != null
-              ? `${memberPct >= 0 ? "+" : ""}${memberPct}% vs prev 30d`
-              : `${data.members.last30} joined in the last 30d`
+              ? i18n.t('...activity.activityDashboard.var0memberpctVsPrev30d', { var0: memberPct >= 0 ? "+" : "", memberPct })
+              : i18n.t('...activity.activityDashboard.last30JoinedInTheLast', { last30: String(data.members.last30) })
           }
           sparkline={[
             data.members.prev30,
@@ -109,36 +110,36 @@ export function ActivityDashboard({ slug }: { slug: string }) {
         />
         <StatCard
           testid="analytics-members-last30"
-          label="New members (30d)"
+          label={i18n.t('...activity.activityDashboard.newMembers30d')}
           value={data.members.last30.toLocaleString()}
           trend={memberDelta}
           trendLabel={
             memberPct != null
-              ? `${memberPct >= 0 ? "+" : ""}${memberPct}% vs prev 30d`
-              : "First reporting window"
+              ? i18n.t('...activity.activityDashboard.var0memberpctVsPrev30d', { var0: memberPct >= 0 ? "+" : "", memberPct })
+              : i18n.t('...activity.activityDashboard.firstReportingWindow')
           }
         />
         <StatCard
           testid="analytics-listings-total"
-          label="Total listings"
+          label={i18n.t('...activity.activityDashboard.totalListings')}
           value={data.listings.total.toLocaleString()}
           trendLabel={`${data.listings.last7} added this week`}
         />
         <StatCard
           testid="analytics-listings-last30"
-          label="Listings (30d)"
+          label={i18n.t('...activity.activityDashboard.listings30d')}
           value={data.listings.last30.toLocaleString()}
           trendLabel={`${data.listings.last7} of those in the last 7d`}
         />
         <StatCard
           testid="analytics-applications-pending"
-          label="Pending applications"
+          label={i18n.t('common.pendingApplications')}
           value={data.applications.pending.toLocaleString()}
           trendLabel={`${data.applications.approvedLast30} approved in 30d`}
         />
         <StatCard
           testid="analytics-applications-reviewed"
-          label="Reviewed apps (30d)"
+          label={i18n.t('...activity.activityDashboard.reviewedApps30d')}
           value={(
             data.applications.approvedLast30 + data.applications.rejectedLast30
           ).toLocaleString()}
@@ -148,9 +149,9 @@ export function ActivityDashboard({ slug }: { slug: string }) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Revenue</CardTitle>
+          <CardTitle>{i18n.t('common.revenue')}</CardTitle>
           <CardDescription>
-            Estimated based on active members and configured pricing.
+            {i18n.t('...activity.activityDashboard.estimatedBasedOnActiveMembers')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -160,7 +161,7 @@ export function ActivityDashboard({ slug }: { slug: string }) {
               data-testid="analytics-revenue-monthly"
             >
               <div className="text-[12px] uppercase tracking-[0.14em] text-muted font-semibold">
-                Active monthly
+                {i18n.t('...activity.activityDashboard.activeMonthly')}
               </div>
               <div className="text-[24px] font-semibold tracking-[-0.01em] tabular-nums mt-1">
                 {formatCents(data.revenue.activeMonthlyCents)}
@@ -171,7 +172,7 @@ export function ActivityDashboard({ slug }: { slug: string }) {
               data-testid="analytics-revenue-annual"
             >
               <div className="text-[12px] uppercase tracking-[0.14em] text-muted font-semibold">
-                Active annual
+                {i18n.t('...activity.activityDashboard.activeAnnual')}
               </div>
               <div className="text-[24px] font-semibold tracking-[-0.01em] tabular-nums mt-1">
                 {formatCents(data.revenue.activeAnnualCents)}

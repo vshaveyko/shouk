@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
 import { applicationApprovedHtml } from "@/app/emails/emailHtml";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const runtime = "nodejs";
 
@@ -92,8 +93,8 @@ export async function POST(req: Request, props: { params: Promise<{ id: string }
       title: newStatus === "APPROVED"
         ? `You're in! ${application.marketplace.name} approved your application.`
         : newStatus === "REJECTED"
-          ? `${application.marketplace.name} didn't approve your application.`
-          : `${application.marketplace.name} asked for more info.`,
+          ? i18n.t('...[id].route.nameDidntApproveYourApplication', { name: String(application.marketplace.name) })
+          : i18n.t('...[id].route.nameAskedForMoreInfo', { name: String(application.marketplace.name) }),
       preview: parsed.data.note ?? null,
       deeplink: newStatus === "APPROVED" ? `/m/${application.marketplace.slug}` : `/apply/${application.marketplace.slug}`,
     },

@@ -1,3 +1,4 @@
+import { i18n } from '@shipeasy/sdk/client'
 /**
  * Minimal transactional-email sender (SHK-044). V1 plumbing:
  *
@@ -34,7 +35,7 @@ export async function sendEmail({
   from,
 }: SendEmailInput): Promise<{ ok: boolean; id?: string; reason?: string }> {
   const apiKey = process.env.RESEND_API_KEY;
-  const sender = from ?? process.env.EMAIL_FROM ?? "Shouks <noreply@shouks.test>";
+  const sender = from ?? process.env.EMAIL_FROM ?? i18n.t('...lib.email.shouksNoreplyshoukstest');
 
   if (!apiKey) {
     if (process.env.NODE_ENV !== "production") {

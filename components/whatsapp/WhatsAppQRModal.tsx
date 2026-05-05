@@ -12,6 +12,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { X, Check, Users } from "lucide-react";
+import { i18n } from '@shipeasy/sdk/client'
 
 interface WhatsAppGroup {
   id: string;
@@ -67,7 +68,7 @@ export function WhatsAppQRModal(props: WhatsAppQRModalProps) {
         const res = await fetch("/api/whatsapp/session", { method: "POST" });
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
-          setError(err.error ?? "Failed to start session");
+          setError(err.error ?? i18n.t('...whatsapp.whatsAppQRModal.failedToStartSession'));
           return;
         }
         const { sessionId: id } = await res.json();
@@ -127,7 +128,7 @@ export function WhatsAppQRModal(props: WhatsAppQRModalProps) {
     })
       .then(async (r) => {
         const data = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(data.error ?? "Join failed");
+        if (!r.ok) throw new Error(data.error ?? i18n.t('...whatsapp.whatsAppQRModal.joinFailed'));
         props.onDone(data.joined ?? []);
       })
       .catch((e) => setError(e.message))
@@ -148,7 +149,7 @@ export function WhatsAppQRModal(props: WhatsAppQRModalProps) {
     })
       .then(async (r) => {
         const data = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(data.error ?? "Verify failed");
+        if (!r.ok) throw new Error(data.error ?? i18n.t('...whatsapp.whatsAppQRModal.verifyFailed'));
         props.onDone({ verified: !!data.verified, approved: !!data.approved });
       })
       .catch((e) => setError(e.message))
@@ -170,10 +171,10 @@ export function WhatsAppQRModal(props: WhatsAppQRModalProps) {
         }),
       });
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error ?? "Linking failed");
+      if (!res.ok) throw new Error(data.error ?? i18n.t('...whatsapp.whatsAppQRModal.linkingFailed'));
       props.onDone(selectedGroup.name, data.synced ?? 0);
     } catch (e: any) {
-      toast.error(e?.message ?? "Linking failed");
+      toast.error(e?.message ?? i18n.t('...whatsapp.whatsAppQRModal.linkingFailed'));
     } finally {
       setWorking(false);
     }
@@ -193,16 +194,16 @@ export function WhatsAppQRModal(props: WhatsAppQRModalProps) {
             </svg>
             <h2 className="font-semibold text-base">
               {props.mode === "setup"
-                ? "Link WhatsApp Group"
+                ? i18n.t('...whatsapp.whatsAppQRModal.linkWhatsappGroup')
                 : props.mode === "verify"
-                  ? "Verify with WhatsApp"
-                  : "Join via WhatsApp"}
+                  ? i18n.t('common.verifyWithWhatsapp')
+                  : i18n.t('common.joinViaWhatsapp')}
             </h2>
           </div>
           <button
             onClick={onClose}
             className="p-1 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted"
-            aria-label="Close"
+            aria-label={i18n.t('common.close')}
           >
             <X className="h-4 w-4" />
           </button>
@@ -221,7 +222,7 @@ export function WhatsAppQRModal(props: WhatsAppQRModalProps) {
           {!error && status.state === "pending" && (
             <div className="flex flex-col items-center py-8 gap-3">
               <div className="w-8 h-8 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
-              <p className="text-sm text-muted-foreground">Starting WhatsApp…</p>
+              <p className="text-sm text-muted-foreground">{i18n.t('...whatsapp.whatsAppQRModal.startingWhatsapp')}</p>
             </div>
           )}
 
@@ -229,25 +230,24 @@ export function WhatsAppQRModal(props: WhatsAppQRModalProps) {
             <div className="flex flex-col items-center gap-3">
               <img
                 src={status.qrDataUri}
-                alt="WhatsApp QR"
+                alt={i18n.t('...whatsapp.whatsAppQRModal.whatsappQrAlt')}
                 className="rounded-xl border border-border w-56 h-56 object-contain"
               />
               <p className="text-xs text-muted-foreground text-center">
-                Open WhatsApp → <strong>Linked Devices</strong> → <strong>Link a Device</strong>
+                {i18n.t('...whatsapp.whatsAppQRModal.openWhatsapp')} <strong>{i18n.t('...whatsapp.whatsAppQRModal.linkedDevices')}</strong> → <strong>{i18n.t('...whatsapp.whatsAppQRModal.linkADevice')}</strong>
               </p>
-              <p className="text-[10px] text-muted-foreground/60">QR refreshes automatically</p>
+              <p className="text-[10px] text-muted-foreground/60">{i18n.t('...whatsapp.whatsAppQRModal.qrRefreshesAutomatically')}</p>
             </div>
           )}
 
           {!error && status.state === "authenticated" && props.mode === "setup" && (
             <div className="space-y-3" data-testid="whatsapp-group-picker">
               <p className="text-sm text-muted-foreground">
-                Signed in as <span className="font-mono font-medium">{status.phone}</span>. Pick
-                the group to link:
+                {i18n.t('...whatsapp.whatsAppQRModal.signedInAs')} <span className="font-mono font-medium">{status.phone}</span>{i18n.t('...whatsapp.whatsAppQRModal.pickTheGroupToLink')}
               </p>
               {(status.groups ?? []).filter((g) => g.isAdmin).length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-4">
-                  No groups found where you are an admin.
+                  {i18n.t('...whatsapp.whatsAppQRModal.noGroupsFoundWhereYou')}
                 </p>
               ) : (
                 <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
@@ -273,7 +273,7 @@ export function WhatsAppQRModal(props: WhatsAppQRModalProps) {
                             <p className="text-sm font-medium truncate">{g.name}</p>
                             <p className="text-xs text-muted-foreground flex items-center gap-1">
                               <Users className="h-3 w-3" />
-                              {g.memberCount} members — will be invited
+                              {g.memberCount} {i18n.t('...whatsapp.whatsAppQRModal.membersWillBeInvited')}
                             </p>
                           </div>
                         </div>
@@ -288,10 +288,10 @@ export function WhatsAppQRModal(props: WhatsAppQRModalProps) {
                 data-testid="whatsapp-setup-confirm"
               >
                 {working
-                  ? "Linking…"
+                  ? i18n.t('...whatsapp.whatsAppQRModal.linking')
                   : selectedGroup
-                    ? `Link "${selectedGroup.name}"`
-                    : "Select a group"}
+                    ? i18n.t('...whatsapp.whatsAppQRModal.linkName', { name: String(selectedGroup.name) })
+                    : i18n.t('...whatsapp.whatsAppQRModal.selectAGroup')}
               </Button>
             </div>
           )}
@@ -299,7 +299,7 @@ export function WhatsAppQRModal(props: WhatsAppQRModalProps) {
           {!error && status.state === "authenticated" && props.mode === "join" && (
             <div className="flex flex-col items-center py-8 gap-3">
               <div className="w-8 h-8 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
-              <p className="text-sm text-muted-foreground">Checking group memberships…</p>
+              <p className="text-sm text-muted-foreground">{i18n.t('...whatsapp.whatsAppQRModal.checkingGroupMemberships')}</p>
             </div>
           )}
 
@@ -307,14 +307,14 @@ export function WhatsAppQRModal(props: WhatsAppQRModalProps) {
             <div className="flex flex-col items-center py-8 gap-3">
               <div className="w-8 h-8 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
               <p className="text-sm text-muted-foreground">
-                Checking
+                {i18n.t('...whatsapp.whatsAppQRModal.checking')}
                 {props.groupName ? (
                   <>
                     {" "}
-                    membership of <strong>{props.groupName}</strong>
+                    {i18n.t('...whatsapp.whatsAppQRModal.membershipOf')} <strong>{props.groupName}</strong>
                   </>
                 ) : (
-                  <> group membership</>
+                  <> {i18n.t('...whatsapp.whatsAppQRModal.groupMembership')}</>
                 )}
                 …
               </p>
@@ -323,9 +323,9 @@ export function WhatsAppQRModal(props: WhatsAppQRModalProps) {
 
           {status.state === "expired" && (
             <div className="text-center py-6 space-y-3">
-              <p className="text-sm text-muted-foreground">Session expired. Close and try again.</p>
+              <p className="text-sm text-muted-foreground">{i18n.t('...whatsapp.whatsAppQRModal.sessionExpiredCloseAndTry')}</p>
               <Button variant="secondary" onClick={onClose}>
-                Close
+                {i18n.t('common.close')}
               </Button>
             </div>
           )}

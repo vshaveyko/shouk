@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/Button";
 import { Input, Label } from "@/components/ui/Input";
+import { i18n } from '@shipeasy/sdk/client'
 
 export function SignInForm({ callbackUrl }: { callbackUrl: string }) {
   const router = useRouter();
@@ -34,7 +35,7 @@ export function SignInForm({ callbackUrl }: { callbackUrl: string }) {
   return (
     <form onSubmit={onSubmit} className="space-y-4" data-testid="credentials-form">
       <div>
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">{i18n.t('common.email')}</Label>
         <Input
           id="email"
           name="email"
@@ -43,11 +44,11 @@ export function SignInForm({ callbackUrl }: { callbackUrl: string }) {
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
+          placeholder={i18n.t('common.youexamplecom')}
         />
       </div>
       <div>
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">{i18n.t('common.password')}</Label>
         <Input
           id="password"
           name="password"
@@ -72,7 +73,7 @@ export function SignInForm({ callbackUrl }: { callbackUrl: string }) {
         className="w-full"
         disabled={submitting}
       >
-        {submitting ? "Signing in…" : "Sign in"}
+        {submitting ? i18n.t('...signin.signInForm.signingIn') : i18n.t('common.signIn')}
       </Button>
     </form>
   );

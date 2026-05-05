@@ -3,10 +3,11 @@ import { requireOwnerOf } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { OwnerShell } from "@/components/owner/OwnerShell";
 import { SettingsTabs } from "@/components/owner/SettingsTabs";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Settings" };
+export const metadata = { title: i18n.t('common.settings') };
 
 export default async function OwnerSettingsLayout(
   props: {
@@ -43,7 +44,7 @@ export default async function OwnerSettingsLayout(
               {mp.name} <em className="italic text-blue-ink">settings</em>
             </h1>
             <p className="text-[13px] text-muted mt-1.5 max-w-[560px]">
-              Identity, schema, rules, and more — everything that shapes your marketplace.
+              {i18n.t('...settings.layout.identitySchemaRulesAndMore')}
             </p>
           </header>
 

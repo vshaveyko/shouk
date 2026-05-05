@@ -2,9 +2,10 @@ import { redirect } from "next/navigation";
 import { getUserContext } from "@/lib/auth-helpers";
 import { Navbar } from "@/components/app/Navbar";
 import { prisma } from "@/lib/prisma";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Dashboard" };
+export const metadata = { title: i18n.t('...activity.page.dashboard') };
 
 // Ported from design Flow 6 screen 6G.
 // TODO: wire live data — counts, saved listings, bids, alerts, ISO matches.
@@ -84,17 +85,17 @@ export default async function ActivityPage(props: { searchParams?: Promise<{ tab
 
       <div className="act-wrap">
         <div className="act-head">
-          <h1>Dashboard</h1>
-          <div className="sub">Private — only visible to you.</div>
+          <h1>{i18n.t('...activity.page.dashboard')}</h1>
+          <div className="sub">{i18n.t('...activity.page.privateOnlyVisibleToYou')}</div>
         </div>
 
         <div className="act-layout">
-          <nav className="act-nav" aria-label="Activity sections">
+          <nav className="act-nav" aria-label={i18n.t('...activity.page.activitySectionsAria-label')}>
             <button type="button" className={initialTab === "saved" ? "active" : ""} data-act="saved">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
               </svg>
-              Saved
+              {i18n.t('common.saved')}
               <span className="ct">0</span>
             </button>
             <button type="button" className={initialTab === "alerts" ? "active" : ""} data-act="alerts">
@@ -103,32 +104,32 @@ export default async function ActivityPage(props: { searchParams?: Promise<{ tab
                 <path d="m21 21-4.3-4.3" />
                 <path d="M11 7v4M11 14h.01" />
               </svg>
-              Alerts
+              {i18n.t('common.alerts')}
               <span className="ct">0</span>
             </button>
 
-            <div className="act-label">Wanted / ISO</div>
+            <div className="act-label">{i18n.t('...activity.page.wantedIso')}</div>
             <button type="button" data-act="iso-mine">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8" />
                 <path d="m21 21-4.3-4.3" />
               </svg>
-              My wanted ads
+              {i18n.t('...activity.page.myWantedAds')}
               <span className="ct">0</span>
             </button>
             <button type="button" data-act="iso-matches">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 6 9 17l-5-5" />
               </svg>
-              Match alerts
+              {i18n.t('...activity.page.matchAlerts')}
             </button>
 
-            <div className="act-label">Selling</div>
+            <div className="act-label">{i18n.t('...activity.page.selling')}</div>
             <button type="button">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" />
               </svg>
-              All my listings
+              {i18n.t('...activity.page.allMyListings')}
               <span className="ct">0</span>
             </button>
             <button type="button">
@@ -136,27 +137,27 @@ export default async function ActivityPage(props: { searchParams?: Promise<{ tab
                 <path d="M3 3v18h18" />
                 <path d="m19 9-5 5-4-4-3 3" />
               </svg>
-              Sold history
+              {i18n.t('...activity.page.soldHistory')}
             </button>
           </nav>
 
           <div className="act-panel">
             <div className="act-toolbar">
-              <button className="chip-btn on">All bids</button>
-              <button className="chip-btn">Leading</button>
-              <button className="chip-btn">Outbid</button>
-              <button className="chip-btn">Watching</button>
+              <button className="chip-btn on">{i18n.t('...activity.page.allBids')}</button>
+              <button className="chip-btn">{i18n.t('...activity.page.leading')}</button>
+              <button className="chip-btn">{i18n.t('...activity.page.outbid')}</button>
+              <button className="chip-btn">{i18n.t('...activity.page.watching')}</button>
               <div className="spacer" />
-              <button className="chip-btn">All marketplaces</button>
+              <button className="chip-btn">{i18n.t('...activity.page.allMarketplaces')}</button>
             </div>
 
             <div className="bids-table">
               <div className="bids-head">
-                <div>Listing</div>
-                <div>Your bid</div>
-                <div>Current</div>
-                <div>Status</div>
-                <div>Ends in</div>
+                <div>{i18n.t('common.listing')}</div>
+                <div>{i18n.t('common.yourBid')}</div>
+                <div>{i18n.t('...activity.page.current')}</div>
+                <div>{i18n.t('common.status')}</div>
+                <div>{i18n.t('common.endsIn')}</div>
                 <div></div>
               </div>
               <div className="bids-row">
@@ -164,20 +165,20 @@ export default async function ActivityPage(props: { searchParams?: Promise<{ tab
                   <div className="th" />
                   <div style={{ minWidth: 0 }}>
                     <div className="t">
-                      Your activity will show up here once you start bidding.
+                      {i18n.t('...activity.page.yourActivityWillShowUp')}
                     </div>
                     <div className="s">
-                      Ferrari Frenzy · Heritage Denim · more
+                      {i18n.t('...activity.page.ferrariFrenzyHeritageDenimMore')}
                     </div>
                   </div>
                 </div>
                 <div className="price">—</div>
                 <div className="price">—</div>
                 <div>
-                  <span className="bid-state watching">● Watching</span>
+                  <span className="bid-state watching">{i18n.t('...activity.page.watching2')}</span>
                 </div>
                 <div className="countdown">—</div>
-                <div className="act">View →</div>
+                <div className="act">{i18n.t('...activity.page.view')}</div>
               </div>
             </div>
           </div>

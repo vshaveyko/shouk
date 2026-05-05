@@ -25,6 +25,7 @@ import {
   DialogDescription,
   DialogClose,
 } from "@/components/ui";
+import { i18n } from '@shipeasy/sdk/client'
 
 type EntryMethod = "APPLICATION" | "INVITE" | "REFERRAL" | "PUBLIC";
 
@@ -45,19 +46,19 @@ type Visibility = "PUBLIC" | "CLOSED" | "PRIVATE";
 const VISIBILITY_OPTIONS: { id: Visibility; title: string; body: string; tag: string }[] = [
   {
     id: "PUBLIC",
-    title: "Public",
+    title: i18n.t('common.public'),
     body: "Anyone can discover the marketplace and browse listings. Best for open communities and merchants who want organic traffic.",
     tag: "OPEN",
   },
   {
     id: "CLOSED",
-    title: "Closed",
+    title: i18n.t('common.closed'),
     body: 'Marketplace is listed publicly, but only members can browse listings. Non-members see a "Request to join" page. Best for most curated communities.',
     tag: "GATED",
   },
   {
     id: "PRIVATE",
-    title: "Private",
+    title: i18n.t('common.private'),
     body: "Hidden from Explore and search. Only direct invite links lead to the marketplace. Best for small trusted groups and beta launches.",
     tag: "HIDDEN",
   },
@@ -66,17 +67,17 @@ const VISIBILITY_OPTIONS: { id: Visibility; title: string; body: string; tag: st
 const JOIN_OPTIONS: { id: "APPLICATION" | "REFERRAL" | "INVITE"; title: string; body: string }[] = [
   {
     id: "APPLICATION",
-    title: "Application",
+    title: i18n.t('common.application'),
     body: "Prospective members answer questions you define. You review and approve or reject each one.",
   },
   {
     id: "REFERRAL",
-    title: "Referral",
+    title: i18n.t('common.referral'),
     body: "Existing members vouch for newcomers. Optionally auto-approve referrals.",
   },
   {
     id: "INVITE",
-    title: "Invite only",
+    title: i18n.t('common.inviteOnly'),
     body: "Only people you invite (or who follow a direct invite link) can join. No application required.",
   },
 ];
@@ -109,17 +110,17 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
         body: JSON.stringify({ contentType: file.type, size: file.size }),
       });
       const json = await res.json().catch(() => ({}));
-      if (!res.ok) { toast.error(json?.error ?? "Upload failed."); return; }
+      if (!res.ok) { toast.error(json?.error ?? i18n.t('...identity.identityForm.uploadFailed')); return; }
       const { uploadUrl, publicUrl } = json as { uploadUrl: string; publicUrl: string };
       const put = await fetch(uploadUrl, {
         method: "PUT",
         headers: { "Content-Type": file.type },
         body: file,
       });
-      if (!put.ok) { toast.error("Upload failed."); return; }
+      if (!put.ok) { toast.error(i18n.t('...identity.identityForm.uploadFailed')); return; }
       setCoverImageUrl(publicUrl);
     } catch {
-      toast.error("Network error during upload.");
+      toast.error(i18n.t('...identity.identityForm.networkErrorDuringUpload'));
     } finally {
       setUploading(false);
     }
@@ -130,11 +131,11 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
   async function save(e: React.FormEvent) {
     e.preventDefault();
     if (primaryColor && !/^#([0-9a-fA-F]{6})$/.test(primaryColor)) {
-      toast.error("Primary color must be a 6-digit hex, e.g. #4DB7E8.");
+      toast.error(i18n.t('...identity.identityForm.primaryColorMustBeA'));
       return;
     }
     if (description.length > 500) {
-      toast.error("Description must be 500 characters or fewer.");
+      toast.error(i18n.t('...identity.identityForm.descriptionMustBe500Characters'));
       return;
     }
     setSaving(true);
@@ -153,13 +154,13 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok) {
-        toast.error(json?.error ?? "Couldn't save changes.");
+        toast.error(json?.error ?? i18n.t('common.couldntSaveChanges'));
         return;
       }
-      toast.success("Identity saved.");
+      toast.success(i18n.t('...identity.identityForm.identitySaved'));
       router.refresh();
     } catch (err) {
-      toast.error("Network error. Please try again.");
+      toast.error(i18n.t('common.networkErrorPleaseTryAgain'));
     } finally {
       setSaving(false);
     }
@@ -175,14 +176,14 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok) {
-        toast.error(json?.error ?? "Couldn't deactivate marketplace.");
+        toast.error(json?.error ?? i18n.t('...identity.identityForm.couldntDeactivateMarketplace'));
         return;
       }
-      toast.success("Marketplace deactivated.");
+      toast.success(i18n.t('...identity.identityForm.marketplaceDeactivated'));
       setDeactivateOpen(false);
       router.refresh();
     } catch {
-      toast.error("Network error. Please try again.");
+      toast.error(i18n.t('common.networkErrorPleaseTryAgain'));
     } finally {
       setDeactivating(false);
     }
@@ -192,60 +193,60 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
     <form onSubmit={save} data-testid="identity-form" className="space-y-5">
       <Card>
         <CardHeader>
-          <CardTitle>Identity</CardTitle>
+          <CardTitle>{i18n.t('common.identity')}</CardTitle>
           <CardDescription>
-            How members will recognize your marketplace.
+            {i18n.t('common.howMembersWillRecognizeYour')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <Label htmlFor="identity-name">Marketplace name</Label>
+              <Label htmlFor="identity-name">{i18n.t('common.marketplaceName')}</Label>
               <div
                 className="flex items-center gap-2 h-[38px] px-3 rounded-[10px] border border-line bg-bg-panel text-[14px] text-ink-soft"
-                title="Name is locked for an established marketplace. Contact support to change."
+                title={i18n.t('...identity.identityForm.nameIsLockedForAn')}
               >
                 <Lock size={13} className="text-muted" />
                 <span className="truncate">{initial.name}</span>
               </div>
               <Help>
-                Locked after launch. Reach out to support if you need to rename.
+                {i18n.t('...identity.identityForm.lockedAfterLaunchReachOut')}
               </Help>
             </div>
             <div>
-              <Label htmlFor="identity-slug">URL slug</Label>
+              <Label htmlFor="identity-slug">{i18n.t('common.urlSlug')}</Label>
               <div
                 className="flex items-center gap-2 h-[38px] px-3 rounded-[10px] border border-line bg-bg-panel text-[14px] text-ink-soft"
-                title="Slug is locked — changing it would break existing links."
+                title={i18n.t('...identity.identityForm.slugIsLockedChangingIt')}
               >
                 <Lock size={13} className="text-muted" />
-                <span className="truncate">shouks.com/m/{initial.slug}</span>
+                <span className="truncate">{i18n.t('common.shoukscomm')}{initial.slug}</span>
               </div>
-              <Help>Locked — changing it would break every existing link.</Help>
+              <Help>{i18n.t('...identity.identityForm.lockedChangingItWouldBreak')}</Help>
             </div>
           </div>
 
           <div>
-            <Label htmlFor="identity-tagline">Tagline</Label>
+            <Label htmlFor="identity-tagline">{i18n.t('common.tagline')}</Label>
             <Input
               id="identity-tagline"
               data-testid="identity-tagline"
               value={tagline}
               onChange={(e) => setTagline(e.target.value)}
-              placeholder="A one-liner that captures the vibe."
+              placeholder={i18n.t('common.aOnelinerThatCapturesThe')}
               maxLength={140}
             />
-            <Help>Up to 140 characters.</Help>
+            <Help>{i18n.t('common.upTo140Characters')}</Help>
           </div>
 
           <div>
-            <Label htmlFor="identity-description">Description</Label>
+            <Label htmlFor="identity-description">{i18n.t('common.description')}</Label>
             <Textarea
               id="identity-description"
               data-testid="identity-description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="What's this community for?"
+              placeholder={i18n.t('...identity.identityForm.whatsThisCommunityForPlaceholder')}
               maxLength={500}
               rows={4}
             />
@@ -253,7 +254,7 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
           </div>
 
           <div>
-            <Label>Cover image</Label>
+            <Label>{i18n.t('...identity.identityForm.coverImage')}</Label>
             <input
               ref={coverFileRef}
               type="file"
@@ -264,7 +265,7 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
             />
             {coverImageUrl ? (
               <div className="relative rounded-[10px] overflow-hidden border border-line" style={{ height: 120 }}>
-                <img src={coverImageUrl} alt="Cover" className="w-full h-full object-cover" />
+                <img src={coverImageUrl} alt={i18n.t('...identity.identityForm.coverAlt')} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 hover:opacity-100 bg-black/40 transition-opacity">
                   <button
                     type="button"
@@ -272,15 +273,15 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
                     disabled={uploading}
                     className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-ink text-[12px] font-medium rounded-[7px]"
                   >
-                    <Upload size={13} /> {uploading ? "Uploading…" : "Replace"}
+                    <Upload size={13} /> {uploading ? i18n.t('...identity.identityForm.uploading') : i18n.t('...identity.identityForm.replace')}
                   </button>
                   <button
                     type="button"
                     onClick={() => setCoverImageUrl("")}
                     className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-danger text-[12px] font-medium rounded-[7px]"
-                    aria-label="Remove cover image"
+                    aria-label={i18n.t('...identity.identityForm.removeCoverImageAria-label')}
                   >
-                    <X size={13} /> Remove
+                    <X size={13} /> {i18n.t('common.remove')}
                   </button>
                 </div>
               </div>
@@ -293,14 +294,14 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
                 className="w-full h-[100px] rounded-[10px] border border-dashed border-line bg-bg-soft flex flex-col items-center justify-center gap-1.5 text-muted hover:border-ink-soft hover:text-ink transition"
               >
                 <Upload size={18} />
-                <span className="text-[12.5px] font-medium">{uploading ? "Uploading…" : "Upload cover image"}</span>
-                <span className="text-[11px]">Shown as the banner on your landing page.</span>
+                <span className="text-[12.5px] font-medium">{uploading ? i18n.t('...identity.identityForm.uploading') : i18n.t('...identity.identityForm.uploadCoverImage')}</span>
+                <span className="text-[11px]">{i18n.t('...identity.identityForm.shownAsTheBannerOn')}</span>
               </button>
             )}
           </div>
 
           <div>
-            <Label htmlFor="identity-color">Primary color</Label>
+            <Label htmlFor="identity-color">{i18n.t('common.primaryColor')}</Label>
             <div className="flex items-center gap-2">
               <div
                 className="h-[38px] w-[38px] rounded-[10px] border border-line shrink-0"
@@ -317,7 +318,7 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
               />
               <input
                 type="color"
-                aria-label="Pick a color"
+                aria-label={i18n.t('common.pickAColor')}
                 data-testid="identity-color-picker"
                 value={
                   /^#([0-9a-fA-F]{6})$/.test(primaryColor) ? primaryColor : "#4DB7E8"
@@ -326,7 +327,7 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
                 className="h-[38px] w-[38px] rounded-[10px] border border-line cursor-pointer bg-surface"
               />
             </div>
-            <Help>6-digit hex. Used for accents on your marketplace pages.</Help>
+            <Help>{i18n.t('...identity.identityForm.6digitHexUsedForAccents')}</Help>
           </div>
         </CardContent>
         <CardFooter className="justify-end">
@@ -336,20 +337,20 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
             data-testid="identity-save"
             disabled={saving}
           >
-            {saving ? "Saving…" : "Save changes"}
+            {saving ? i18n.t('common.saving') : i18n.t('common.saveChanges')}
           </Button>
         </CardFooter>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Privacy</CardTitle>
-          <CardDescription>Control who can discover and join your marketplace.</CardDescription>
+          <CardTitle>{i18n.t('common.privacy')}</CardTitle>
+          <CardDescription>{i18n.t('...identity.identityForm.controlWhoCanDiscoverAnd')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
           <div>
-            <div className="text-[12px] font-semibold uppercase tracking-wide text-muted mb-2">Visibility</div>
-            <div className="space-y-2" role="radiogroup" aria-label="Visibility">
+            <div className="text-[12px] font-semibold uppercase tracking-wide text-muted mb-2">{i18n.t('common.visibility')}</div>
+            <div className="space-y-2" role="radiogroup" aria-label={i18n.t('common.visibility')}>
               {VISIBILITY_OPTIONS.map((opt) => {
                 const selected = visibility === opt.id;
                 return (
@@ -400,8 +401,8 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
 
           {(visibility === "CLOSED" || visibility === "PRIVATE") && (
             <div>
-              <div className="text-[12px] font-semibold uppercase tracking-wide text-muted mb-2">Ways to join</div>
-              <div className="space-y-2" role="radiogroup" aria-label="Ways to join">
+              <div className="text-[12px] font-semibold uppercase tracking-wide text-muted mb-2">{i18n.t('common.waysToJoin')}</div>
+              <div className="space-y-2" role="radiogroup" aria-label={i18n.t('common.waysToJoin')}>
                 {JOIN_OPTIONS.map((opt) => {
                   const selected = entryMethod === opt.id;
                   return (
@@ -442,17 +443,16 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
             data-testid="identity-privacy-save"
             disabled={saving}
           >
-            {saving ? "Saving…" : "Save changes"}
+            {saving ? i18n.t('common.saving') : i18n.t('common.saveChanges')}
           </Button>
         </CardFooter>
       </Card>
 
       <Card className="border-danger/20">
         <CardHeader>
-          <CardTitle className="text-danger">Danger zone</CardTitle>
+          <CardTitle className="text-danger">{i18n.t('...identity.identityForm.dangerZone')}</CardTitle>
           <CardDescription>
-            Deactivating hides your marketplace from members and visitors. You can
-            reactivate later.
+            {i18n.t('...identity.identityForm.deactivatingHidesYourMarketplaceFrom')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -461,7 +461,7 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
               <Info size={16} className="text-muted mt-0.5 shrink-0" />
               <div className="min-w-0">
                 <div className="text-[14px] font-medium">
-                  Status:{" "}
+                  {i18n.t('...identity.identityForm.status')}{" "}
                   <span
                     className={
                       initial.status === "ACTIVE"
@@ -473,7 +473,7 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
                   </span>
                 </div>
                 <div className="text-[12.5px] text-muted">
-                  Members lose access to listings until you reactivate.
+                  {i18n.t('...identity.identityForm.membersLoseAccessToListings')}
                 </div>
               </div>
             </div>
@@ -484,7 +484,7 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
               onClick={() => setDeactivateOpen(true)}
               disabled={initial.status === "INACTIVE"}
             >
-              Deactivate
+              {i18n.t('...identity.identityForm.deactivate')}
             </Button>
           </div>
         </CardContent>
@@ -498,25 +498,24 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
                 <AlertTriangle size={18} className="text-danger" />
               </div>
               <div>
-                <DialogTitle>Deactivate this marketplace?</DialogTitle>
+                <DialogTitle>{i18n.t('...identity.identityForm.deactivateThisMarketplace')}</DialogTitle>
                 <DialogDescription>
-                  Listings, applications, and member activity will pause until you
-                  reactivate. No data is deleted.
+                  {i18n.t('...identity.identityForm.listingsApplicationsAndMemberActivity')}
                 </DialogDescription>
               </div>
             </div>
           </DialogHeader>
           <DialogBody>
             <ul className="space-y-1.5 text-[13.5px] text-ink-soft list-disc pl-5">
-              <li>Members cannot post or bid.</li>
-              <li>New applications are blocked.</li>
-              <li>The public page shows as unavailable.</li>
+              <li>{i18n.t('...identity.identityForm.membersCannotPostOrBid')}</li>
+              <li>{i18n.t('...identity.identityForm.newApplicationsAreBlocked')}</li>
+              <li>{i18n.t('...identity.identityForm.thePublicPageShowsAs')}</li>
             </ul>
           </DialogBody>
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="secondary" data-testid="identity-deactivate-cancel">
-                Cancel
+                {i18n.t('common.cancel')}
               </Button>
             </DialogClose>
             <Button
@@ -525,7 +524,7 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
               onClick={deactivate}
               disabled={deactivating}
             >
-              {deactivating ? "Deactivating…" : "Yes, deactivate"}
+              {deactivating ? i18n.t('...identity.identityForm.deactivating') : i18n.t('...identity.identityForm.yesDeactivate')}
             </Button>
           </DialogFooter>
         </DialogContent>

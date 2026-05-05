@@ -25,6 +25,7 @@ import {
   DialogClose,
 } from "@/components/ui";
 import { cn } from "@/lib/utils";
+import { i18n } from '@shipeasy/sdk/client'
 
 type Role = "OWNER" | "ADMIN" | "MODERATOR" | "MEMBER";
 
@@ -106,7 +107,7 @@ export function RolesPanel({
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok) {
-        toast.error(json?.error ?? "Couldn't update role.");
+        toast.error(json?.error ?? i18n.t('...roles.rolesPanel.couldntUpdateRole'));
         return;
       }
       const labels: Record<typeof action, string> = {
@@ -118,7 +119,7 @@ export function RolesPanel({
       toast.success(labels[action]);
       router.refresh();
     } catch {
-      toast.error("Network error. Please try again.");
+      toast.error(i18n.t('common.networkErrorPleaseTryAgain'));
     } finally {
       setBusyId(null);
     }
@@ -126,7 +127,7 @@ export function RolesPanel({
 
   async function invite() {
     if (!picked) {
-      toast.error("Pick a member to promote.");
+      toast.error(i18n.t('...roles.rolesPanel.pickAMemberToPromote'));
       return;
     }
     setBusyId("invite");
@@ -141,20 +142,18 @@ export function RolesPanel({
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok) {
-        toast.error(json?.error ?? "Couldn't add admin.");
+        toast.error(json?.error ?? i18n.t('...roles.rolesPanel.couldntAddAdmin'));
         return;
       }
       toast.success(
-        `${picked.user.displayName} is now ${
-          assignRole === "ADMIN" ? "an admin" : "a moderator"
-        }.`,
+        i18n.t('...roles.rolesPanel.displaynameIsNowVar1', { displayName: String(picked.user.displayName), var1: assignRole === "ADMIN" ? "an admin" : "a moderator" }),
       );
       setInviteOpen(false);
       setPicked(null);
       setQuery("");
       router.refresh();
     } catch {
-      toast.error("Network error. Please try again.");
+      toast.error(i18n.t('common.networkErrorPleaseTryAgain'));
     } finally {
       setBusyId(null);
     }
@@ -166,9 +165,9 @@ export function RolesPanel({
         <CardHeader>
           <div className="flex items-start justify-between gap-3">
             <div>
-              <CardTitle>Admins & moderators</CardTitle>
+              <CardTitle>{i18n.t('...roles.rolesPanel.adminsModerators')}</CardTitle>
               <CardDescription>
-                People who help run this marketplace. Owners can change any role.
+                {i18n.t('...roles.rolesPanel.peopleWhoHelpRunThis')}
               </CardDescription>
             </div>
             <Button
@@ -178,21 +177,21 @@ export function RolesPanel({
               data-testid="roles-invite-admin"
               onClick={() => setInviteOpen(true)}
             >
-              <UserPlus size={16} /> Invite admin
+              <UserPlus size={16} /> {i18n.t('...roles.rolesPanel.inviteAdmin')}
             </Button>
           </div>
         </CardHeader>
         <CardContent>
           {staff.length === 0 ? (
-            <p className="text-[13px] text-muted">No admins or moderators yet.</p>
+            <p className="text-[13px] text-muted">{i18n.t('...roles.rolesPanel.noAdminsOrModeratorsYet')}</p>
           ) : (
             <table className="w-full" data-testid="roles-staff-table">
               <thead>
                 <tr className="text-left text-[11px] uppercase tracking-[0.12em] text-muted border-b border-line-soft">
-                  <th className="py-2 pr-3 font-semibold">Member</th>
-                  <th className="py-2 pr-3 font-semibold">Role</th>
-                  <th className="py-2 pr-3 font-semibold tabular-nums">Joined</th>
-                  <th className="py-2 pr-3 font-semibold text-right">Actions</th>
+                  <th className="py-2 pr-3 font-semibold">{i18n.t('common.member')}</th>
+                  <th className="py-2 pr-3 font-semibold">{i18n.t('common.role')}</th>
+                  <th className="py-2 pr-3 font-semibold tabular-nums">{i18n.t('common.joined')}</th>
+                  <th className="py-2 pr-3 font-semibold text-right">{i18n.t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -239,7 +238,7 @@ export function RolesPanel({
                       <div className="flex items-center justify-end gap-2">
                         {m.role === "OWNER" ? (
                           <span className="text-[12px] text-muted">
-                            Owner is fixed
+                            {i18n.t('...roles.rolesPanel.ownerIsFixed')}
                           </span>
                         ) : (
                           <>
@@ -251,7 +250,7 @@ export function RolesPanel({
                               onClick={() => act(m, "DEMOTE")}
                               disabled={busyId === m.id}
                             >
-                              Demote
+                              {i18n.t('...roles.rolesPanel.demote')}
                             </Button>
                             <Button
                               type="button"
@@ -262,7 +261,7 @@ export function RolesPanel({
                               onClick={() => act(m, "REMOVE")}
                               disabled={busyId === m.id}
                             >
-                              <UserMinus size={14} /> Remove
+                              <UserMinus size={14} /> {i18n.t('common.remove')}
                             </Button>
                           </>
                         )}
@@ -278,32 +277,31 @@ export function RolesPanel({
 
       <Card>
         <CardHeader>
-          <CardTitle>Permission bundles</CardTitle>
+          <CardTitle>{i18n.t('...roles.rolesPanel.permissionBundles')}</CardTitle>
           <CardDescription>
-            V1 ships with fixed bundles per role. Granular overrides are stored
-            but not yet editable.
+            {i18n.t('...roles.rolesPanel.v1ShipsWithFixedBundles')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <PermissionBundle
-              title="Admin"
-              description="Manage listings, members, and settings short of owner-only actions."
+              title={i18n.t('common.admin')}
+              description={i18n.t('...roles.rolesPanel.manageListingsMembersAndSettingsDescript')}
               items={[
-                { id: "canModerate", label: "Can moderate listings", fixed: true },
-                { id: "canManageMembers", label: "Can manage members", fixed: true },
-                { id: "canEditSchema", label: "Can edit listing schema", fixed: true },
-                { id: "canBilling", label: "Can view billing", fixed: false },
+                { id: "canModerate", label: i18n.t('...roles.rolesPanel.canModerateListings'), fixed: true },
+                { id: "canManageMembers", label: i18n.t('...roles.rolesPanel.canManageMembers'), fixed: true },
+                { id: "canEditSchema", label: i18n.t('...roles.rolesPanel.canEditListingSchema'), fixed: true },
+                { id: "canBilling", label: i18n.t('...roles.rolesPanel.canViewBilling'), fixed: false },
               ]}
             />
             <PermissionBundle
-              title="Moderator"
-              description="Review & approve listings. No member management."
+              title={i18n.t('common.moderator')}
+              description={i18n.t('...roles.rolesPanel.reviewApproveListingsNoMemberDescription')}
               items={[
-                { id: "canModerate", label: "Can moderate listings", fixed: true },
-                { id: "canManageMembers", label: "Can manage members", fixed: false },
-                { id: "canEditSchema", label: "Can edit listing schema", fixed: false },
-                { id: "canBilling", label: "Can view billing", fixed: false },
+                { id: "canModerate", label: i18n.t('...roles.rolesPanel.canModerateListings'), fixed: true },
+                { id: "canManageMembers", label: i18n.t('...roles.rolesPanel.canManageMembers'), fixed: false },
+                { id: "canEditSchema", label: i18n.t('...roles.rolesPanel.canEditListingSchema'), fixed: false },
+                { id: "canBilling", label: i18n.t('...roles.rolesPanel.canViewBilling'), fixed: false },
               ]}
             />
           </div>
@@ -318,16 +316,16 @@ export function RolesPanel({
                 <ShieldCheck size={18} className="text-blue-ink" />
               </div>
               <div>
-                <DialogTitle>Invite an admin or moderator</DialogTitle>
+                <DialogTitle>{i18n.t('...roles.rolesPanel.inviteAnAdminOrModerator')}</DialogTitle>
                 <DialogDescription>
-                  Pick an existing member, then choose a role.
+                  {i18n.t('...roles.rolesPanel.pickAnExistingMemberThen')}
                 </DialogDescription>
               </div>
             </div>
           </DialogHeader>
           <DialogBody>
             <div>
-              <Label htmlFor="roles-search">Find a member</Label>
+              <Label htmlFor="roles-search">{i18n.t('...roles.rolesPanel.findAMember')}</Label>
               <div className="relative">
                 <Search
                   size={14}
@@ -336,7 +334,7 @@ export function RolesPanel({
                 <Input
                   id="roles-search"
                   data-testid="roles-invite-search"
-                  placeholder="Name or email"
+                  placeholder={i18n.t('...roles.rolesPanel.nameOrEmailPlaceholder')}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   className="pl-8"
@@ -349,7 +347,7 @@ export function RolesPanel({
             >
               {candidates.length === 0 ? (
                 <div className="p-3 text-[13px] text-muted">
-                  No matching members.
+                  {i18n.t('...roles.rolesPanel.noMatchingMembers')}
                 </div>
               ) : (
                 candidates.map((m) => {
@@ -386,7 +384,7 @@ export function RolesPanel({
             </div>
 
             <div className="mt-4">
-              <Label>Role</Label>
+              <Label>{i18n.t('common.role')}</Label>
               <div className="grid grid-cols-2 gap-2">
                 {(["ADMIN", "MODERATOR"] as const).map((r) => {
                   const active = assignRole === r;
@@ -410,8 +408,8 @@ export function RolesPanel({
                       </div>
                       <div className="text-[12.5px] text-muted">
                         {r === "ADMIN"
-                          ? "Full settings + member management"
-                          : "Moderate listings only"}
+                          ? i18n.t('...roles.rolesPanel.fullSettingsMemberManagement')
+                          : i18n.t('...roles.rolesPanel.moderateListingsOnly')}
                       </div>
                     </button>
                   );
@@ -422,7 +420,7 @@ export function RolesPanel({
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="secondary" data-testid="roles-invite-cancel">
-                Cancel
+                {i18n.t('common.cancel')}
               </Button>
             </DialogClose>
             <Button
@@ -432,7 +430,7 @@ export function RolesPanel({
               onClick={invite}
               disabled={!picked || busyId === "invite"}
             >
-              {busyId === "invite" ? "Promoting…" : "Promote"}
+              {busyId === "invite" ? i18n.t('...roles.rolesPanel.promoting') : i18n.t('...roles.rolesPanel.promote')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -470,7 +468,7 @@ function PermissionBundle({
             </span>
             {!p.fixed && (
               <span className="ml-auto text-[11px] text-muted">
-                Not in bundle
+                {i18n.t('...roles.rolesPanel.notInBundle')}
               </span>
             )}
           </li>

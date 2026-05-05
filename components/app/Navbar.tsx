@@ -8,6 +8,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { ShouksMark } from "@/components/brand/Logo";
 import { NotificationBell } from "@/components/app/NotificationBell";
 import { cn } from "@/lib/utils";
+import { i18n } from '@shipeasy/sdk/client'
 
 type Marketplace = {
   id: string;
@@ -93,12 +94,12 @@ export function Navbar({
     ? [
         {
           href: `/owner/${slug}/dashboard`,
-          label: "Admin",
+          label: i18n.t('common.admin'),
           active: pathname.startsWith(`/owner/${slug}`),
         },
         {
           href: `/m/${slug}/feed`,
-          label: "Browse",
+          label: i18n.t('...app.navbar.browse'),
           active:
             pathname.startsWith(`/m/${slug}`) &&
             !pathname.startsWith(`/m/${slug}/messages`),
@@ -107,19 +108,19 @@ export function Navbar({
     : [
         {
           href: "/explore",
-          label: "Explore",
+          label: i18n.t('...app.navbar.explore'),
           active: pathname.startsWith("/explore"),
         },
         {
           href: "/activity",
-          label: "Dashboard",
+          label: i18n.t('...app.navbar.dashboard'),
           active: pathname.startsWith("/activity"),
         },
       ];
 
   const searchLabel = inMarketplace
-    ? "Search this marketplace…"
-    : "Search marketplaces, listings…";
+    ? i18n.t('...app.navbar.searchThisMarketplace')
+    : i18n.t('...app.navbar.searchMarketplacesListings');
 
   return (
     <>
@@ -131,7 +132,7 @@ export function Navbar({
           data-testid="navbar-brand"
         >
           <ShouksMark size={24} />
-          <span>Shouks</span>
+          <span>{i18n.t('common.shouks')}</span>
         </Link>
 
         <MarketplaceSwitcher
@@ -141,7 +142,7 @@ export function Navbar({
         />
 
         {links.length > 0 && (
-          <nav className="nav-links" aria-label="Primary">
+          <nav className="nav-links" aria-label={i18n.t('...app.navbar.primaryAria-label')}>
             {links.map((l) => (
               <Link
                 key={l.href}
@@ -156,7 +157,7 @@ export function Navbar({
 
         <div className="spacer" />
 
-        <Link href="/search" className="search" aria-label="Search">
+        <Link href="/search" className="search" aria-label={i18n.t('common.search')}>
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -173,7 +174,7 @@ export function Navbar({
 
         <Link
           href={messagesHref}
-          aria-label="Messages"
+          aria-label={i18n.t('...app.navbar.messagesAria-label')}
           className={cn("nav-icon", messagesActive && "active")}
           data-testid="nav-messages"
         >
@@ -234,7 +235,7 @@ function MarketplaceSwitcher({
               </span>
             </>
           ) : (
-            <span style={{ color: "var(--muted)" }}>Choose a marketplace</span>
+            <span style={{ color: "var(--muted)" }}>{i18n.t('...app.navbar.chooseAMarketplace')}</span>
           )}
           <svg width="12" height="12" viewBox="0 0 12 12" style={{ color: "var(--muted)" }}>
             <path d="M3 5l3 3 3-3" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
@@ -248,11 +249,11 @@ function MarketplaceSwitcher({
           className="min-w-[280px] p-1.5 bg-surface border border-line rounded-[10px] shadow-lg z-50"
         >
           <div className="px-2.5 py-1.5 text-[11px] uppercase tracking-[0.14em] text-muted font-semibold">
-            {mode === "owner" ? "My marketplaces" : "My communities"}
+            {mode === "owner" ? i18n.t('...app.navbar.myMarketplaces') : i18n.t('...app.navbar.myCommunities')}
           </div>
           {marketplaces.length === 0 ? (
             <div className="px-2.5 py-2 text-[13px] text-muted">
-              You haven't joined any marketplaces yet.
+              {i18n.t('...app.navbar.youHaventJoinedAnyMarketplaces')}
             </div>
           ) : (
             marketplaces.map((m) => (
@@ -280,13 +281,13 @@ function MarketplaceSwitcher({
           <DropdownMenu.Item asChild>
             <Link href="/explore" className="flex items-center gap-2 px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[14px] text-blue-ink">
               <span className="w-6 h-6 rounded-[6px] grid place-items-center bg-blue-soft font-semibold text-[12px]">+</span>
-              Discover marketplaces
+              {i18n.t('...app.navbar.discoverMarketplaces')}
             </Link>
           </DropdownMenu.Item>
           <DropdownMenu.Item asChild>
             <Link href="/owner/create" className="flex items-center gap-2 px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[14px]">
               <span className="w-6 h-6 rounded-[6px] grid place-items-center bg-ink text-white font-semibold text-[12px]">✦</span>
-              Create a marketplace
+              {i18n.t('...app.navbar.createAMarketplace')}
             </Link>
           </DropdownMenu.Item>
         </DropdownMenu.Content>
@@ -304,7 +305,7 @@ function UserMenu({
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger asChild>
-        <button type="button" className="avatar-btn" aria-label="Account" data-testid="user-menu">
+        <button type="button" className="avatar-btn" aria-label={i18n.t('...app.navbar.accountAria-label')} data-testid="user-menu">
           {user.image ? <img src={user.image} alt="" /> : initial}
         </button>
       </DropdownMenu.Trigger>
@@ -320,17 +321,17 @@ function UserMenu({
           </div>
           <DropdownMenu.Item asChild>
             <Link href="/profile" className="block px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[14px]">
-              Profile
+              {i18n.t('common.profile')}
             </Link>
           </DropdownMenu.Item>
           <DropdownMenu.Item asChild>
             <Link href="/activity?tab=saved" className="block px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[14px]">
-              Saved
+              {i18n.t('...app.navbar.saved')}
             </Link>
           </DropdownMenu.Item>
           <DropdownMenu.Item asChild>
             <Link href="/onboarding/verify" className="block px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[14px]">
-              Verified accounts
+              {i18n.t('...app.navbar.verifiedAccounts')}
             </Link>
           </DropdownMenu.Item>
           <DropdownMenu.Separator className="h-px bg-line-soft my-1" />
@@ -341,7 +342,7 @@ function UserMenu({
               className="w-full text-left px-2.5 py-2 rounded-[6px] hover:bg-hover text-[14px] text-danger"
               data-testid="sign-out"
             >
-              Sign out
+              {i18n.t('common.signOut')}
             </button>
           </DropdownMenu.Item>
         </DropdownMenu.Content>

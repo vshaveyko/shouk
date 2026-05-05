@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { i18n } from '@shipeasy/sdk/client'
 
 export function JoinNowButton({ slug }: { slug: string }) {
   const router = useRouter();
@@ -16,14 +17,14 @@ export function JoinNowButton({ slug }: { slug: string }) {
       const res = await fetch(`/api/marketplaces/${slug}/join`, { method: "POST" });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        toast.error(data.error ?? "Couldn't join. Try again.");
+        toast.error(data.error ?? i18n.t('...[slug].joinNowButton.couldntJoinTryAgain'));
         return;
       }
-      toast.success("You joined! Taking you to the feed…");
+      toast.success(i18n.t('...[slug].joinNowButton.youJoinedTakingYouTo'));
       router.push(`/m/${slug}/feed`);
       router.refresh();
     } catch {
-      toast.error("Network error. Try again.");
+      toast.error(i18n.t('...[slug].joinNowButton.networkErrorTryAgain'));
     } finally {
       setJoining(false);
     }
@@ -31,7 +32,7 @@ export function JoinNowButton({ slug }: { slug: string }) {
 
   return (
     <Button size="lg" className="w-full" onClick={join} disabled={joining} data-testid="join-now-btn">
-      {joining ? "Joining…" : <>Join now <ArrowRight size={16} /></>}
+      {joining ? i18n.t('...[slug].joinNowButton.joining') : <>{i18n.t('...[slug].joinNowButton.joinNow')} <ArrowRight size={16} /></>}
     </Button>
   );
 }

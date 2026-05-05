@@ -12,6 +12,7 @@ import { BrandLockup } from "@/components/brand/Logo";
 import { verifyProviders } from "@/lib/utils";
 import { StatusBanner } from "./StatusBanner";
 import { JoinNowButton } from "./JoinNowButton";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +28,7 @@ export async function generateMetadata(
     where: { slug: params.slug },
     select: { name: true, tagline: true, description: true },
   });
-  if (!mp) return { title: "Marketplace not found" };
+  if (!mp) return { title: i18n.t('...[slug].page.marketplaceNotFound') };
   return {
     title: mp.name,
     description: mp.tagline ?? mp.description ?? undefined,
@@ -100,7 +101,7 @@ export default async function MarketplaceLanding(props: { params: Promise<Params
   const requirements = mp.requiredVerifications;
   const missingRequirements = requirements.filter((r) => !verifiedSet.has(r));
 
-  const ownerName = mp.owner.displayName ?? mp.owner.name ?? "The owner";
+  const ownerName = mp.owner.displayName ?? mp.owner.name ?? i18n.t('...[slug].page.theOwner');
   const headerGradient = mp.coverImageUrl
     ? undefined
     : `linear-gradient(135deg, ${mp.primaryColor ?? "oklch(0.66 0.16 230)"}, oklch(0.5 0.15 232))`;
@@ -117,27 +118,27 @@ export default async function MarketplaceLanding(props: { params: Promise<Params
       >
         <div>
           <h2 className="text-[17px] font-semibold">
-            {mp.entryMethod === "PUBLIC" ? "Join" : "Apply to join"}
+            {mp.entryMethod === "PUBLIC" ? i18n.t('...[slug].page.join') : i18n.t('...[slug].page.applyToJoin')}
           </h2>
           <p className="text-[13px] text-muted mt-1">
             {mp.entryMethod === "PUBLIC"
-              ? "Sign in to join instantly."
-              : `Create your Shouks account and submit an application to ${mp.name}.`}
+              ? i18n.t('...[slug].page.signInToJoinInstantly')
+              : i18n.t('...[slug].page.createYourShouksAccountAnd', { name: String(mp.name) })}
           </p>
         </div>
         <Link href={`/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
           <Button size="lg" className="w-full">
-            {mp.entryMethod === "PUBLIC" ? "Sign in to join" : "Sign in to apply"}{" "}
+            {mp.entryMethod === "PUBLIC" ? i18n.t('...[slug].page.signInToJoin') : i18n.t('...[slug].page.signInToApply')}{" "}
             <ArrowRight size={16} />
           </Button>
         </Link>
         <p className="text-[12px] text-muted text-center">
-          New to Shouks?{" "}
+          {i18n.t('common.newToShouks')}{" "}
           <Link
             href={`/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`}
             className="text-blue-ink hover:underline"
           >
-            Create an account
+            {i18n.t('common.createAnAccount')}
           </Link>
         </p>
       </div>
@@ -152,11 +153,11 @@ export default async function MarketplaceLanding(props: { params: Promise<Params
           <Check size={18} />
         </span>
         <div className="flex-1 min-w-0">
-          <div className="text-[14px] font-semibold">You're a member.</div>
-          <div className="text-[12px] text-muted">Jump into the feed.</div>
+          <div className="text-[14px] font-semibold">{i18n.t('...[slug].page.youreAMember')}</div>
+          <div className="text-[12px] text-muted">{i18n.t('...[slug].page.jumpIntoTheFeed')}</div>
         </div>
         <Link href={`/m/${mp.slug}/feed`}>
-          <Button>Go to feed</Button>
+          <Button>{i18n.t('common.goToFeed')}</Button>
         </Link>
       </div>
     );
@@ -177,10 +178,10 @@ export default async function MarketplaceLanding(props: { params: Promise<Params
       >
         <div>
           <h2 className="text-[18px] font-semibold tracking-[-0.01em]">
-            Join <em className="serif italic text-blue-ink">{mp.name}</em>
+            {i18n.t('...[slug].page.join')} <em className="serif italic text-blue-ink">{mp.name}</em>
           </h2>
           <p className="text-[13px] text-muted mt-1">
-            Open community — join instantly with one click.
+            {i18n.t('...[slug].page.openCommunityJoinInstantlyWith')}
           </p>
         </div>
         <JoinNowButton slug={mp.slug} />
@@ -194,15 +195,15 @@ export default async function MarketplaceLanding(props: { params: Promise<Params
       >
         <div>
           <h2 className="text-[18px] font-semibold tracking-[-0.01em]">
-            Apply to <em className="serif italic text-blue-ink">{mp.name}</em>
+            {i18n.t('common.applyTo')} <em className="serif italic text-blue-ink">{mp.name}</em>
           </h2>
           <p className="text-[13px] text-muted mt-1">
-            ~48h review · free to apply · answer a few questions from the owners.
+            {i18n.t('...[slug].page.48hReviewFreeToApply')}
           </p>
         </div>
         <Link href={`/apply/${mp.slug}`} className="block">
           <Button size="lg" className="w-full">
-            Apply to join <ArrowRight size={16} />
+            {i18n.t('...[slug].page.applyToJoin')} <ArrowRight size={16} />
           </Button>
         </Link>
       </div>
@@ -244,7 +245,7 @@ export default async function MarketplaceLanding(props: { params: Promise<Params
             <BrandLockup href="/" size={22} />
             <div className="flex items-center gap-2">
               <Link href={`/signin?callbackUrl=/m/${mp.slug}`}>
-                <Button size="sm">Log in</Button>
+                <Button size="sm">{i18n.t('common.logIn')}</Button>
               </Link>
             </div>
           </div>
@@ -289,7 +290,7 @@ export default async function MarketplaceLanding(props: { params: Promise<Params
               <div className="flex flex-wrap items-center gap-2 mb-1">
                 <Badge variant="blue">{mp.category}</Badge>
                 {mp.entryMethod === "INVITE" && (
-                  <Badge variant="outline">Invite only</Badge>
+                  <Badge variant="outline">{i18n.t('common.inviteOnly')}</Badge>
                 )}
               </div>
               <h1 className="text-[24px] sm:text-[28px] font-semibold tracking-[-0.02em] leading-tight">
@@ -325,7 +326,7 @@ export default async function MarketplaceLanding(props: { params: Promise<Params
               listings
             </span>
             <span className="inline-flex items-center gap-1.5">
-              Run by <span className="text-ink">{ownerName}</span>
+              {i18n.t('...[slug].page.runBy')} <span className="text-ink">{ownerName}</span>
             </span>
           </div>
         </div>
@@ -339,13 +340,13 @@ export default async function MarketplaceLanding(props: { params: Promise<Params
             <div className="flex items-center gap-2 mb-3">
               <ShieldCheck size={16} className="text-blue-ink" />
               <h3 className="text-[14px] font-semibold">
-                Verification requirements
+                {i18n.t('...[slug].page.verificationRequirements')}
               </h3>
             </div>
             <p className="text-[12px] text-muted mb-3">
               {userId
-                ? "Link these accounts before you apply."
-                : "These get linked during the application flow."}
+                ? i18n.t('...[slug].page.linkTheseAccountsBeforeYou')
+                : i18n.t('...[slug].page.theseGetLinkedDuringThe')}
             </p>
             <ul className="space-y-2">
               {requirements.map((p) => {
@@ -376,7 +377,7 @@ export default async function MarketplaceLanding(props: { params: Promise<Params
                         (covered ? "text-success" : "text-muted")
                       }
                     >
-                      {covered ? "Linked" : "Not linked"}
+                      {covered ? i18n.t('common.linked') : i18n.t('common.notLinked')}
                     </span>
                   </li>
                 );
@@ -388,7 +389,7 @@ export default async function MarketplaceLanding(props: { params: Promise<Params
                   href={`/onboarding/verify?redirect=/apply/${mp.slug}`}
                   className="text-[13px] text-blue-ink hover:underline inline-flex items-center gap-1"
                 >
-                  Link accounts <ArrowRight size={13} />
+                  {i18n.t('common.linkAccounts')} <ArrowRight size={13} />
                 </Link>
               </div>
             )}
@@ -401,11 +402,11 @@ export default async function MarketplaceLanding(props: { params: Promise<Params
           mp.applicationQuestions.length > 0 && (
             <section className="mt-6 bg-surface border border-line rounded-[14px] shadow-sm p-5">
               <h3 className="text-[14px] font-semibold mb-1">
-                What owners will ask
+                {i18n.t('...[slug].page.whatOwnersWillAsk')}
               </h3>
               <p className="text-[12px] text-muted mb-3">
                 {mp.applicationQuestions.length} question
-                {mp.applicationQuestions.length === 1 ? "" : "s"} · takes ~3 min
+                {mp.applicationQuestions.length === 1 ? "" : "s"} {i18n.t('...[slug].page.takes3Min')}
               </p>
               <ul className="space-y-2.5">
                 {mp.applicationQuestions.slice(0, 4).map((q) => (
@@ -426,9 +427,9 @@ export default async function MarketplaceLanding(props: { params: Promise<Params
           )}
 
         <footer className="mt-10 text-center text-[12px] text-muted">
-          Powered by{" "}
+          {i18n.t('...[slug].page.poweredBy')}{" "}
           <Link href="/" className="hover:text-ink">
-            Shouks
+            {i18n.t('common.shouks')}
           </Link>
         </footer>
       </main>

@@ -6,6 +6,7 @@ import { getUserContext } from "@/lib/auth-helpers";
 import { Navbar } from "@/components/app/Navbar";
 import { BrandLockup } from "@/components/brand/Logo";
 import { timeAgo, verifyProviders, formatCents } from "@/lib/utils";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +16,7 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
     where: { id: params.id },
     select: { displayName: true, name: true },
   });
-  return { title: u?.displayName ?? u?.name ?? "Member" };
+  return { title: u?.displayName ?? u?.name ?? i18n.t('common.member') };
 }
 
 // Ported from Flow 4 seller profile + Flow 6F profile screen.
@@ -89,7 +90,7 @@ export default async function PublicProfilePage(props: { params: Promise<{ id: s
     ? await prisma.notification.count({ where: { userId: sessionUserId, readAt: null } })
     : 0;
 
-  const displayName = user.displayName ?? user.name ?? "Member";
+  const displayName = user.displayName ?? user.name ?? i18n.t('common.member');
 
   // Compute shared communities (marketplaces both users are in)
   const viewerMarketplaceIds = new Set([
@@ -125,7 +126,7 @@ export default async function PublicProfilePage(props: { params: Promise<{ id: s
           <div className="max-w-[1280px] mx-auto px-6 h-14 flex items-center justify-between">
             <BrandLockup href="/" size={22} />
             <Link href="/signin" className="text-[13px] text-ink-soft hover:text-ink">
-              Sign in
+              {i18n.t('common.signIn')}
             </Link>
           </div>
         </header>
@@ -140,11 +141,11 @@ export default async function PublicProfilePage(props: { params: Promise<{ id: s
           <div style={{ minWidth: 0, flex: 1 }}>
             <h1>{displayName}</h1>
             <div className="pf-meta">
-              <span>Joined {timeAgo(user.createdAt)}</span>
+              <span>{i18n.t('common.joined')} {timeAgo(user.createdAt)}</span>
               <span className="dot" />
               <span>{user.listings.length} listings</span>
               <span className="dot" />
-              <span>{user.verifiedAccounts.length} verified account{user.verifiedAccounts.length === 1 ? "" : "s"}</span>
+              <span>{user.verifiedAccounts.length} {i18n.t('common.verifiedAccount')}{user.verifiedAccounts.length === 1 ? "" : "s"}</span>
             </div>
             {user.bio && <p className="pf-bio">{user.bio}</p>}
             {user.verifiedAccounts.length > 0 && (
@@ -165,9 +166,9 @@ export default async function PublicProfilePage(props: { params: Promise<{ id: s
         {/* Shared communities section */}
         {sessionUserId && sessionUserId !== params.id && (
           <div className="mb-8">
-            <div className="pf-section-label">Shared communities</div>
+            <div className="pf-section-label">{i18n.t('...[id].page.sharedCommunities')}</div>
             {sharedCommunities.length === 0 ? (
-              <div className="pf-empty">No shared communities.</div>
+              <div className="pf-empty">{i18n.t('...[id].page.noSharedCommunities')}</div>
             ) : (
               <div className="pf-shared-grid">
                 {sharedCommunities.map((mp) => (
@@ -187,9 +188,9 @@ export default async function PublicProfilePage(props: { params: Promise<{ id: s
         )}
 
         {/* Listings */}
-        <div className="pf-section-label">Listings</div>
+        <div className="pf-section-label">{i18n.t('common.listings')}</div>
         {user.listings.length === 0 ? (
-          <div className="pf-empty">No listings yet.</div>
+          <div className="pf-empty">{i18n.t('common.noListingsYet')}</div>
         ) : (
           <div className="pf-listings-grid">
             {user.listings.map((l) => (

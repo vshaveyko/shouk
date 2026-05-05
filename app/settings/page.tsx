@@ -3,9 +3,10 @@ import Link from "next/link";
 import { getUserContext } from "@/lib/auth-helpers";
 import { Navbar } from "@/components/app/Navbar";
 import { prisma } from "@/lib/prisma";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Account settings" };
+export const metadata = { title: i18n.t('...settings.page.accountSettings') };
 
 // Ported from design Flow 6 screen 6H. Left-rail settings nav + right panel.
 // Profile edit is existing /profile; this page links sections out. TODO: inline tabs.
@@ -67,20 +68,20 @@ export default async function UserSettingsPage() {
 
       <div className="set-wrap">
         <div className="set-head">
-          <h1>Settings</h1>
+          <h1>{i18n.t('common.settings')}</h1>
           <div className="sub">
-            Manage your account, identity, and how Shouks reaches you.
+            {i18n.t('...settings.page.manageYourAccountIdentityAnd')}
           </div>
         </div>
 
         <div className="set-layout">
-          <nav className="set-nav" aria-label="Settings sections">
+          <nav className="set-nav" aria-label={i18n.t('...settings.page.settingsSectionsAria-label')}>
             <a href="#account" className="active">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                 <circle cx="12" cy="7" r="4" />
               </svg>
-              Account
+              {i18n.t('common.account')}
             </a>
             <Link href="/profile">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -88,52 +89,52 @@ export default async function UserSettingsPage() {
                 <circle cx="9" cy="10" r="2" />
                 <path d="M15 8h3M15 12h3M6 17h12" />
               </svg>
-              Public profile
+              {i18n.t('...settings.page.publicProfile')}
             </Link>
             <Link href="/onboarding/verify">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="m9 12 2 2 4-4" />
                 <path d="M12 2l3 3 5-2-2 5 3 3-3 3 2 5-5-2-3 3-3-3-5 2 2-5-3-3 3-3-2-5 5 2 3-3z" />
               </svg>
-              Identity &amp; trust
+              {i18n.t('...settings.page.identityTrust')}rust
             </Link>
             <a href="#payments">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="2" y="5" width="20" height="14" rx="2" />
                 <line x1="2" y1="10" x2="22" y2="10" />
               </svg>
-              Payments &amp; payouts
+              {i18n.t('...settings.page.paymentsPayouts')}outs
             </a>
             <a href="#notifications">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
                 <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
               </svg>
-              Notifications
+              {i18n.t('common.notifications')}
             </a>
             <a href="#privacy">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="11" width="18" height="11" rx="2" />
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
-              Privacy &amp; data
+              {i18n.t('...settings.page.privacyData')}data
             </a>
           </nav>
 
           <div className="set-panel">
             <section className="set-section" id="account">
-              <h3>Account</h3>
-              <p>Basics we use to sign you in and contact you.</p>
+              <h3>{i18n.t('common.account')}</h3>
+              <p>{i18n.t('...settings.page.basicsWeUseToSign')}</p>
               <div className="set-field">
-                <label>Email</label>
+                <label>{i18n.t('common.email')}</label>
                 <span className="val">{user.email ?? "—"}</span>
               </div>
               <div className="set-field">
-                <label>Display name</label>
+                <label>{i18n.t('common.displayName')}</label>
                 <span className="val">{user.displayName ?? user.name ?? "—"}</span>
               </div>
               <div className="set-field">
-                <label>Member since</label>
+                <label>{i18n.t('...settings.page.memberSince')}</label>
                 <span className="val">
                   {new Date(user.createdAt).toLocaleDateString()}
                 </span>
@@ -141,13 +142,12 @@ export default async function UserSettingsPage() {
             </section>
 
             <section className="set-section" id="identity">
-              <h3>Identity &amp; trust</h3>
+              <h3>{i18n.t('...settings.page.identityTrust')}rust</h3>
               <p>
-                Verified accounts signal to other members that you&apos;re real.
-                Some marketplaces require specific providers to join.
+                {i18n.t('...settings.page.verifiedAccountsSignalToOther')}join.
               </p>
               <div className="set-field">
-                <label>Verified accounts</label>
+                <label>{i18n.t('common.verifiedAccounts')}</label>
                 <span className="val">
                   {verified.length} linked
                   <Link
@@ -155,42 +155,40 @@ export default async function UserSettingsPage() {
                     className="linkout"
                     style={{ marginLeft: 10 }}
                   >
-                    Manage →
+                    {i18n.t('...settings.page.manage')}
                   </Link>
                 </span>
               </div>
             </section>
 
             <section className="set-section" id="payments">
-              <h3>Payments &amp; payouts</h3>
+              <h3>{i18n.t('...settings.page.paymentsPayouts')}outs</h3>
               <p>
-                Shouks doesn&apos;t process payments between buyers and sellers —
-                transactions happen off-platform. Membership billing (if any) lives
-                per-marketplace in Owner → Billing.
+                {i18n.t('...settings.page.shouksDoesntProcessPaymentsBetween')}ling.
               </p>
             </section>
 
             <section className="set-section" id="notifications">
-              <h3>Notifications</h3>
-              <p>Control what reaches your inbox, push, and WhatsApp.</p>
+              <h3>{i18n.t('common.notifications')}</h3>
+              <p>{i18n.t('...settings.page.controlWhatReachesYourInbox')}</p>
               <div className="set-field">
-                <label>Notification preferences</label>
+                <label>{i18n.t('...settings.page.notificationPreferences')}</label>
                 <Link href="/notifications" className="linkout">
-                  Open notification center →
+                  {i18n.t('...settings.page.openNotificationCenter')}
                 </Link>
               </div>
             </section>
 
             <section className="set-section" id="privacy">
-              <h3>Privacy &amp; data</h3>
-              <p>Export your data, or delete your account and all associated content.</p>
+              <h3>{i18n.t('...settings.page.privacyData')}data</h3>
+              <p>{i18n.t('...settings.page.exportYourDataOrDelete')}</p>
               <div className="set-field">
-                <label>Data export</label>
-                <span className="val">Coming soon</span>
+                <label>{i18n.t('...settings.page.dataExport')}</label>
+                <span className="val">{i18n.t('common.comingSoon')}</span>
               </div>
               <div className="set-field">
-                <label>Delete account</label>
-                <span className="val">Email support@shouks.com</span>
+                <label>{i18n.t('...settings.page.deleteAccount')}</label>
+                <span className="val">{i18n.t('...settings.page.emailSupportshoukscom')}</span>
               </div>
             </section>
           </div>

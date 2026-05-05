@@ -2,8 +2,9 @@ import Link from "next/link";
 import { signIn } from "@/auth";
 import { ShouksMark } from "@/components/brand/Logo";
 import { SignInForm } from "./SignInForm";
+import { i18n } from '@shipeasy/sdk/client'
 
-export const metadata = { title: "Sign in" };
+export const metadata = { title: i18n.t('common.signIn') };
 
 export default async function SignInPage(
   props: {
@@ -29,21 +30,21 @@ export default async function SignInPage(
       <div className="w-full max-w-[420px]">
         <div className="flex items-center justify-center gap-2.5 mb-7 text-[18px] font-semibold tracking-[-0.02em]">
           <ShouksMark size={28} />
-          <span>Shouks</span>
+          <span>{i18n.t('common.shouks')}</span>
         </div>
         <div className="bg-surface border border-line rounded-[18px] p-8" style={{ boxShadow: "0 1px 0 oklch(0.9 0.008 240 / 0.5), 0 20px 48px -24px oklch(0.1 0.03 240 / 0.2)" }}>
           <h1 className="serif text-[32px] leading-[1.1] tracking-[-0.01em] mb-1.5" style={{ fontWeight: 400 }}>
-            Continue to Shouks
+            {i18n.t('...signin.page.continueToShouks')}
           </h1>
           <p className="text-[14px] text-ink-soft mb-7">
-            One account for joining marketplaces and running your own. New here? You'll be signed up automatically.
+            {i18n.t('...signin.page.oneAccountForJoiningMarketplaces')}
           </p>
 
           {error && (
             <div className="mb-5 px-3.5 py-2.5 rounded-[10px] bg-danger-soft text-danger text-[13px] border border-danger/20">
               {error === "CredentialsSignin"
-                ? "Email or password is incorrect."
-                : "Something went wrong signing in. Try again."}
+                ? i18n.t('...signin.page.emailOrPasswordIsIncorrect')
+                : i18n.t('...signin.page.somethingWentWrongSigningIn')}
             </div>
           )}
 
@@ -53,53 +54,53 @@ export default async function SignInPage(
               className="w-full h-11 rounded-[10px] border border-line bg-surface hover:bg-hover flex items-center justify-center gap-2.5 font-medium text-[14px] transition mb-2"
             >
               <GoogleIcon />
-              Continue with Google
+              {i18n.t('...signin.page.continueWithGoogle')}
             </button>
           </form>
 
           <button
             type="button"
             disabled
-            title="Identity linking only — not a login method"
+            title={i18n.t('...signin.page.identityLinkingOnlyNotA')}
             className="w-full h-11 rounded-[10px] border border-line bg-surface hover:bg-hover flex items-center justify-center gap-2.5 font-medium text-[14px] transition mb-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <FacebookIcon />
-            Continue with Facebook
+            {i18n.t('...signin.page.continueWithFacebook')}
           </button>
 
           <button
             type="button"
             disabled
-            title="Identity linking only — not a login method"
+            title={i18n.t('...signin.page.identityLinkingOnlyNotA')}
             className="w-full h-11 rounded-[10px] border border-line bg-surface hover:bg-hover flex items-center justify-center gap-2.5 font-medium text-[14px] transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <InstagramIcon />
-            Continue with Instagram
+            {i18n.t('...signin.page.continueWithInstagram')}
           </button>
 
           {credentialsEnabled && (
             <>
               <div className="my-5 flex items-center gap-3 text-[12px] text-muted">
                 <div className="h-px bg-line-soft flex-1" />
-                or email
+                {i18n.t('...signin.page.orEmail')}
                 <div className="h-px bg-line-soft flex-1" />
               </div>
 
               <SignInForm callbackUrl={callbackUrl} />
 
               <p className="mt-6 text-center text-[13px] text-muted">
-                New to Shouks?{" "}
+                {i18n.t('common.newToShouks')}{" "}
                 <Link href="/signup" className="text-blue-ink hover:underline font-medium">
-                  Create an account
+                  {i18n.t('common.createAnAccount')}
                 </Link>
               </p>
             </>
           )}
         </div>
         <p className="text-center text-[12px] text-muted mt-5">
-          By continuing you agree to our{" "}
-          <Link href="/terms" className="underline hover:text-ink">Terms</Link>{" "}and{" "}
-          <Link href="/privacy" className="underline hover:text-ink">Privacy Policy</Link>.
+          {i18n.t('...signin.page.byContinuingYouAgreeTo')}{" "}
+          <Link href="/terms" className="underline hover:text-ink">{i18n.t('common.terms')}</Link>{" "}and{" "}
+          <Link href="/privacy" className="underline hover:text-ink">{i18n.t('...signin.page.privacyPolicy')}</Link>.
         </p>
       </div>
     </main>

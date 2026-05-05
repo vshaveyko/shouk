@@ -23,6 +23,7 @@ import {
   SelectItem,
 } from "@/components/ui";
 import { cn, verifyProviders } from "@/lib/utils";
+import { i18n } from '@shipeasy/sdk/client'
 
 type EntryMethod = "APPLICATION" | "INVITE" | "REFERRAL" | "PUBLIC";
 type VerifyProviderId = (typeof verifyProviders)[number]["id"];
@@ -47,12 +48,12 @@ type Question = {
 };
 
 const QUESTION_TYPE_OPTIONS: { value: QuestionType; label: string }[] = [
-  { value: "SHORT_TEXT", label: "Short text" },
-  { value: "LONG_TEXT", label: "Long text" },
-  { value: "NUMBER", label: "Number" },
-  { value: "SELECT", label: "Single select" },
-  { value: "MULTI_SELECT", label: "Multi select" },
-  { value: "DATE", label: "Date" },
+  { value: "SHORT_TEXT", label: i18n.t('common.shortText') },
+  { value: "LONG_TEXT", label: i18n.t('common.longText') },
+  { value: "NUMBER", label: i18n.t('common.number') },
+  { value: "SELECT", label: i18n.t('common.singleSelect') },
+  { value: "MULTI_SELECT", label: i18n.t('common.multiSelect') },
+  { value: "DATE", label: i18n.t('common.date') },
 ];
 
 const uid = () =>
@@ -169,7 +170,7 @@ export function RulesForm({
       });
       if (!mpRes.ok) {
         const j = await mpRes.json().catch(() => ({}));
-        toast.error(j?.error ?? "Couldn't save rules.");
+        toast.error(j?.error ?? i18n.t('...rules.rulesForm.couldntSaveRules'));
         return;
       }
 
@@ -196,14 +197,14 @@ export function RulesForm({
       });
       if (!qRes.ok) {
         const j = await qRes.json().catch(() => ({}));
-        toast.error(j?.error ?? "Couldn't save application questions.");
+        toast.error(j?.error ?? i18n.t('...rules.rulesForm.couldntSaveApplicationQuestions'));
         return;
       }
 
-      toast.success("Membership rules saved.");
+      toast.success(i18n.t('...rules.rulesForm.membershipRulesSaved'));
       router.refresh();
     } catch {
-      toast.error("Network error. Please try again.");
+      toast.error(i18n.t('common.networkErrorPleaseTryAgain'));
     } finally {
       setSaving(false);
     }
@@ -212,13 +213,13 @@ export function RulesForm({
   return (
     <form onSubmit={save} data-testid="rules-form" className="space-y-5">
       <h2 className="text-[18px] font-semibold tracking-[-0.01em]">
-        Membership rules
+        {i18n.t('common.membershipRules')}
       </h2>
       <Card>
         <CardHeader>
-          <CardTitle>Required verifications</CardTitle>
+          <CardTitle>{i18n.t('common.requiredVerifications')}</CardTitle>
           <CardDescription>
-            Pick at least one — new members must link every account below.
+            {i18n.t('common.pickAtLeastOneNew')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -255,9 +256,9 @@ export function RulesForm({
           <CardHeader>
             <div className="flex items-start justify-between gap-3">
               <div>
-                <CardTitle>Application questions</CardTitle>
+                <CardTitle>{i18n.t('common.applicationQuestions')}</CardTitle>
                 <CardDescription>
-                  What do applicants answer? Leave empty for a frictionless apply.
+                  {i18n.t('...rules.rulesForm.whatDoApplicantsAnswerLeave')}
                 </CardDescription>
               </div>
               <Badge>
@@ -279,7 +280,7 @@ export function RulesForm({
                 />
               ))}
               {questions.length === 0 && (
-                <p className="text-[13px] text-muted">No questions yet.</p>
+                <p className="text-[13px] text-muted">{i18n.t('common.noQuestionsYet')}</p>
               )}
             </div>
             <div className="mt-4">
@@ -290,7 +291,7 @@ export function RulesForm({
                 onClick={addQuestion}
                 className="gap-1.5"
               >
-                <Plus size={16} /> Add question
+                <Plus size={16} /> {i18n.t('common.addQuestion')}
               </Button>
             </div>
           </CardContent>
@@ -304,7 +305,7 @@ export function RulesForm({
           data-testid="rules-save"
           disabled={saving}
         >
-          {saving ? "Saving…" : "Save rules"}
+          {saving ? i18n.t('common.saving') : i18n.t('...rules.rulesForm.saveRules')}
         </Button>
       </div>
     </form>
@@ -329,18 +330,18 @@ function QuestionRow({
     >
       <div className="grid grid-cols-1 md:grid-cols-[1fr_180px_auto] gap-3 items-start">
         <div>
-          <Label htmlFor={`q-${question.uid}-label`}>Question</Label>
+          <Label htmlFor={`q-${question.uid}-label`}>{i18n.t('common.question')}</Label>
           <Input
             id={`q-${question.uid}-label`}
             data-testid={`rules-question-${index}-label`}
             value={question.label}
             onChange={(e) => onChange({ label: e.target.value })}
-            placeholder="e.g. What brands do you collect?"
+            placeholder={i18n.t('common.egWhatBrandsDoYou')}
             maxLength={200}
           />
         </div>
         <div>
-          <Label>Answer type</Label>
+          <Label>{i18n.t('common.answerType')}</Label>
           <Select
             value={question.type}
             onValueChange={(v) => onChange({ type: v as QuestionType })}
@@ -361,7 +362,7 @@ function QuestionRow({
           <button
             type="button"
             onClick={onRemove}
-            aria-label="Remove question"
+            aria-label={i18n.t('common.removeQuestion')}
             data-testid={`rules-question-${index}-remove`}
             className="h-7 w-7 grid place-items-center rounded-[6px] text-ink-soft hover:bg-hover hover:text-danger"
           >
@@ -372,15 +373,15 @@ function QuestionRow({
               checked={question.required}
               onCheckedChange={(v) => onChange({ required: !!v })}
               data-testid={`rules-question-${index}-required`}
-              aria-label="Required question"
+              aria-label={i18n.t('common.requiredQuestion')}
             />
-            Required
+            {i18n.t('common.required')}
           </label>
         </div>
 
         {(question.type === "SELECT" || question.type === "MULTI_SELECT") && (
           <div className="md:col-span-3">
-            <Label>Options</Label>
+            <Label>{i18n.t('common.options')}</Label>
             <div className="space-y-2">
               {(question.options ?? []).map((opt, i) => (
                 <div key={i} className="flex items-center gap-2">
@@ -391,11 +392,11 @@ function QuestionRow({
                       next[i] = e.target.value;
                       onChange({ options: next });
                     }}
-                    placeholder={`Option ${i + 1}`}
+                    placeholder={i18n.t('common.optionVar0', { var0: i + 1 })}
                   />
                   <button
                     type="button"
-                    aria-label="Remove option"
+                    aria-label={i18n.t('common.removeOption')}
                     onClick={() =>
                       onChange({
                         options: (question.options ?? []).filter((_, idx) => idx !== i),
@@ -416,7 +417,7 @@ function QuestionRow({
                   onChange({ options: [...(question.options ?? []), ""] })
                 }
               >
-                <Plus size={14} /> Add option
+                <Plus size={14} /> {i18n.t('common.addOption')}
               </Button>
             </div>
           </div>

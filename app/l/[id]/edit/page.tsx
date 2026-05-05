@@ -7,6 +7,7 @@ import { getUserContext } from "@/lib/auth-helpers";
 import { Navbar } from "@/components/app/Navbar";
 import { NewListingForm } from "@/app/m/[slug]/new/NewListingForm";
 import { clCss } from "@/app/m/[slug]/new/listingFormCss";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
 
@@ -75,7 +76,7 @@ export default async function EditListingPage(props: { params: Promise<{ id: str
             href={`/l/${listing.id}`}
             className="inline-flex items-center gap-1.5 text-[13px] text-ink-soft hover:text-ink"
           >
-            <ArrowLeft size={14} /> Back to listing
+            <ArrowLeft size={14} /> {i18n.t('...edit.page.backToListing')}
           </Link>
         </div>
 

@@ -4,9 +4,10 @@ import { getUserContext } from "@/lib/auth-helpers";
 import { Navbar } from "@/components/app/Navbar";
 import { prisma } from "@/lib/prisma";
 import { Search as SearchIcon } from "lucide-react";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Search" };
+export const metadata = { title: i18n.t('common.search') };
 
 // Stub global search. Navbar's search chip points here.
 // TODO: unify with server-side search indexing; for now does simple contains lookup
@@ -99,22 +100,22 @@ export default async function SearchPage(
           <input
             name="q"
             defaultValue={q}
-            placeholder="Search marketplaces, listings, members…"
+            placeholder={i18n.t('...search.page.searchMarketplacesListingsMembersPlaceho')}
             autoFocus
           />
         </form>
 
         {!q ? (
           <div className="search-empty">
-            Type a query to search across marketplaces, listings, and members.
+            {i18n.t('...search.page.typeAQueryToSearch')}
           </div>
         ) : (
           <>
             <section className="search-section">
-              <h2>Marketplaces ({marketplaces.length})</h2>
+              <h2>{i18n.t('...search.page.marketplaces')}{marketplaces.length})</h2>
               {marketplaces.length === 0 ? (
                 <div className="search-empty" style={{ padding: 20 }}>
-                  No marketplaces match.
+                  {i18n.t('...search.page.noMarketplacesMatch')}
                 </div>
               ) : (
                 marketplaces.map((m) => (
@@ -135,10 +136,10 @@ export default async function SearchPage(
             </section>
 
             <section className="search-section">
-              <h2>Listings ({listings.length})</h2>
+              <h2>{i18n.t('...search.page.listings')}{listings.length})</h2>
               {listings.length === 0 ? (
                 <div className="search-empty" style={{ padding: 20 }}>
-                  No listings match.
+                  {i18n.t('common.noListingsMatch')}
                 </div>
               ) : (
                 listings.map((l) => (
@@ -151,7 +152,7 @@ export default async function SearchPage(
                       <div className="res-s">
                         {l.marketplace.name}
                         {l.priceCents != null
-                          ? ` · $${(l.priceCents / 100).toLocaleString()}`
+                          ? i18n.t('...search.page.var0', { var0: (l.priceCents / 100).toLocaleString() })
                           : ""}
                       </div>
                     </div>

@@ -13,6 +13,7 @@ import {
   Avatar,
 } from "@/components/ui";
 import { formatCents } from "@/lib/utils";
+import { i18n } from '@shipeasy/sdk/client'
 
 type Member = {
   id: string;
@@ -82,12 +83,12 @@ export function BillingPanel({
         <CardHeader>
           <div className="flex items-start justify-between gap-3">
             <div>
-              <CardTitle>Shouks fee</CardTitle>
+              <CardTitle>{i18n.t('...billing.billingPanel.shouksFee')}</CardTitle>
               <CardDescription>
-                Our platform fee for marketplace operators.
+                {i18n.t('...billing.billingPanel.ourPlatformFeeForMarketplace')}
               </CardDescription>
             </div>
-            <Badge variant="blue">MVP beta</Badge>
+            <Badge variant="blue">{i18n.t('...billing.billingPanel.mvpBeta')}</Badge>
           </div>
         </CardHeader>
         <CardContent>
@@ -95,10 +96,9 @@ export function BillingPanel({
             <Sparkles size={16} className="text-blue-ink shrink-0 mt-0.5" />
             <div className="text-[13px] text-ink-soft">
               <span className="font-medium text-ink">
-                Your marketplace is free during the MVP beta.
+                {i18n.t('...billing.billingPanel.yourMarketplaceIsFreeDuring')}
               </span>{" "}
-              We'll introduce pricing gradually — you'll hear from us before any
-              fees kick in.
+              {i18n.t('...billing.billingPanel.wellIntroducePricingGraduallyYoull')}
             </div>
           </div>
         </CardContent>
@@ -108,9 +108,9 @@ export function BillingPanel({
         <CardHeader>
           <div className="flex items-start justify-between gap-3">
             <div>
-              <CardTitle>Current pricing</CardTitle>
+              <CardTitle>{i18n.t('...billing.billingPanel.currentPricing')}</CardTitle>
               <CardDescription>
-                What members pay to join (set in Monetization).
+                {i18n.t('...billing.billingPanel.whatMembersPayToJoin')}
               </CardDescription>
             </div>
           </div>
@@ -122,10 +122,10 @@ export function BillingPanel({
               data-testid="billing-status"
             >
               <div className="text-[12px] uppercase tracking-[0.14em] text-muted font-semibold">
-                Status
+                {i18n.t('common.status')}
               </div>
               <div className="text-[18px] font-semibold mt-1">
-                {isPaid ? "Paid membership" : "Free"}
+                {isPaid ? i18n.t('common.paidMembership') : i18n.t('common.free')}
               </div>
             </div>
             <div
@@ -133,7 +133,7 @@ export function BillingPanel({
               data-testid="billing-monthly"
             >
               <div className="text-[12px] uppercase tracking-[0.14em] text-muted font-semibold">
-                Monthly
+                {i18n.t('...billing.billingPanel.monthly')}
               </div>
               <div className="text-[18px] font-semibold mt-1 tabular-nums">
                 {isPaid && monthlyPriceCents ? formatCents(monthlyPriceCents) : "—"}
@@ -144,7 +144,7 @@ export function BillingPanel({
               data-testid="billing-annual"
             >
               <div className="text-[12px] uppercase tracking-[0.14em] text-muted font-semibold">
-                Annual
+                {i18n.t('...billing.billingPanel.annual')}
               </div>
               <div className="text-[18px] font-semibold mt-1 tabular-nums">
                 {isPaid && annualPriceCents ? formatCents(annualPriceCents) : "—"}
@@ -158,10 +158,10 @@ export function BillingPanel({
         <CardHeader>
           <div className="flex items-start justify-between gap-3">
             <div>
-              <CardTitle>Subscribers</CardTitle>
+              <CardTitle>{i18n.t('...billing.billingPanel.subscribers')}</CardTitle>
               <CardDescription>
-                {members.length} active member{members.length === 1 ? "" : "s"}.
-                {isPaid ? " These are your paying members." : ""}
+                {members.length} {i18n.t('...billing.billingPanel.activeMember')}{members.length === 1 ? "" : "s"}.
+                {isPaid ? i18n.t('...billing.billingPanel.theseAreYourPayingMembers') : ""}
               </CardDescription>
             </div>
             <Button
@@ -172,23 +172,23 @@ export function BillingPanel({
               onClick={exportCsv}
               disabled={members.length === 0}
             >
-              <Download size={14} /> Export CSV
+              <Download size={14} /> {i18n.t('...billing.billingPanel.exportCsv')}
             </Button>
           </div>
         </CardHeader>
         <CardContent>
           {members.length === 0 ? (
-            <p className="text-[13px] text-muted">No subscribers yet.</p>
+            <p className="text-[13px] text-muted">{i18n.t('...billing.billingPanel.noSubscribersYet')}</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full" data-testid="billing-subscribers-table">
                 <thead>
                   <tr className="text-left text-[11px] uppercase tracking-[0.12em] text-muted border-b border-line-soft">
-                    <th className="py-2 pr-3 font-semibold">Member</th>
-                    <th className="py-2 pr-3 font-semibold">Role</th>
-                    <th className="py-2 pr-3 font-semibold tabular-nums">Joined</th>
+                    <th className="py-2 pr-3 font-semibold">{i18n.t('common.member')}</th>
+                    <th className="py-2 pr-3 font-semibold">{i18n.t('common.role')}</th>
+                    <th className="py-2 pr-3 font-semibold tabular-nums">{i18n.t('common.joined')}</th>
                     <th className="py-2 pr-3 font-semibold text-right tabular-nums">
-                      Status
+                      {i18n.t('common.status')}
                     </th>
                   </tr>
                 </thead>
@@ -233,7 +233,7 @@ export function BillingPanel({
                         {formatDate(m.joinedAt)}
                       </td>
                       <td className="py-3 pr-3 text-right">
-                        <Badge variant="approved">Active</Badge>
+                        <Badge variant="approved">{i18n.t('common.active')}</Badge>
                       </td>
                     </tr>
                   ))}

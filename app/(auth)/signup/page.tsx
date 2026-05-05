@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SignUpForm } from "./SignUpForm";
+import { i18n } from '@shipeasy/sdk/client'
 
-export const metadata = { title: "Create your account" };
+export const metadata = { title: i18n.t('common.createYourAccount') };
 
 export default function SignUpPage() {
   // V1 creates accounts implicitly on first OAuth sign-in (SHK-019).
@@ -18,16 +19,16 @@ export default function SignUpPage() {
       <div className="w-full max-w-[440px]">
         <div className="bg-surface border border-line rounded-[14px] shadow p-8">
           <h1 className="text-[28px] font-semibold tracking-[-0.02em] mb-1.5">
-            Create your <span className="serif italic text-blue">account</span>
+            {i18n.t('...signup.page.createYour')} <span className="serif italic text-blue">account</span>
           </h1>
           <p className="text-[14px] text-ink-soft mb-7">
-            One account for every marketplace you join or run.
+            {i18n.t('...signup.page.oneAccountForEveryMarketplace')}
           </p>
           <SignUpForm />
           <p className="mt-6 text-center text-[13px] text-muted">
-            Already have an account?{" "}
+            {i18n.t('...signup.page.alreadyHaveAnAccount')}{" "}
             <Link href="/signin" className="text-blue-ink hover:underline font-medium">
-              Sign in
+              {i18n.t('common.signIn')}
             </Link>
           </p>
         </div>

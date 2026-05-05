@@ -8,6 +8,7 @@ import { HomeFeedSentinel } from "@/components/app/HomeFeedSentinel";
 import { RecentlyViewedSection } from "@/components/app/RecentlyViewed";
 import { prisma } from "@/lib/prisma";
 import { countUnreadThreads } from "@/lib/messages";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
 
@@ -277,8 +278,8 @@ export default async function HomeDashboard(
           <div className="welcome-strip-inner">
             <div className="section-row">
               <div>
-                <div className="kicker">Welcome back, {firstName}</div>
-                <h1>Your marketplaces</h1>
+                <div className="kicker">{i18n.t('common.welcomeBack')} {firstName}</div>
+                <h1>{i18n.t('...home.page.yourMarketplaces')}</h1>
               </div>
               <div style={{ display: "inline-flex", gap: 8 }}>
                 <JoinViaWhatsAppButton
@@ -289,7 +290,7 @@ export default async function HomeDashboard(
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M12 5v14M5 12h14" />
                   </svg>
-                  Create a marketplace
+                  {i18n.t('common.createAMarketplace')}
                 </Link>
               </div>
             </div>
@@ -300,20 +301,20 @@ export default async function HomeDashboard(
                   <circle cx="11" cy="11" r="8" />
                   <path d="m21 21-4.3-4.3" />
                 </svg>
-                Search marketplaces by name
+                {i18n.t('...home.page.searchMarketplacesByName')}
               </Link>
-              <div className="scope" role="tablist" aria-label="Filter marketplaces">
+              <div className="scope" role="tablist" aria-label={i18n.t('...home.page.filterMarketplacesAria-label')}>
                 <Link href="/home?stay=1" className={scope === "all" ? "on" : ""} data-testid="scope-all">
-                  All <span className="n">{scopeCounts.all}</span>
+                  {i18n.t('common.all')} <span className="n">{scopeCounts.all}</span>
                 </Link>
                 <Link href="/home?stay=1&scope=owner" className={scope === "owner" ? "on" : ""} data-testid="scope-owner">
-                  Owner <span className="n">{scopeCounts.owner}</span>
+                  {i18n.t('common.owner')} <span className="n">{scopeCounts.owner}</span>
                 </Link>
                 <Link href="/home?stay=1&scope=member" className={scope === "member" ? "on" : ""} data-testid="scope-member">
-                  Member <span className="n">{scopeCounts.member}</span>
+                  {i18n.t('common.member')} <span className="n">{scopeCounts.member}</span>
                 </Link>
                 <Link href="/home?stay=1&scope=favorites" className={scope === "favorites" ? "on" : ""} data-testid="scope-favorites">
-                  Favorites <span className="n">{scopeCounts.favorites}</span>
+                  {i18n.t('...home.page.favorites')} <span className="n">{scopeCounts.favorites}</span>
                 </Link>
               </div>
             </div>
@@ -345,7 +346,7 @@ export default async function HomeDashboard(
                       <div className="c">{m.category}</div>
                       <div className="tags">
                         <span className={`role-pill ${isOwner ? "owner" : "member"}`}>
-                          {isOwner ? "Owner" : "Member"}
+                          {isOwner ? i18n.t('common.owner') : i18n.t('common.member')}
                         </span>
                       </div>
                     </div>
@@ -359,7 +360,7 @@ export default async function HomeDashboard(
                     <path d="m21 21-4.3-4.3" />
                   </svg>
                 </span>
-                Discover more
+                {i18n.t('...home.page.discoverMore')}
               </Link>
             </div>
           </div>
@@ -369,25 +370,25 @@ export default async function HomeDashboard(
           <div className="dash-two">
             <div className="feed">
               <div className="feed-head">
-                <h2>New in your marketplaces</h2>
-                <div className="scope" role="tablist" aria-label="Feed scope">
-                  <button type="button" className="on">All</button>
-                  <button type="button">Favorites</button>
-                  <button type="button">Matching alerts</button>
+                <h2>{i18n.t('...home.page.newInYourMarketplaces')}</h2>
+                <div className="scope" role="tablist" aria-label={i18n.t('...home.page.feedScopeAria-label')}>
+                  <button type="button" className="on">{i18n.t('common.all')}</button>
+                  <button type="button">{i18n.t('...home.page.favorites')}</button>
+                  <button type="button">{i18n.t('...home.page.matchingAlerts')}</button>
                 </div>
               </div>
 
               {feed.length === 0 ? (
                 <div className="feed-empty">
                   <strong>
-                    {hasAnyMarketplace ? "Nothing new yet." : "You haven't joined a marketplace yet."}
+                    {hasAnyMarketplace ? i18n.t('...home.page.nothingNewYet') : i18n.t('...home.page.youHaventJoinedAMarketplace')}
                   </strong>
                   {hasAnyMarketplace
-                    ? "New listings and drops from your marketplaces will show up here."
-                    : "Find a community that fits you — or stand up your own."}
+                    ? i18n.t('...home.page.newListingsAndDropsFrom')
+                    : i18n.t('...home.page.findACommunityThatFits')}
                   <div className="feed-empty-actions">
-                    <Link href="/explore" className="btn btn-dark">Explore marketplaces</Link>
-                    {!hasAnyMarketplace && <Link href="/owner/create" className="btn btn-outline">Create one</Link>}
+                    <Link href="/explore" className="btn btn-dark">{i18n.t('common.exploreMarketplaces')}</Link>
+                    {!hasAnyMarketplace && <Link href="/owner/create" className="btn btn-outline">{i18n.t('...home.page.createOne')}</Link>}
                   </div>
                 </div>
               ) : (
@@ -404,10 +405,10 @@ export default async function HomeDashboard(
                       : l.priceCents ?? 0;
                     const postedLabel =
                       hoursOld < 1
-                        ? "Just posted"
+                        ? i18n.t('...home.page.justPosted')
                         : hoursOld < 24
-                          ? `${Math.max(1, Math.round(hoursOld))}h ago`
-                          : `${Math.max(1, Math.round(hoursOld / 24))}d ago`;
+                          ? i18n.t('...home.page.var0hAgo', { var0: Math.max(1, Math.round(hoursOld)) })
+                          : i18n.t('...home.page.var0dAgo', { var0: Math.max(1, Math.round(hoursOld / 24)) });
                     const auctionEndsIn = l.auctionEndsAt ? timeUntilShort(l.auctionEndsAt) : null;
                     return (
                       <Link key={l.id} href={`/l/${l.id}`} className="feed-item" data-testid="feed-item">
@@ -423,9 +424,9 @@ export default async function HomeDashboard(
                             }}
                           >
                             {isAuction && auctionEndsIn ? (
-                              <span className="chip auction">Auction · {auctionEndsIn}</span>
+                              <span className="chip auction">{i18n.t('...home.page.auction')} {auctionEndsIn}</span>
                             ) : fresh ? (
-                              <span className="chip">New</span>
+                              <span className="chip">{i18n.t('common.new')}</span>
                             ) : null}
                           </div>
                         )}
@@ -443,22 +444,22 @@ export default async function HomeDashboard(
                             <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
                               {isIso ? (
                                 <span className="fi-iso-price">
-                                  Looking for{priceCents > 0 ? ` · up to ${formatMoney(priceCents)}` : ""}
+                                  {i18n.t('...home.page.lookingFor')}{priceCents > 0 ? i18n.t('...home.page.upToFormatmoneyresult', { formatMoneyResult: formatMoney(priceCents) }) : ""}
                                 </span>
                               ) : (
                                 <span className="fi-price">{formatMoney(priceCents)}</span>
                               )}
                               {isIso ? (
-                                <span className="fi-tag match">Wanted</span>
+                                <span className="fi-tag match">{i18n.t('common.wanted')}</span>
                               ) : fresh ? (
-                                <span className="fi-tag new">New</span>
+                                <span className="fi-tag new">{i18n.t('common.new')}</span>
                               ) : isAuction ? (
-                                <span className="fi-tag ending">Live</span>
+                                <span className="fi-tag ending">{i18n.t('...home.page.live')}</span>
                               ) : null}
                             </div>
                             <span className="fi-meta">
                               {isAuction && l._count.bids > 0 && <span>{l._count.bids} bids</span>}
-                              <span>Posted {postedLabel}</span>
+                              <span>{i18n.t('...home.page.posted')} {postedLabel}</span>
                             </span>
                           </div>
                         </div>
@@ -479,27 +480,27 @@ export default async function HomeDashboard(
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" />
                     </svg>
-                    Your listings
+                    {i18n.t('...home.page.yourListings')}
                   </h3>
-                  {myActiveCount > 0 && <Link href="/activity">Manage all</Link>}
+                  {myActiveCount > 0 && <Link href="/activity">{i18n.t('...home.page.manageAll')}</Link>}
                 </div>
                 <div className="mine-stats">
                   <div>
                     <div className="v">{myActiveCount}</div>
-                    <span>Active</span>
+                    <span>{i18n.t('common.active')}</span>
                   </div>
                   <div>
                     <div className="v">{myOfferCount}</div>
-                    <span>Offers</span>
+                    <span>{i18n.t('...home.page.offers')}</span>
                   </div>
                   <div>
                     <div className="v">{myViewsTotal}</div>
-                    <span>Views</span>
+                    <span>{i18n.t('...home.page.views')}</span>
                   </div>
                 </div>
                 {myListings.length === 0 ? (
                   <div className="empty-mini">
-                    You haven't posted anything yet. Your active listings and offers will show up here.
+                    {i18n.t('...home.page.youHaventPostedAnythingYet')}
                   </div>
                 ) : (
                   myListings.map((l) => {
@@ -549,13 +550,13 @@ export default async function HomeDashboard(
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
                     </svg>
-                    Saved listings
+                    {i18n.t('...home.page.savedListings')}
                   </h3>
-                  {mySaved.length > 0 && <Link href="/activity?tab=saved">See all</Link>}
+                  {mySaved.length > 0 && <Link href="/activity?tab=saved">{i18n.t('common.seeAll')}</Link>}
                 </div>
                 {mySaved.length === 0 ? (
                   <div className="empty-mini">
-                    Nothing saved yet. Tap the bookmark on any listing to keep tabs on it.
+                    {i18n.t('...home.page.nothingSavedYetTapThe')}
                   </div>
                 ) : (
                   mySaved.map((s) => {
@@ -577,7 +578,7 @@ export default async function HomeDashboard(
                           <div className="rv-title">{l.title}</div>
                           <div className="rv-sub">
                             <span>{l.marketplace.name}</span>
-                            <span>· Saved {shortAgo(s.createdAt)}</span>
+                            <span>{i18n.t('...home.page.saved')} {shortAgo(s.createdAt)}</span>
                           </div>
                         </div>
                         <div className="rv-price">{formatMoneyFull(price)}</div>
@@ -635,5 +636,5 @@ function shortAgo(d: Date) {
   if (hours < 1) return "just now";
   if (hours < 24) return `${Math.round(hours)}h ago`;
   const days = Math.round(hours / 24);
-  return days === 1 ? "yesterday" : `${days}d ago`;
+  return days === 1 ? "yesterday" : i18n.t('...home.page.daysdAgo', { days });
 }

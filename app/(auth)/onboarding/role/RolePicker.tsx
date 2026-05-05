@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Compass, Wrench, Check } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { i18n } from '@shipeasy/sdk/client'
 
 type Role = "MEMBER" | "OWNER";
 
@@ -32,8 +33,8 @@ export function RolePicker() {
           onSelect={() => setRole("MEMBER")}
           icon={<Compass size={22} />}
           tag="Browse & collect"
-          title="I'm here to join marketplaces."
-          description="Discover vetted communities, apply to join, and buy or bid on what you love."
+          title={i18n.t('...role.rolePicker.imHereToJoinMarketplaces')}
+          description={i18n.t('...role.rolePicker.discoverVettedCommunitiesApplyToDescript')}
           testid="role-member"
         />
         <RoleCard
@@ -41,8 +42,8 @@ export function RolePicker() {
           onSelect={() => setRole("OWNER")}
           icon={<Wrench size={22} />}
           tag="Build & run"
-          title="I want to run a marketplace."
-          description="Set up your community in minutes — your schema, your members, your rules."
+          title={i18n.t('...role.rolePicker.iWantToRunA')}
+          description={i18n.t('...role.rolePicker.setUpYourCommunityInDescription')}
           testid="role-owner"
         />
       </div>
@@ -54,7 +55,7 @@ export function RolePicker() {
           onClick={save}
           data-testid="continue-role"
         >
-          {saving ? "Saving…" : "Continue"}
+          {saving ? i18n.t('common.saving') : i18n.t('common.continue')}
         </Button>
       </div>
     </div>

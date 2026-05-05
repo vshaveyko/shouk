@@ -2,8 +2,9 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { VerificationPanel } from "./VerificationPanel";
+import { i18n } from '@shipeasy/sdk/client'
 
-export const metadata = { title: "Verify your identity" };
+export const metadata = { title: i18n.t('...verify.page.verifyYourIdentity') };
 
 export default async function VerifyPage(
   props: {
@@ -30,12 +31,12 @@ export default async function VerifyPage(
     <main className="min-h-[calc(100vh-64px)] py-12 px-4">
       <div className="mx-auto w-full max-w-[640px]">
         <div className="text-center mb-8">
-          <p className="text-[12px] tracking-[0.14em] uppercase text-blue-ink font-semibold mb-3">Step 2</p>
+          <p className="text-[12px] tracking-[0.14em] uppercase text-blue-ink font-semibold mb-3">{i18n.t('...verify.page.step2')}</p>
           <h1 className="text-[32px] font-semibold tracking-[-0.03em] mb-3">
-            Verify your <span className="serif italic text-blue">identity</span>
+            {i18n.t('...verify.page.verifyYour')} <span className="serif italic text-blue">identity</span>
           </h1>
           <p className="text-[15px] text-ink-soft max-w-[480px] mx-auto">
-            Link accounts you already use. Most marketplaces require at least one. You can do this later — but verifying now unlocks applications.
+            {i18n.t('...verify.page.linkAccountsYouAlreadyUse')}
           </p>
         </div>
         <VerificationPanel

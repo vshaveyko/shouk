@@ -6,9 +6,10 @@ import { BrandLockup } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { prisma } from "@/lib/prisma";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Explore marketplaces" };
+export const metadata = { title: i18n.t('common.exploreMarketplaces') };
 
 const entryLabels: Record<string, string> = {
   APPLICATION: "Application",
@@ -68,7 +69,7 @@ export default async function ExplorePage(
           <div className="h-full max-w-[1280px] mx-auto px-6 flex items-center justify-between">
             <BrandLockup href="/" size={24} />
             <div className="flex items-center gap-2">
-              <Link href="/signin"><Button variant="primary" size="md">Log in</Button></Link>
+              <Link href="/signin"><Button variant="primary" size="md">{i18n.t('common.logIn')}</Button></Link>
             </div>
           </div>
         </header>
@@ -77,17 +78,16 @@ export default async function ExplorePage(
       <main className="max-w-[1280px] mx-auto px-6 py-10">
         <div className="mb-8">
           <div className="text-[12px] tracking-[0.14em] uppercase text-blue-ink font-semibold mb-3">
-            Discover
+            {i18n.t('...explore.page.discover')}
           </div>
           <h1
             className="tracking-[-0.01em] leading-[1.05]"
             style={{ fontFamily: '"Instrument Serif", serif', fontWeight: 400, fontSize: 44 }}
           >
-            Find communities <em className="text-blue-ink italic">worth joining</em>.
+            {i18n.t('...explore.page.findCommunities')} <em className="text-blue-ink italic">{i18n.t('...explore.page.worthJoining')}</em>.
           </h1>
           <p className="text-[14px] text-muted mt-2 max-w-[560px]">
-            Small, vetted marketplaces run by people who care — not algorithms. Filter by
-            category or search a name.
+            {i18n.t('...explore.page.smallVettedMarketplacesRunBy')}
           </p>
         </div>
 
@@ -98,7 +98,7 @@ export default async function ExplorePage(
               type="search"
               name="q"
               defaultValue={q}
-              placeholder="Search by name, category, or vibe…"
+              placeholder={i18n.t('...explore.page.searchByNameCategoryOrPlaceholder')}
               className="w-full h-[42px] pl-10 pr-4 rounded-[10px] border border-line bg-surface text-[14px] focus-visible:outline-none focus-visible:border-blue focus-visible:ring-[3px] focus-visible:ring-[var(--blue-softer)]"
               data-testid="explore-search"
             />
@@ -109,8 +109,8 @@ export default async function ExplorePage(
           <div className="bg-surface border border-line rounded-[14px]">
             <EmptyState
               icon={<Compass size={32} />}
-              title={q ? "No marketplaces match that search." : "Nothing here yet."}
-              description={q ? "Try a broader term — or check back later." : "Be the first to start a marketplace."}
+              title={q ? i18n.t('...explore.page.noMarketplacesMatchThatSearch') : i18n.t('...explore.page.nothingHereYet')}
+              description={q ? i18n.t('...explore.page.tryABroaderTermOr') : i18n.t('...explore.page.beTheFirstToStart')}
             />
           </div>
         ) : (

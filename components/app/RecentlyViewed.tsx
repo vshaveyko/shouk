@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { formatCents } from "@/lib/utils";
+import { i18n } from '@shipeasy/sdk/client'
 
 type RecentListing = {
   id: string;
@@ -67,7 +68,7 @@ export function RecentlyViewedSection() {
 
   return (
     <section className="mt-8" data-testid="recently-viewed">
-      <h2 className="text-[15px] font-semibold mb-3">Recently viewed</h2>
+      <h2 className="text-[15px] font-semibold mb-3">{i18n.t('...app.recentlyViewed.recentlyViewed')}</h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
         {listings.map((l) => (
           <Link
@@ -79,7 +80,7 @@ export function RecentlyViewedSection() {
               {l.image ? (
                 <img src={l.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
               ) : (
-                <div className="absolute inset-0 grid place-items-center text-muted text-[11px]">No image</div>
+                <div className="absolute inset-0 grid place-items-center text-muted text-[11px]">{i18n.t('...app.recentlyViewed.noImage')}</div>
               )}
             </div>
             <div className="p-2">

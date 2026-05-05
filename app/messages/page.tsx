@@ -5,9 +5,10 @@ import { prisma } from "@/lib/prisma";
 import { getUserContext } from "@/lib/auth-helpers";
 import { Navbar } from "@/components/app/Navbar";
 import { countUnreadThreads } from "@/lib/messages";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Messages" };
+export const metadata = { title: i18n.t('common.messages') };
 
 // SHK-059: universal inbox. Lists every thread the user is a participant
 // of, across every marketplace, ordered by lastMessageAt desc. Each row
@@ -56,7 +57,7 @@ export default async function UniversalInboxPage() {
       (!mine?.lastReadAt || last.createdAt > mine.lastReadAt);
     return {
       id: t.id,
-      otherName: other?.displayName ?? other?.name ?? "Member",
+      otherName: other?.displayName ?? other?.name ?? i18n.t('common.member'),
       otherImage: other?.image ?? null,
       marketplace: t.marketplace,
       listing: t.listing,
@@ -84,17 +85,17 @@ export default async function UniversalInboxPage() {
 
       <main className="max-w-[920px] mx-auto px-6 py-8">
         <div className="mb-5">
-          <h1 className="text-[28px] font-serif font-normal tracking-[-0.01em]">Messages</h1>
+          <h1 className="text-[28px] font-serif font-normal tracking-[-0.01em]">{i18n.t('common.messages')}</h1>
           <p className="text-[13px] text-muted mt-1">
-            Every conversation across the marketplaces you belong to.
+            {i18n.t('...messages.page.everyConversationAcrossTheMarketplaces')}
           </p>
         </div>
 
         {threads.length === 0 ? (
           <div className="bg-surface border border-line rounded-[12px] p-10 text-center">
-            <div className="text-[14px] font-medium mb-1">No conversations yet</div>
+            <div className="text-[14px] font-medium mb-1">{i18n.t('...messages.page.noConversationsYet')}</div>
             <div className="text-[13px] text-muted">
-              Message a seller from any listing and the conversation will land here.
+              {i18n.t('...messages.page.messageASellerFromAny')}
             </div>
           </div>
         ) : (
@@ -121,7 +122,7 @@ export default async function UniversalInboxPage() {
                       <div className="flex items-center gap-2 min-w-0">
                         <span className="text-[14px] font-medium truncate">{t.otherName}</span>
                         {t.unread && (
-                          <span className="w-2 h-2 rounded-full bg-danger shrink-0" aria-label="Unread" />
+                          <span className="w-2 h-2 rounded-full bg-danger shrink-0" aria-label={i18n.t('...messages.page.unreadAria-label')} />
                         )}
                       </div>
                       <span className="text-[11.5px] text-muted shrink-0">
@@ -141,7 +142,7 @@ export default async function UniversalInboxPage() {
                           <span className="font-medium">{t.listing.title}</span>
                         </>
                       ) : (
-                        <span className="text-muted">Direct message</span>
+                        <span className="text-muted">{i18n.t('...messages.page.directMessage')}</span>
                       )}
                     </div>
                     <div className="text-[13px] text-ink-soft mt-1 truncate">{t.preview}</div>

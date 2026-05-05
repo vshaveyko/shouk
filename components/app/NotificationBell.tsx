@@ -5,6 +5,7 @@ import Link from "next/link";
 import * as Popover from "@radix-ui/react-popover";
 import { Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { i18n } from '@shipeasy/sdk/client'
 
 type NotificationItem = {
   id: string;
@@ -125,7 +126,7 @@ export function NotificationBell({ initialCount = 0 }: { initialCount?: number }
       <Popover.Trigger asChild>
         <button
           type="button"
-          aria-label="Notifications"
+          aria-label={i18n.t('...app.notificationBell.notificationsAria-label')}
           data-testid="notifications-bell"
           className="h-9 w-9 rounded-[10px] inline-flex items-center justify-center hover:bg-hover text-ink-soft relative"
         >
@@ -148,7 +149,7 @@ export function NotificationBell({ initialCount = 0 }: { initialCount?: number }
           className="w-[380px] max-w-[calc(100vw-24px)] bg-surface border border-line rounded-[12px] shadow-lg animate-fade-in-up z-50 overflow-hidden"
         >
           <div className="flex items-center justify-between px-4 py-3 border-b border-line">
-            <div className="text-[14px] font-semibold">Notifications</div>
+            <div className="text-[14px] font-semibold">{i18n.t('...app.notificationBell.notificationsAria-label')}</div>
             {count > 0 && (
               <span className="inline-flex items-center h-5 px-2 rounded-full bg-blue-soft text-blue-ink text-[11px] font-semibold">
                 {count} unread
@@ -157,12 +158,12 @@ export function NotificationBell({ initialCount = 0 }: { initialCount?: number }
           </div>
           <div className="max-h-[420px] overflow-y-auto">
             {loading && items.length === 0 ? (
-              <div className="px-4 py-8 text-center text-[13px] text-muted">Loading…</div>
+              <div className="px-4 py-8 text-center text-[13px] text-muted">{i18n.t('common.loading3')}</div>
             ) : items.length === 0 ? (
               <div className="px-4 py-10 text-center">
                 <Bell size={22} className="mx-auto text-ink-soft" />
-                <div className="mt-2 text-[13px] font-medium">You're all caught up</div>
-                <div className="text-[12px] text-muted">Nothing new right now.</div>
+                <div className="mt-2 text-[13px] font-medium">{i18n.t('...app.notificationBell.youreAllCaughtUp')}</div>
+                <div className="text-[12px] text-muted">{i18n.t('...app.notificationBell.nothingNewRightNow')}</div>
               </div>
             ) : (
               <ul className="divide-y divide-line-soft">
@@ -204,7 +205,7 @@ export function NotificationBell({ initialCount = 0 }: { initialCount?: number }
               onClick={() => setOpen(false)}
               className="block text-center text-[13px] font-medium text-blue-ink hover:underline"
             >
-              See all notifications
+              {i18n.t('...app.notificationBell.seeAllNotifications')}
             </Link>
           </div>
         </Popover.Content>

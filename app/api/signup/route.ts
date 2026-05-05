@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const runtime = "nodejs";
 
@@ -16,7 +17,7 @@ export async function POST(req: Request) {
   const parsed = schema.safeParse(json);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: parsed.error.issues[0]?.message ?? "Invalid input" },
+      { error: parsed.error.issues[0]?.message ?? i18n.t('...signup.route.invalidInput') },
       { status: 400 },
     );
   }

@@ -41,6 +41,7 @@ import {
   DialogClose,
 } from "@/components/ui";
 import { cn } from "@/lib/utils";
+import { i18n } from '@shipeasy/sdk/client'
 
 type FieldType =
   | "SHORT_TEXT"
@@ -82,14 +83,14 @@ type Initial = {
 };
 
 const FIELD_TYPE_OPTIONS: { value: FieldType; label: string }[] = [
-  { value: "SHORT_TEXT", label: "Short text" },
-  { value: "LONG_TEXT", label: "Long text" },
-  { value: "NUMBER", label: "Number" },
-  { value: "CURRENCY", label: "Currency" },
-  { value: "SELECT", label: "Single select" },
-  { value: "MULTI_SELECT", label: "Multi select" },
-  { value: "DATE", label: "Date" },
-  { value: "IMAGE", label: "Image" },
+  { value: "SHORT_TEXT", label: i18n.t('common.shortText') },
+  { value: "LONG_TEXT", label: i18n.t('common.longText') },
+  { value: "NUMBER", label: i18n.t('common.number') },
+  { value: "CURRENCY", label: i18n.t('common.currency') },
+  { value: "SELECT", label: i18n.t('common.singleSelect') },
+  { value: "MULTI_SELECT", label: i18n.t('common.multiSelect') },
+  { value: "DATE", label: i18n.t('common.date') },
+  { value: "IMAGE", label: i18n.t('common.image') },
 ];
 
 const uid = () =>
@@ -300,18 +301,16 @@ export function SchemaEditor({
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok) {
-        toast.error(json?.error ?? "Couldn't save schema.");
+        toast.error(json?.error ?? i18n.t('...schema.schemaEditor.couldntSaveSchema'));
         return;
       }
       toast.success(
-        `Schema saved${
-          json.archived > 0 ? ` — ${json.archived} field(s) archived` : ""
-        }.`,
+        i18n.t('...schema.schemaEditor.schemaSavedvar0', { var0: json.archived > 0 ? ` — ${json.archived} field(s) archived` : "" }),
       );
       setConfirmOpen(false);
       router.refresh();
     } catch {
-      toast.error("Network error. Please try again.");
+      toast.error(i18n.t('common.networkErrorPleaseTryAgain'));
     } finally {
       setSaving(false);
     }
@@ -322,9 +321,7 @@ export function SchemaEditor({
       <div className="rounded-[10px] border border-warn/20 bg-warn-soft px-4 py-3 flex items-start gap-3">
         <AlertTriangle size={18} className="text-warn shrink-0 mt-0.5" />
         <div className="text-[13px] text-ink-soft">
-          <span className="font-medium text-ink">Heads up:</span> changing the
-          schema affects every existing listing. Removed fields with live data are
-          archived (not deleted) to preserve history.
+          <span className="font-medium text-ink">{i18n.t('...schema.schemaEditor.headsUp')}</span> {i18n.t('...schema.schemaEditor.changingTheSchemaAffectsEvery')}
         </div>
       </div>
 
@@ -332,10 +329,9 @@ export function SchemaEditor({
         <CardHeader>
           <div className="flex items-start justify-between gap-3">
             <div>
-              <CardTitle>Listing schema</CardTitle>
+              <CardTitle>{i18n.t('common.listingSchema')}</CardTitle>
               <CardDescription>
-                Define what every listing in this marketplace looks like. Up to 25
-                fields.
+                {i18n.t('...schema.schemaEditor.defineWhatEveryListingIn')}
               </CardDescription>
             </div>
             <Badge>
@@ -358,7 +354,7 @@ export function SchemaEditor({
               />
             ))}
             {fields.length === 0 && (
-              <p className="text-[13px] text-muted">No fields yet.</p>
+              <p className="text-[13px] text-muted">{i18n.t('...schema.schemaEditor.noFieldsYet')}</p>
             )}
           </div>
 
@@ -371,7 +367,7 @@ export function SchemaEditor({
               disabled={fields.length >= 25}
               className="gap-1.5"
             >
-              <Plus size={16} /> Add field
+              <Plus size={16} /> {i18n.t('common.addField')}
             </Button>
           </div>
         </CardContent>
@@ -382,7 +378,7 @@ export function SchemaEditor({
             data-testid="schema-save"
             disabled={!isDirty || saving}
           >
-            Save schema
+            {i18n.t('...schema.schemaEditor.saveSchema')}
           </Button>
         </CardFooter>
       </Card>
@@ -397,7 +393,7 @@ export function SchemaEditor({
               data-testid="schema-toggle-archived"
             >
               <div>
-                <CardTitle>Archived fields</CardTitle>
+                <CardTitle>{i18n.t('...schema.schemaEditor.archivedFields')}</CardTitle>
                 <CardDescription>
                   {archived.length} field{archived.length === 1 ? "" : "s"} hidden
                   from the listing form but preserved on existing listings.
@@ -435,7 +431,7 @@ export function SchemaEditor({
                       data-testid={`schema-restore-${f.name}`}
                       onClick={() => restoreArchived(f.uid)}
                     >
-                      <RotateCcw size={14} /> Restore
+                      <RotateCcw size={14} /> {i18n.t('common.restore')}
                     </Button>
                   </li>
                 ))}
@@ -453,30 +449,29 @@ export function SchemaEditor({
                 <AlertTriangle size={18} className="text-warn" />
               </div>
               <div>
-                <DialogTitle>Apply schema changes?</DialogTitle>
+                <DialogTitle>{i18n.t('...schema.schemaEditor.applySchemaChanges')}</DialogTitle>
                 <DialogDescription>
-                  These updates will affect every active listing in your
-                  marketplace.
+                  {i18n.t('...schema.schemaEditor.theseUpdatesWillAffectEvery')}
                 </DialogDescription>
               </div>
             </div>
           </DialogHeader>
           <DialogBody>
             <ul className="space-y-1.5 text-[13.5px] text-ink-soft list-disc pl-5">
-              <li>New required fields aren't back-filled — sellers see them on edit.</li>
+              <li>{i18n.t('...schema.schemaEditor.newRequiredFieldsArentBackfilled')}</li>
               {removedFromActive.length > 0 && (
                 <li>
                   {removedFromActive.length} field(s) will be removed or archived
                   if referenced by listings.
                 </li>
               )}
-              <li>Option changes apply to new listings and edits.</li>
+              <li>{i18n.t('...schema.schemaEditor.optionChangesApplyToNew')}</li>
             </ul>
           </DialogBody>
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="secondary" data-testid="schema-confirm-cancel">
-                Cancel
+                {i18n.t('common.cancel')}
               </Button>
             </DialogClose>
             <Button
@@ -486,7 +481,7 @@ export function SchemaEditor({
               onClick={confirmSave}
               disabled={saving}
             >
-              {saving ? "Saving…" : "Apply changes"}
+              {saving ? i18n.t('common.saving') : i18n.t('...schema.schemaEditor.applyChanges')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -525,7 +520,7 @@ function FieldRow({
             type="button"
             onClick={onMoveUp}
             disabled={index === 0}
-            aria-label="Move up"
+            aria-label={i18n.t('common.moveUp')}
             className="h-7 w-7 grid place-items-center rounded-[6px] text-ink-soft hover:bg-hover disabled:opacity-30 disabled:hover:bg-transparent"
           >
             <ArrowUp size={14} />
@@ -534,7 +529,7 @@ function FieldRow({
             type="button"
             onClick={onMoveDown}
             disabled={index === total - 1}
-            aria-label="Move down"
+            aria-label={i18n.t('common.moveDown')}
             className="h-7 w-7 grid place-items-center rounded-[6px] text-ink-soft hover:bg-hover disabled:opacity-30 disabled:hover:bg-transparent"
           >
             <ArrowDown size={14} />
@@ -543,18 +538,18 @@ function FieldRow({
 
         <div className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
-            <Label htmlFor={`f-${field.uid}-label`}>Display name</Label>
+            <Label htmlFor={`f-${field.uid}-label`}>{i18n.t('common.displayName')}</Label>
             <Input
               id={`f-${field.uid}-label`}
               data-testid={`schema-field-${index}-label`}
               value={field.label}
               onChange={(e) => onChange({ label: e.target.value })}
-              placeholder="e.g. Condition"
+              placeholder={i18n.t('common.egCondition')}
               maxLength={80}
             />
           </div>
           <div>
-            <Label>Field type</Label>
+            <Label>{i18n.t('common.fieldType')}</Label>
             <Select
               value={field.type}
               onValueChange={(v) => onChange({ type: v as FieldType })}
@@ -573,20 +568,20 @@ function FieldRow({
           </div>
 
           <div className="md:col-span-2">
-            <Label htmlFor={`f-${field.uid}-help`}>Help text</Label>
+            <Label htmlFor={`f-${field.uid}-help`}>{i18n.t('common.helpText')}</Label>
             <Input
               id={`f-${field.uid}-help`}
               data-testid={`schema-field-${index}-help`}
               value={field.helpText ?? ""}
               onChange={(e) => onChange({ helpText: e.target.value })}
-              placeholder="Shown under the field when sellers fill it out."
+              placeholder={i18n.t('common.shownUnderTheFieldWhen')}
               maxLength={200}
             />
           </div>
 
           {(field.type === "SELECT" || field.type === "MULTI_SELECT") && (
             <div className="md:col-span-2">
-              <Label>Options</Label>
+              <Label>{i18n.t('common.options')}</Label>
               <OptionsEditor
                 options={field.options ?? []}
                 onChange={(opts) => onChange({ options: opts })}
@@ -597,7 +592,7 @@ function FieldRow({
           {field.type === "IMAGE" && (
             <>
               <div>
-                <Label htmlFor={`f-${field.uid}-min`}>Min images</Label>
+                <Label htmlFor={`f-${field.uid}-min`}>{i18n.t('common.minImages')}</Label>
                 <Input
                   id={`f-${field.uid}-min`}
                   type="number"
@@ -608,7 +603,7 @@ function FieldRow({
                 />
               </div>
               <div>
-                <Label htmlFor={`f-${field.uid}-max`}>Max images</Label>
+                <Label htmlFor={`f-${field.uid}-max`}>{i18n.t('common.maxImages')}</Label>
                 <Input
                   id={`f-${field.uid}-max`}
                   type="number"
@@ -626,7 +621,7 @@ function FieldRow({
           <button
             type="button"
             onClick={onRemove}
-            aria-label="Remove field"
+            aria-label={i18n.t('common.removeField')}
             data-testid={`schema-field-${index}-remove`}
             className="h-7 w-7 grid place-items-center rounded-[6px] text-ink-soft hover:bg-hover hover:text-danger"
           >
@@ -636,10 +631,10 @@ function FieldRow({
             <Switch
               checked={field.required}
               onCheckedChange={(v) => onChange({ required: !!v })}
-              aria-label="Required field"
+              aria-label={i18n.t('common.requiredField')}
               data-testid={`schema-field-${index}-required`}
             />
-            Required
+            {i18n.t('common.required')}
           </label>
         </div>
       </div>
@@ -665,12 +660,12 @@ function OptionsEditor({
               next[i] = e.target.value;
               onChange(next);
             }}
-            placeholder={`Option ${i + 1}`}
+            placeholder={i18n.t('common.optionVar0', { var0: i + 1 })}
           />
           <button
             type="button"
             onClick={() => onChange(options.filter((_, idx) => idx !== i))}
-            aria-label="Remove option"
+            aria-label={i18n.t('common.removeOption')}
             className="h-[38px] w-[38px] grid place-items-center rounded-[10px] border border-line text-ink-soft hover:bg-hover hover:text-danger shrink-0"
           >
             <X size={14} />
@@ -684,7 +679,7 @@ function OptionsEditor({
         className="gap-1"
         onClick={() => onChange([...options, ""])}
       >
-        <Plus size={14} /> Add option
+        <Plus size={14} /> {i18n.t('common.addOption')}
       </Button>
     </div>
   );

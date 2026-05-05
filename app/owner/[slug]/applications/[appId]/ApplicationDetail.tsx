@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { timeAgo, verifyProviders } from "@/lib/utils";
 import { ApplicationActions } from "./ApplicationActions";
+import { i18n } from '@shipeasy/sdk/client'
 
 function initials(name: string) {
   const parts = name.trim().split(/\s+/);
@@ -40,7 +41,7 @@ export async function ApplicationDetail({
 
   const user = app.user;
   const answers = (app.answers ?? {}) as Record<string, unknown>;
-  const displayName = user.displayName ?? user.name ?? user.email ?? "Applicant";
+  const displayName = user.displayName ?? user.name ?? user.email ?? i18n.t('common.applicant');
   const required = app.marketplace.requiredVerifications;
   const verifiedSet = new Set(user.verifiedAccounts.map((v) => v.provider));
 
@@ -62,7 +63,7 @@ export async function ApplicationDetail({
           <div>
             <h2>{displayName}</h2>
             <div className="qd-meta">
-              <span>Applied {timeAgo(app.createdAt)}</span>
+              <span>{i18n.t('...[appId].applicationDetail.applied')} {timeAgo(app.createdAt)}</span>
               {user.email && (
                 <>
                   <span className="dot"></span>
@@ -70,7 +71,7 @@ export async function ApplicationDetail({
                 </>
               )}
               <span className="dot"></span>
-              <span>Account {accountAgeDays}d old</span>
+              <span>{i18n.t('common.account')} {accountAgeDays}{i18n.t('...[appId].applicationDetail.dOld')}</span>
             </div>
           </div>
         </div>
@@ -82,13 +83,13 @@ export async function ApplicationDetail({
       <div className="qd-grid">
         <div className="qd-answers">
           <div className="qd-sub">
-            Application answers ·{" "}
+            {i18n.t('...[appId].applicationDetail.applicationAnswers')}{" "}
             {Object.keys(answers).length} of{" "}
             {app.marketplace.applicationQuestions.length}
           </div>
           {app.marketplace.applicationQuestions.length === 0 ? (
             <div style={{ fontSize: 13, color: "var(--muted)" }}>
-              No application questions configured.
+              {i18n.t('...[appId].applicationDetail.noApplicationQuestionsConfigured')}
             </div>
           ) : (
             app.marketplace.applicationQuestions.map((q) => {
@@ -115,11 +116,11 @@ export async function ApplicationDetail({
 
         <aside className="qd-side">
           <div className="qd-panel">
-            <h4>Identity verification</h4>
+            <h4>{i18n.t('...[appId].applicationDetail.identityVerification')}</h4>
             <div className="verif-list">
               {required.length === 0 ? (
                 <div style={{ fontSize: 12, color: "var(--muted)" }}>
-                  No providers required.
+                  {i18n.t('...[appId].applicationDetail.noProvidersRequired')}
                 </div>
               ) : (
                 required.map((p) => {
@@ -147,10 +148,10 @@ export async function ApplicationDetail({
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
                               <path d="M20 6 9 17l-5-5" />
                             </svg>
-                            Verified
+                            {i18n.t('common.verified')}
                           </>
                         ) : (
-                          <>Missing</>
+                          <>{i18n.t('...[appId].applicationDetail.missing')}</>
                         )}
                       </span>
                     </div>
@@ -161,18 +162,18 @@ export async function ApplicationDetail({
           </div>
 
           <div className="qd-panel">
-            <h4>Signals</h4>
+            <h4>{i18n.t('...[appId].applicationDetail.signals')}</h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, fontSize: 12.5 }}>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ color: "var(--muted)" }}>Email domain</span>
+                <span style={{ color: "var(--muted)" }}>{i18n.t('...[appId].applicationDetail.emailDomain')}</span>
                 <span style={{ fontWeight: 500 }}>{emailDomain ?? "—"}</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ color: "var(--muted)" }}>Account age</span>
+                <span style={{ color: "var(--muted)" }}>{i18n.t('...[appId].applicationDetail.accountAge')}</span>
                 <span style={{ fontWeight: 500 }}>{accountAgeDays} days</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ color: "var(--muted)" }}>Verified accounts</span>
+                <span style={{ color: "var(--muted)" }}>{i18n.t('common.verifiedAccounts')}</span>
                 <span style={{ fontWeight: 500 }}>{user.verifiedAccounts.length} linked</span>
               </div>
             </div>
@@ -180,7 +181,7 @@ export async function ApplicationDetail({
 
           {user.memberships.length > 0 && (
             <div className="qd-panel">
-              <h4>Other marketplaces</h4>
+              <h4>{i18n.t('...[appId].applicationDetail.otherMarketplaces')}</h4>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                 {user.memberships.map((m) => (
                   <Link

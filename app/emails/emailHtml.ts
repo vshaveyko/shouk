@@ -1,3 +1,4 @@
+import { i18n } from '@shipeasy/sdk/client'
 // Inline-styled, table-based HTML email templates. Each function returns a
 // self-contained HTML string safe to drop in a real email renderer later.
 // Colors are hex (not oklch) for email-client compat.
@@ -143,12 +144,12 @@ export function applicationApprovedHtml(opts: {
   ownerName?: string;
   ownerCosign?: string;
 }) {
-  const marketplace = opts.marketplace ?? "Ferrari Frenzy";
-  const applicant = opts.applicant ?? "Jane";
-  const owner = opts.ownerName ?? "Marcus Chen";
+  const marketplace = opts.marketplace ?? i18n.t('common.ferrariFrenzy');
+  const applicant = opts.applicant ?? i18n.t('common.jane');
+  const owner = opts.ownerName ?? i18n.t('common.marcusChen');
   const cosign =
     opts.ownerCosign ??
-    "Read your profile top to bottom — your 308 GT4 project photos were the tiebreaker. Welcome in. Post the writeup when you're ready, people will geek out with you.";
+    i18n.t('...emails.emailHtml.readYourProfileTopTo');
   const inner = `
     <tr>
       <td style="padding:32px 24px 8px;">
@@ -198,11 +199,11 @@ export function auctionWonHtml(opts: {
   seller?: string;
   payBy?: string;
 }) {
-  const listing = opts.listing ?? "1997 Ferrari F355 Spider · 6-speed";
-  const bidder = opts.bidder ?? "Jane";
+  const listing = opts.listing ?? i18n.t('common.1997FerrariF355Spider6speed');
+  const bidder = opts.bidder ?? i18n.t('common.jane');
   const amount = opts.amount ?? "$94,000";
-  const seller = opts.seller ?? "Marco C.";
-  const payBy = opts.payBy ?? "Fri, Mar 28 · 7:00 PM";
+  const seller = opts.seller ?? i18n.t('common.marcoC');
+  const payBy = opts.payBy ?? i18n.t('common.friMar28700Pm');
   const inner = `
     <tr>
       <td style="padding:32px 24px 8px;">
@@ -273,14 +274,14 @@ export function isoMatchHtml(opts: {
   recipient?: string;
   seller?: string;
 }) {
-  const iso = opts.iso ?? "1987–1991 Testarossa · Nero or Rosso Corsa";
-  const listing = opts.listing ?? "1987 Testarossa · Nero";
-  const marketplace = opts.marketplace ?? "Ferrari Frenzy";
-  const budget = opts.budget ?? "Budget $150–200k · Nero or Rosso Corsa · <45k miles";
+  const iso = opts.iso ?? i18n.t('common.19871991TestarossaNeroOrRosso');
+  const listing = opts.listing ?? i18n.t('common.1987TestarossaNero');
+  const marketplace = opts.marketplace ?? i18n.t('common.ferrariFrenzy');
+  const budget = opts.budget ?? i18n.t('common.budget150200kNeroOrRosso');
   const matchPrice = opts.matchPrice ?? "$184,000";
-  const matchSpecs = opts.matchSpecs ?? "38,412 mi · Monospecchio · Excellent";
-  const recipient = opts.recipient ?? "Jane";
-  const seller = opts.seller ?? "Marco C.";
+  const matchSpecs = opts.matchSpecs ?? i18n.t('common.38412MiMonospecchioExcellent');
+  const recipient = opts.recipient ?? i18n.t('common.jane');
+  const seller = opts.seller ?? i18n.t('common.marcoC');
 
   const inner = `
     <tr>

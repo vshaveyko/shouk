@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { i18n } from '@shipeasy/sdk/client'
 
 type FeedItem = {
   id: string;
@@ -90,10 +91,10 @@ export function HomeFeedSentinel({ initialCursor }: { initialCursor: string | nu
           : l.priceCents ?? 0;
         const postedLabel =
           hoursOld < 1
-            ? "Just posted"
+            ? i18n.t('...app.homeFeedSentinel.justPosted')
             : hoursOld < 24
-              ? `${Math.max(1, Math.round(hoursOld))}h ago`
-              : `${Math.max(1, Math.round(hoursOld / 24))}d ago`;
+              ? i18n.t('...app.homeFeedSentinel.var0hAgo', { var0: Math.max(1, Math.round(hoursOld)) })
+              : i18n.t('...app.homeFeedSentinel.var0dAgo', { var0: Math.max(1, Math.round(hoursOld / 24)) });
         const auctionEndsIn = l.auctionEndsAt ? timeUntilShort(l.auctionEndsAt) : null;
         return (
           <Link key={l.id} href={`/l/${l.id}`} className="feed-item" data-testid="feed-item">
@@ -109,9 +110,9 @@ export function HomeFeedSentinel({ initialCursor }: { initialCursor: string | nu
                 }}
               >
                 {isAuction && auctionEndsIn ? (
-                  <span className="chip auction">Auction · {auctionEndsIn}</span>
+                  <span className="chip auction">{i18n.t('...app.homeFeedSentinel.auction')} {auctionEndsIn}</span>
                 ) : fresh ? (
-                  <span className="chip">New</span>
+                  <span className="chip">{i18n.t('...app.homeFeedSentinel.new')}</span>
                 ) : null}
               </div>
             )}
@@ -129,22 +130,22 @@ export function HomeFeedSentinel({ initialCursor }: { initialCursor: string | nu
                 <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
                   {isIso ? (
                     <span className="fi-iso-price">
-                      Looking for{priceCents > 0 ? ` · up to ${formatMoney(priceCents)}` : ""}
+                      {i18n.t('...app.homeFeedSentinel.lookingFor')}{priceCents > 0 ? i18n.t('...app.homeFeedSentinel.upToFormatmoneyresult', { formatMoneyResult: formatMoney(priceCents) }) : ""}
                     </span>
                   ) : (
                     <span className="fi-price">{formatMoney(priceCents)}</span>
                   )}
                   {isIso ? (
-                    <span className="fi-tag match">Wanted</span>
+                    <span className="fi-tag match">{i18n.t('...app.homeFeedSentinel.wanted')}</span>
                   ) : fresh ? (
-                    <span className="fi-tag new">New</span>
+                    <span className="fi-tag new">{i18n.t('...app.homeFeedSentinel.new')}</span>
                   ) : isAuction ? (
-                    <span className="fi-tag ending">Live</span>
+                    <span className="fi-tag ending">{i18n.t('...app.homeFeedSentinel.live')}</span>
                   ) : null}
                 </div>
                 <span className="fi-meta">
                   {isAuction && l.bidCount > 0 && <span>{l.bidCount} bids</span>}
-                  <span>Posted {postedLabel}</span>
+                  <span>{i18n.t('...app.homeFeedSentinel.posted')} {postedLabel}</span>
                 </span>
               </div>
             </div>
@@ -157,7 +158,7 @@ export function HomeFeedSentinel({ initialCursor }: { initialCursor: string | nu
       )}
       {loading && (
         <div style={{ textAlign: "center", padding: "12px 0", fontSize: 12, color: "var(--muted)" }}>
-          Loading…
+          {i18n.t('common.loading3')}
         </div>
       )}
     </>

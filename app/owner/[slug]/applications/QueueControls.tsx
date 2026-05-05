@@ -10,26 +10,27 @@ import type {
   SortFilter,
   VerifFilter,
 } from "./filters";
+import { i18n } from '@shipeasy/sdk/client'
 
 type Counts = { pending: number; approved: number; rejected: number; all: number };
 
 const STATUS_TABS: { key: QueueStatusFilter; label: string }[] = [
-  { key: "PENDING", label: "Pending" },
-  { key: "APPROVED", label: "Approved" },
-  { key: "REJECTED", label: "Rejected" },
-  { key: "ALL", label: "All" },
+  { key: "PENDING", label: i18n.t('common.pending') },
+  { key: "APPROVED", label: i18n.t('...applications.queueControls.approved') },
+  { key: "REJECTED", label: i18n.t('...applications.queueControls.rejected') },
+  { key: "ALL", label: i18n.t('common.all') },
 ];
 
 const VERIF_OPTIONS: { key: VerifFilter; label: string }[] = [
-  { key: "all", label: "All verifications" },
-  { key: "full", label: "Fully verified" },
-  { key: "partial", label: "Partially verified" },
-  { key: "none", label: "Unverified" },
+  { key: "all", label: i18n.t('...applications.queueControls.allVerifications') },
+  { key: "full", label: i18n.t('...applications.queueControls.fullyVerified') },
+  { key: "partial", label: i18n.t('...applications.queueControls.partiallyVerified') },
+  { key: "none", label: i18n.t('...applications.queueControls.unverified') },
 ];
 
 const SORT_OPTIONS: { key: SortFilter; label: string }[] = [
-  { key: "oldest", label: "Oldest first" },
-  { key: "newest", label: "Newest first" },
+  { key: "oldest", label: i18n.t('...applications.queueControls.oldestFirst') },
+  { key: "newest", label: i18n.t('...applications.queueControls.newestFirst') },
 ];
 
 const DEFAULTS: QueueFilters = { status: "PENDING", q: "", verif: "all", sort: "oldest" };
@@ -83,13 +84,13 @@ export function QueueControls({
   }
 
   const verifLabel =
-    VERIF_OPTIONS.find((o) => o.key === filters.verif)?.label ?? "All verifications";
+    VERIF_OPTIONS.find((o) => o.key === filters.verif)?.label ?? i18n.t('...applications.queueControls.allVerifications');
   const sortLabel =
-    filters.sort === "newest" ? "Sort: Newest first" : "Sort: Oldest first";
+    filters.sort === "newest" ? i18n.t('...applications.queueControls.sortNewestFirst') : i18n.t('...applications.queueControls.sortOldestFirst');
 
   return (
     <div className="queue-head">
-      <nav className="queue-tabs" aria-label="Queue tabs">
+      <nav className="queue-tabs" aria-label={i18n.t('...applications.queueControls.queueTabsAria-label')}>
         {STATUS_TABS.map((tab) => {
           const active = filters.status === tab.key;
           const count =
@@ -126,8 +127,8 @@ export function QueueControls({
           <input
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            placeholder="Search applicants, answers…"
-            aria-label="Search applications"
+            placeholder={i18n.t('...applications.queueControls.searchApplicantsAnswersPlaceholder')}
+            aria-label={i18n.t('...applications.queueControls.searchApplicationsAria-label')}
             data-testid="apps-search"
           />
         </form>

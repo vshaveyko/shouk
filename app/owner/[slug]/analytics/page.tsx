@@ -1,9 +1,10 @@
 import { requireOwnerOf } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { OwnerShell } from "@/components/owner/OwnerShell";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Analytics" };
+export const metadata = { title: i18n.t('...analytics.page.analytics') };
 
 // Ported from design Flow 7 screen 7A — KPIs, sparklines, growth chart, top lists.
 const analyticsCss = `
@@ -290,7 +291,7 @@ export default async function AnalyticsPage(
   const sellerById = new Map(sellerInfo.map((s) => [s.id, s]));
   const topSellers = topSellersRaw.map((r) => {
     const u = sellerById.get(r.sellerId);
-    const displayName = u?.displayName ?? u?.name ?? "Unknown seller";
+    const displayName = u?.displayName ?? u?.name ?? i18n.t('...analytics.page.unknownSeller');
     return {
       id: r.sellerId,
       name: displayName,
@@ -307,24 +308,24 @@ export default async function AnalyticsPage(
         <div className="page-head">
           <div>
             <h1>
-              How <em>{marketplace.name}</em> is trending
+              How <em>{marketplace.name}</em> {i18n.t('...analytics.page.isTrending')}
             </h1>
             <div className="lead">
-              The last 30 days — member growth, listing velocity, engagement. A pulse, not a dashboard to stare at.
+              {i18n.t('...analytics.page.theLast30DaysMember')}
             </div>
           </div>
-          <div className="range-picker" role="tablist" aria-label="Time range">
+          <div className="range-picker" role="tablist" aria-label={i18n.t('...analytics.page.timeRangeAria-label')}>
             <button type="button">7d</button>
             <button type="button" className="on" aria-pressed="true">30d</button>
             <button type="button">90d</button>
-            <button type="button">All</button>
+            <button type="button">{i18n.t('common.all')}</button>
           </div>
         </div>
 
         <div className="kpi-grid">
           <KpiCard
             testId="kpi-members"
-            label="Members"
+            label={i18n.t('common.members')}
             icon={
               <>
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -341,7 +342,7 @@ export default async function AnalyticsPage(
           />
           <KpiCard
             testId="kpi-listings"
-            label="Active listings"
+            label={i18n.t('common.activeListings')}
             icon={
               <>
                 <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -358,7 +359,7 @@ export default async function AnalyticsPage(
           />
           <KpiCard
             testId="kpi-gmv"
-            label="Gross sales volume"
+            label={i18n.t('...analytics.page.grossSalesVolume')}
             icon={
               <>
                 <path d="M3 3v18h18" />
@@ -379,15 +380,15 @@ export default async function AnalyticsPage(
         <div className="chart-grid">
           <div className="panel" data-testid="analytics-growth-chart">
             <div className="panel-hd">
-              <h3>Member growth & listing activity</h3>
+              <h3>{i18n.t('...analytics.page.memberGrowthListingActivity')}</h3>
               <div className="chart-legend">
                 <span>
                   <span className="dot" style={{ background: "var(--success)" }} />
-                  New members
+                  {i18n.t('...analytics.page.newMembers')}
                 </span>
                 <span>
                   <span className="dot" style={{ background: "var(--blue)" }} />
-                  New listings
+                  {i18n.t('...analytics.page.newListings')}
                 </span>
               </div>
             </div>
@@ -397,7 +398,7 @@ export default async function AnalyticsPage(
                 viewBox="0 0 600 220"
                 preserveAspectRatio="none"
                 role="img"
-                aria-label="Member and listing trend over the last 30 days"
+                aria-label={i18n.t('...analytics.page.memberAndListingTrendOverAria-label')}
               >
                 {[40, 90, 140, 190].map((y) => (
                   <line key={y} className="gridline" x1="40" y1={y} x2="600" y2={y} />
@@ -413,7 +414,7 @@ export default async function AnalyticsPage(
                 })}
                 {[0, 1, 2, 3, 4].map((w) => {
                   const x = 40 + ((600 - 40) * w) / 4;
-                  const label = w === 4 ? "Now" : `W-${4 - w}`;
+                  const label = w === 4 ? "Now" : i18n.t('...analytics.page.wvar0', { var0: 4 - w });
                   return (
                     <text key={w} className="axis-lbl" x={x - 10} y={210}>
                       {label}
@@ -492,14 +493,14 @@ export default async function AnalyticsPage(
 
         <div className="panel">
           <div className="panel-hd">
-            <h3>This month's top performers</h3>
-            <span style={{ fontSize: 11, color: "var(--muted)" }}>Last 30 days</span>
+            <h3>{i18n.t('...analytics.page.thisMonthsTopPerformers')}</h3>
+            <span style={{ fontSize: 11, color: "var(--muted)" }}>{i18n.t('...analytics.page.last30Days')}</span>
           </div>
           <div className="top-grid">
             <div className="top-col" data-testid="top-sellers">
-              <div className="col-hd">Top sellers</div>
+              <div className="col-hd">{i18n.t('...analytics.page.topSellers')}</div>
               {topSellers.length === 0 ? (
-                <div className="empty">No sales yet in this period.</div>
+                <div className="empty">{i18n.t('...analytics.page.noSalesYetInThis')}</div>
               ) : (
                 topSellers.map((s, i) => (
                   <div key={s.id} className="top-row">
@@ -510,7 +511,7 @@ export default async function AnalyticsPage(
                     <div className="tr-body">
                       <div className="tr-name">{s.name}</div>
                       <div className="tr-meta">
-                        {s.sold} sold · {s.active} active
+                        {s.sold} {i18n.t('...analytics.page.sold')} {s.active} active
                       </div>
                     </div>
                     <div className="tr-val">{shortCurrency(s.gmvCents)}</div>
@@ -519,9 +520,9 @@ export default async function AnalyticsPage(
               )}
             </div>
             <div className="top-col" data-testid="top-listings">
-              <div className="col-hd">Most viewed listings</div>
+              <div className="col-hd">{i18n.t('...analytics.page.mostViewedListings')}</div>
               {topListings.length === 0 ? (
-                <div className="empty">No listings yet.</div>
+                <div className="empty">{i18n.t('common.noListingsYet')}</div>
               ) : (
                 topListings.map((l, i) => (
                   <div key={l.id} className="top-row">

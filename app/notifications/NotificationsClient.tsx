@@ -19,6 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { i18n } from '@shipeasy/sdk/client'
 
 type NotificationItem = {
   id: string;
@@ -187,7 +188,7 @@ export function NotificationsClient({
     <div className="bg-surface border border-line rounded-[14px] overflow-hidden">
       <div className="flex items-center justify-between px-5 py-4 border-b border-line">
         <div className="flex items-center gap-2">
-          <h1 className="text-[20px] font-semibold">Notifications</h1>
+          <h1 className="text-[20px] font-semibold">{i18n.t('common.notifications')}</h1>
           {unreadCount > 0 && (
             <span className="inline-flex items-center h-[22px] px-2 rounded-full bg-blue-soft text-blue-ink text-[12px] font-semibold">
               {unreadCount} unread
@@ -201,18 +202,18 @@ export function NotificationsClient({
           disabled={marking || unreadCount === 0}
           data-testid="mark-all-read"
         >
-          Mark all read
+          {i18n.t('...notifications.notificationsClient.markAllRead')}
         </Button>
       </div>
 
       <div
         className="flex items-center gap-1 px-5 border-b border-line"
         role="tablist"
-        aria-label="Notification filters"
+        aria-label={i18n.t('...notifications.notificationsClient.notificationFiltersAria-label')}
       >
-        <TabButton label="All" count={counts.all} active={tab === "all"} onClick={() => setTab("all")} testId="tab-all" />
-        <TabButton label="Mentions" count={counts.mentions} active={tab === "mentions"} onClick={() => setTab("mentions")} testId="tab-mentions" />
-        <TabButton label="Sales" count={counts.sales} active={tab === "sales"} onClick={() => setTab("sales")} testId="tab-sales" />
+        <TabButton label={i18n.t('common.all')} count={counts.all} active={tab === "all"} onClick={() => setTab("all")} testId="tab-all" />
+        <TabButton label={i18n.t('...notifications.notificationsClient.mentions')} count={counts.mentions} active={tab === "mentions"} onClick={() => setTab("mentions")} testId="tab-mentions" />
+        <TabButton label={i18n.t('...notifications.notificationsClient.sales')} count={counts.sales} active={tab === "sales"} onClick={() => setTab("sales")} testId="tab-sales" />
         <TabButton label="ISO" count={counts.iso} active={tab === "iso"} onClick={() => setTab("iso")} testId="tab-iso" />
       </div>
 
@@ -220,8 +221,8 @@ export function NotificationsClient({
         {visible.length === 0 ? (
           <EmptyState
             icon={<Bell size={24} />}
-            title="Nothing here yet"
-            description="Switch tabs or check back soon — this is where new activity will appear."
+            title={i18n.t('...notifications.notificationsClient.nothingHereYet')}
+            description={i18n.t('...notifications.notificationsClient.switchTabsOrCheckBackDescription')}
           />
         ) : (
           bucketOrder.map((b) =>
@@ -336,7 +337,7 @@ function NotificationRow({ n }: { n: NotificationItem }) {
               href={n.deeplink}
               className="flex-none inline-flex items-center h-8 px-3 rounded-[8px] text-[13px] font-medium text-blue-ink hover:bg-blue-soft transition-colors"
             >
-              View
+              {i18n.t('common.view')}
             </Link>
           )}
         </div>

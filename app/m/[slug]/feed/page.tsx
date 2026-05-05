@@ -8,6 +8,7 @@ import { ShareReferralButton } from "@/components/app/ShareReferralButton";
 import { Navbar } from "@/components/app/Navbar";
 import { countUnreadThreads } from "@/lib/messages";
 import { FeedClient } from "./FeedClient";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
 
@@ -175,7 +176,7 @@ export default async function FeedPage(
     isSaved: savedSet.has(l.id),
   }));
 
-  const ownerName = mp.owner.displayName ?? mp.owner.name ?? "Owner";
+  const ownerName = mp.owner.displayName ?? mp.owner.name ?? i18n.t('common.owner');
   const heroBg = mp.coverImageUrl
     ? `url(${mp.coverImageUrl})`
     : `linear-gradient(135deg, ${mp.primaryColor ?? "oklch(0.48 0.2 28)"}, color-mix(in oklab, ${mp.primaryColor ?? "oklch(0.48 0.2 28)"} 40%, black))`;
@@ -212,12 +213,12 @@ export default async function FeedPage(
               <h1>{mp.name}</h1>
               <div className="cat">
                 {mp.category}
-                {mp.tagline ? ` · ${mp.tagline}` : ""}
-                {ownerName ? ` · Founded by ${ownerName}` : ""}
-                {mp._count.memberships > 0 ? ` · ${mp._count.memberships.toLocaleString()} members` : ""}
+                {mp.tagline ? i18n.t('...feed.page.tagline', { tagline: String(mp.tagline) }) : ""}
+                {ownerName ? i18n.t('...feed.page.foundedByOwnername', { ownerName }) : ""}
+                {mp._count.memberships > 0 ? i18n.t('...feed.page.var0Members', { var0: mp._count.memberships.toLocaleString() }) : ""}
               </div>
               <div className="hero-stats">
-                <span>🏷 {mp._count.listings.toLocaleString()} active listings</span>
+                <span>🏷 {mp._count.listings.toLocaleString()} {i18n.t('...feed.page.activeListings')}</span>
               </div>
             </div>
           </div>
@@ -226,21 +227,21 @@ export default async function FeedPage(
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 5v14M5 12h14" />
               </svg>
-              Post a listing
+              {i18n.t('common.postAListing')}
             </Link>
             {isAdmin && (
               <Link href={`/owner/${mp.slug}/dashboard`} className="btn btn-ghost" data-testid="admin-button">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                 </svg>
-                Admin
+                {i18n.t('common.admin')}
               </Link>
             )}
             <Link href="/activity?tab=alerts" className="btn btn-ghost">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
               </svg>
-              Alerts
+              {i18n.t('common.alerts')}
             </Link>
             <FavoriteToggle
               slug={mp.slug}
@@ -276,17 +277,17 @@ export default async function FeedPage(
                   `${unresolvedReports} listing${unresolvedReports === 1 ? "" : "s"} flagged for review`}
               </div>
               <div className="s">
-                You run this marketplace. Only admins see this bar.
+                {i18n.t('...feed.page.youRunThisMarketplaceOnly')}
               </div>
             </div>
             <div className="m-actions">
               {pendingApps > 0 && (
                 <Link href={`/owner/${mp.slug}/applications`} className="btn btn-outline">
-                  Review queue
+                  {i18n.t('common.reviewQueue')}
                 </Link>
               )}
               <Link href={`/owner/${mp.slug}/dashboard`} className="btn btn-dark">
-                Open dashboard →
+                {i18n.t('...feed.page.openDashboard')}
               </Link>
             </div>
           </div>

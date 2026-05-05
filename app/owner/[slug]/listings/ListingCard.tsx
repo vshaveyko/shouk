@@ -25,6 +25,7 @@ import {
   DialogTitle,
 } from "@/components/ui/Dialog";
 import { formatCents, timeAgo } from "@/lib/utils";
+import { i18n } from '@shipeasy/sdk/client'
 
 export type ListingCardData = {
   id: string;
@@ -52,7 +53,7 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ status: "ACTIVE" }),
       });
-      if (!res.ok) alert((await res.json().catch(() => null))?.error ?? "Failed");
+      if (!res.ok) alert((await res.json().catch(() => null))?.error ?? i18n.t('common.failed'));
       else router.refresh();
     } finally {
       setBusy(false);
@@ -67,7 +68,7 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ status: "SHADOW_HIDDEN" }),
       });
-      if (!res.ok) alert((await res.json().catch(() => null))?.error ?? "Failed");
+      if (!res.ok) alert((await res.json().catch(() => null))?.error ?? i18n.t('common.failed'));
       else router.refresh();
     } finally {
       setBusy(false);
@@ -78,7 +79,7 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
     setBusy(true);
     try {
       const res = await fetch(`/api/listings/${listing.id}`, { method: "DELETE" });
-      if (!res.ok) alert((await res.json().catch(() => null))?.error ?? "Failed");
+      if (!res.ok) alert((await res.json().catch(() => null))?.error ?? i18n.t('common.failed'));
       else {
         setConfirm(null);
         router.refresh();
@@ -132,7 +133,7 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
             <DropdownMenu.Trigger asChild>
               <button
                 className="h-8 w-8 inline-grid place-items-center rounded-[8px] text-ink-soft hover:bg-hover"
-                aria-label="Actions"
+                aria-label={i18n.t('common.actions')}
                 disabled={busy}
               >
                 <MoreHorizontal size={16} />
@@ -153,7 +154,7 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
                     className="flex items-center gap-2 px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[13px] cursor-pointer"
                     data-testid="listing-approve"
                   >
-                    <Check size={14} /> Approve
+                    <Check size={14} /> {i18n.t('common.approve')}
                   </DropdownMenu.Item>
                 )}
                 {listing.status !== "SHADOW_HIDDEN" && (
@@ -165,7 +166,7 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
                     className="flex items-center gap-2 px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[13px] cursor-pointer"
                     data-testid="listing-shadow"
                   >
-                    <EyeOff size={14} /> Shadow-hide
+                    <EyeOff size={14} /> {i18n.t('...listings.listingCard.shadowhide')}
                   </DropdownMenu.Item>
                 )}
                 <DropdownMenu.Item asChild>
@@ -173,7 +174,7 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
                     href={`/l/${listing.id}/edit`}
                     className="flex items-center gap-2 px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[13px] cursor-pointer"
                   >
-                    <Pencil size={14} /> Edit
+                    <Pencil size={14} /> {i18n.t('common.edit')}
                   </Link>
                 </DropdownMenu.Item>
                 <DropdownMenu.Separator className="h-px bg-line-soft my-1" />
@@ -185,7 +186,7 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
                   className="flex items-center gap-2 px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[13px] cursor-pointer text-danger"
                   data-testid="listing-remove"
                 >
-                  <Trash2 size={14} /> Remove
+                  <Trash2 size={14} /> {i18n.t('common.remove')}
                 </DropdownMenu.Item>
               </DropdownMenu.Content>
             </DropdownMenu.Portal>
@@ -196,20 +197,19 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
       <Dialog open={confirm === "remove"} onOpenChange={(o) => !o && setConfirm(null)}>
         <DialogContent width={420}>
           <DialogHeader>
-            <DialogTitle>Remove listing?</DialogTitle>
+            <DialogTitle>{i18n.t('...listings.listingCard.removeListing')}</DialogTitle>
           </DialogHeader>
           <DialogBody>
             <p className="text-[13px] text-ink-soft">
-              <span className="font-medium">{listing.title}</span> will be deleted from
-              the marketplace. This cannot be undone.
+              <span className="font-medium">{listing.title}</span> {i18n.t('...listings.listingCard.willBeDeletedFromThe')}
             </p>
           </DialogBody>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setConfirm(null)} disabled={busy}>
-              Cancel
+              {i18n.t('common.cancel')}
             </Button>
             <Button variant="danger" onClick={remove} disabled={busy}>
-              {busy ? "Removing…" : "Remove"}
+              {busy ? i18n.t('...listings.listingCard.removing') : i18n.t('common.remove')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -219,9 +219,9 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
 }
 
 function StatusBadge({ status, reportCount }: { status: string; reportCount?: number }) {
-  if (status === "PENDING_REVIEW") return <Badge variant="pending">Pending</Badge>;
-  if (status === "SHADOW_HIDDEN") return <Badge variant="neutral">Hidden</Badge>;
-  if (status === "REMOVED") return <Badge variant="rejected">Removed</Badge>;
+  if (status === "PENDING_REVIEW") return <Badge variant="pending">{i18n.t('common.pending')}</Badge>;
+  if (status === "SHADOW_HIDDEN") return <Badge variant="neutral">{i18n.t('...listings.listingCard.hidden')}</Badge>;
+  if (status === "REMOVED") return <Badge variant="rejected">{i18n.t('...listings.listingCard.removed')}</Badge>;
   if (status === "ACTIVE" && reportCount && reportCount > 0) {
     return (
       <Badge variant="rejected" className="gap-1">
@@ -229,6 +229,6 @@ function StatusBadge({ status, reportCount }: { status: string; reportCount?: nu
       </Badge>
     );
   }
-  if (status === "ACTIVE") return <Badge variant="approved">Active</Badge>;
+  if (status === "ACTIVE") return <Badge variant="approved">{i18n.t('common.active')}</Badge>;
   return <Badge variant="neutral">{status}</Badge>;
 }

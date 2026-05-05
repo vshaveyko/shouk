@@ -1,5 +1,6 @@
 import { Prisma, type ApplicationStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { i18n } from '@shipeasy/sdk/client'
 
 export type QueueStatusFilter = "PENDING" | "APPROVED" | "REJECTED" | "ALL";
 export type VerifFilter = "all" | "full" | "partial" | "none";
@@ -47,7 +48,7 @@ export function serializeFilters(filters: QueueFilters): string {
   if (filters.verif !== "all") params.set("verif", filters.verif);
   if (filters.sort !== "oldest") params.set("sort", filters.sort);
   const s = params.toString();
-  return s ? `?${s}` : "";
+  return s ? i18n.t('...applications.filters.s', { s }) : "";
 }
 
 export function buildWhere(

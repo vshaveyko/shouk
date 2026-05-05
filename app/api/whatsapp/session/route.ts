@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { auth } from "@/auth";
 import { whatsappSessions, WHATSAPP_ENABLED } from "@/lib/whatsapp";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -21,7 +22,7 @@ export async function POST() {
   } catch (err: any) {
     console.error("[WhatsApp/session] create error:", err);
     return NextResponse.json(
-      { error: err?.message ?? "Failed to create session" },
+      { error: err?.message ?? i18n.t('...session.route.failedToCreateSession') },
       { status: 500 },
     );
   }

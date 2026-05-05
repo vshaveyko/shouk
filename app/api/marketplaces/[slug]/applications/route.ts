@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const runtime = "nodejs";
 
@@ -114,8 +115,8 @@ export async function POST(req: Request, props: { params: Promise<{ slug: string
       marketplaceId: mp.id,
       kind: "APPLICATION_SUBMITTED",
       title: needsInfo
-        ? `${session.user.name ?? "An applicant"} replied with more info`
-        : `New application from ${session.user.name ?? "a new user"}`,
+        ? `${session.user.name ?? i18n.t('...applications.route.anApplicant')} replied with more info`
+        : `New application from ${session.user.name ?? i18n.t('...applications.route.aNewUser')}`,
       deeplink: `/owner/${mp.slug}/applications/${application.id}`,
     },
   });

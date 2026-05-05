@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CheckCircle2, Clock3, XCircle, MessageSquareMore } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { i18n } from '@shipeasy/sdk/client'
 
 type Props = {
   slug: string;
@@ -25,11 +26,11 @@ export function StatusBanner({ slug, status, reviewerNote, rejectionReason }: Pr
           </div>
           <div className="space-y-1.5">
             <h2 className="text-[22px] tracking-[-0.02em]">
-              Your application is{" "}
-              <em className="serif italic text-blue-ink">pending review</em>.
+              {i18n.t('...[slug].statusBanner.yourApplicationIs')}{" "}
+              <em className="serif italic text-blue-ink">{i18n.t('...[slug].statusBanner.pendingReview')}</em>.
             </h2>
             <p className="text-[14px] text-ink-soft max-w-[360px] mx-auto">
-              Typical review takes ~48 hours — you'll hear back by email.
+              {i18n.t('...[slug].statusBanner.typicalReviewTakes48Hours')}
             </p>
           </div>
         </div>
@@ -49,15 +50,15 @@ export function StatusBanner({ slug, status, reviewerNote, rejectionReason }: Pr
           </span>
           <div className="space-y-1.5">
             <h2 className="text-[22px] tracking-[-0.02em]">
-              Welcome in —{" "}
-              <em className="serif italic text-success">ready to browse?</em>
+              {i18n.t('...[slug].statusBanner.welcomeIn')}{" "}
+              <em className="serif italic text-success">{i18n.t('...[slug].statusBanner.readyToBrowse')}</em>
             </h2>
             <p className="text-[14px] text-ink-soft max-w-[360px] mx-auto">
-              You're officially a member. The feed is warm and waiting.
+              {i18n.t('...[slug].statusBanner.youreOfficiallyAMemberThe')}
             </p>
           </div>
           <Link href={`/m/${slug}/feed`} className="mt-1">
-            <Button size="lg">Go to feed</Button>
+            <Button size="lg">{i18n.t('common.goToFeed')}</Button>
           </Link>
         </div>
       </section>
@@ -77,11 +78,11 @@ export function StatusBanner({ slug, status, reviewerNote, rejectionReason }: Pr
             </span>
             <div className="space-y-1">
               <h2 className="text-[20px] tracking-[-0.02em]">
-                Not a fit{" "}
-                <em className="serif italic text-ink-soft">right now</em>.
+                {i18n.t('...[slug].statusBanner.notAFit')}{" "}
+                <em className="serif italic text-ink-soft">{i18n.t('...[slug].statusBanner.rightNow')}</em>.
               </h2>
               <p className="text-[13px] text-muted">
-                The owners reviewed your application and decided not to proceed.
+                {i18n.t('...[slug].statusBanner.theOwnersReviewedYourApplication')}
               </p>
             </div>
           </div>
@@ -90,7 +91,7 @@ export function StatusBanner({ slug, status, reviewerNote, rejectionReason }: Pr
               {rejectionReason && (
                 <div>
                   <div className="text-[11px] mono uppercase tracking-[0.14em] text-muted mb-1">
-                    Reason
+                    {i18n.t('common.reason')}
                   </div>
                   <p className="text-[13px] text-ink">{rejectionReason}</p>
                 </div>
@@ -98,7 +99,7 @@ export function StatusBanner({ slug, status, reviewerNote, rejectionReason }: Pr
               {reviewerNote && (
                 <div>
                   <div className="text-[11px] mono uppercase tracking-[0.14em] text-muted mb-1">
-                    From the reviewer
+                    {i18n.t('...[slug].statusBanner.fromTheReviewer')}
                   </div>
                   <p className="text-[13px] text-ink whitespace-pre-line">
                     {reviewerNote}
@@ -108,7 +109,7 @@ export function StatusBanner({ slug, status, reviewerNote, rejectionReason }: Pr
             </div>
           )}
           <p className="text-[12px] text-muted text-center">
-            You can reapply in 30 days. Your Shouks account remains active.
+            {i18n.t('...[slug].statusBanner.youCanReapplyIn30')}
           </p>
         </div>
       </section>
@@ -128,18 +129,18 @@ export function StatusBanner({ slug, status, reviewerNote, rejectionReason }: Pr
           </span>
           <div className="space-y-1">
             <h2 className="text-[20px] tracking-[-0.02em]">
-              Your reviewer asked for a{" "}
+              {i18n.t('...[slug].statusBanner.yourReviewerAskedForA')}{" "}
               <em className="serif italic text-blue-ink">follow-up</em>.
             </h2>
             <p className="text-[13px] text-muted">
-              Your application is on hold — answer below to keep it moving.
+              {i18n.t('...[slug].statusBanner.yourApplicationIsOnHold')}
             </p>
           </div>
         </div>
         {reviewerNote && (
           <div className="rounded-[10px] border border-line-soft bg-surface p-4">
             <div className="text-[11px] mono uppercase tracking-[0.14em] text-muted mb-1">
-              From the reviewer
+              {i18n.t('...[slug].statusBanner.fromTheReviewer')}
             </div>
             <p className="text-[13px] text-ink whitespace-pre-line">
               {reviewerNote}
@@ -148,7 +149,7 @@ export function StatusBanner({ slug, status, reviewerNote, rejectionReason }: Pr
         )}
         <div className="flex justify-center">
           <Link href={`/apply/${slug}`}>
-            <Button>Re-submit application</Button>
+            <Button>{i18n.t('...[slug].statusBanner.resubmitApplication')}</Button>
           </Link>
         </div>
       </div>

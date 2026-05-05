@@ -7,6 +7,7 @@ import { getUserContext } from "@/lib/auth-helpers";
 import { Navbar } from "@/components/app/Navbar";
 import { NewListingForm } from "./NewListingForm";
 import { clCss } from "./listingFormCss";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
 
@@ -83,7 +84,7 @@ export default async function NewListingPage(props: { params: Promise<{ slug: st
             href={`/m/${mp.slug}/feed`}
             className="inline-flex items-center gap-1.5 text-[13px] text-ink-soft hover:text-ink"
           >
-            <ArrowLeft size={14} /> Back to {mp.name}
+            <ArrowLeft size={14} /> {i18n.t('common.backTo')} {mp.name}
           </Link>
         </div>
 

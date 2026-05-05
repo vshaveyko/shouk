@@ -12,6 +12,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { i18n } from '@shipeasy/sdk/client'
 
 type Counts = {
   applications?: number;
@@ -30,30 +31,30 @@ export function OwnerSidebar({
   const base = `/owner/${slug}`;
 
   const items = [
-    { href: `${base}/dashboard`, label: "Admin", icon: LayoutDashboard },
+    { href: `${base}/dashboard`, label: i18n.t('common.admin'), icon: LayoutDashboard },
     {
       href: `${base}/applications`,
-      label: "Applications",
+      label: i18n.t('...owner.ownerSidebar.applications'),
       icon: UserPlus,
       count: counts.applications,
       urgent: (counts.applications ?? 0) > 0,
     },
     {
       href: `${base}/listings`,
-      label: "Listings",
+      label: i18n.t('...owner.ownerSidebar.listings'),
       icon: FileText,
       count: counts.listings,
     },
     {
       href: `${base}/members`,
-      label: "Members",
+      label: i18n.t('...owner.ownerSidebar.members'),
       icon: Users,
       count: counts.members,
     },
   ];
   const mpItems = [
-    { href: `${base}/settings`, label: "Settings", icon: Settings },
-    { href: `${base}/analytics`, label: "Analytics", icon: LineChart },
+    { href: `${base}/settings`, label: i18n.t('common.settings'), icon: Settings },
+    { href: `${base}/analytics`, label: i18n.t('...owner.ownerSidebar.analytics'), icon: LineChart },
   ];
 
   return (
@@ -62,7 +63,7 @@ export function OwnerSidebar({
       className="hidden sm:block w-[232px] flex-none border-r border-line bg-surface px-3.5 py-[22px] sticky top-[60px] self-start max-h-[calc(100vh-60px)] overflow-y-auto"
     >
       <div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted px-2.5 pb-2">
-        Moderation
+        {i18n.t('...owner.ownerSidebar.moderation')}
       </div>
       <nav className="flex flex-col">
         {items.map((item) => (
@@ -79,7 +80,7 @@ export function OwnerSidebar({
       </nav>
       <div className="h-px bg-line my-2.5 mx-1.5" />
       <div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted px-2.5 pb-2 mt-1.5">
-        Marketplace
+        {i18n.t('...owner.ownerSidebar.marketplace')}
       </div>
       <nav className="flex flex-col">
         {mpItems.map((item) => (

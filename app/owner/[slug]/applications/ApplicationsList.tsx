@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import * as React from "react";
 import { verifyProviders } from "@/lib/utils";
 import { timeAgo } from "@/lib/utils";
+import { i18n } from '@shipeasy/sdk/client'
 
 type AppRow = {
   id: string;
@@ -88,11 +89,11 @@ export function ApplicationsList({
       <div className="q-list">
         <div className="q-list-head">
           <label>
-            <input type="checkbox" disabled /> Select all
+            <input type="checkbox" disabled /> {i18n.t('common.selectAll')}
           </label>
-          <span className="sort">Sort: Oldest</span>
+          <span className="sort">{i18n.t('...applications.applicationsList.sortOldest')}</span>
         </div>
-        <div className="empty-state">Queue is clear. No pending applications.</div>
+        <div className="empty-state">{i18n.t('...applications.applicationsList.queueIsClearNoPending')}</div>
       </div>
     );
   }
@@ -106,10 +107,10 @@ export function ApplicationsList({
             checked={selectedIds.size === rows.length}
             onChange={(e) => toggleAll(e.target.checked)}
           />
-          {selectedIds.size > 0 ? `${selectedIds.size} selected` : "Select all"}
+          {selectedIds.size > 0 ? i18n.t('...applications.applicationsList.sizeSelected', { size: String(selectedIds.size) }) : i18n.t('common.selectAll')}
         </label>
         <span className="sort">
-          Sort: Oldest
+          {i18n.t('...applications.applicationsList.sortOldest')}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="m6 9 6 6 6-6" />
           </svg>
@@ -143,7 +144,7 @@ export function ApplicationsList({
               }}
               data-testid="apps-bulk-approve"
             >
-              Approve
+              {i18n.t('common.approve')}
             </button>
             <button
               type="button"
@@ -158,7 +159,7 @@ export function ApplicationsList({
               }}
               data-testid="apps-bulk-reject"
             >
-              Reject
+              {i18n.t('common.reject')}
             </button>
           </div>
         </div>
@@ -186,7 +187,7 @@ export function ApplicationsList({
               }}
               onClick={(e) => e.stopPropagation()}
               data-testid={`app-select-${r.id}`}
-              aria-label={`Select ${r.userName}`}
+              aria-label={i18n.t('...applications.applicationsList.selectUsername', { userName: String(r.userName) })}
             />
             <div className="qi-av" style={{ background: gradient }}>
               {r.userImage ? <img src={r.userImage} alt="" /> : initials(r.userName)}
@@ -244,15 +245,15 @@ export function ApplicationsList({
             }}
           >
             <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12 }}>
-              {bulk === "APPROVE" ? "Approve selected" : "Reject selected"}
+              {bulk === "APPROVE" ? i18n.t('...applications.applicationsList.approveSelected') : i18n.t('...applications.applicationsList.rejectSelected')}
             </h2>
             <div style={{ fontSize: 13, color: "var(--ink-soft)", marginBottom: 12 }}>
-              Apply this decision to <b>{selectedIds.size}</b> application
+              {i18n.t('...applications.applicationsList.applyThisDecisionTo')} <b>{selectedIds.size}</b> application
               {selectedIds.size === 1 ? "" : "s"}.
             </div>
             {bulk === "REJECT" && (
               <div style={{ marginBottom: 12 }}>
-                <label className="label">Reason</label>
+                <label className="label">{i18n.t('common.reason')}</label>
                 <select
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
@@ -268,18 +269,18 @@ export function ApplicationsList({
               </div>
             )}
             <div>
-              <label className="label">Note (optional)</label>
+              <label className="label">{i18n.t('...applications.applicationsList.noteOptional')}</label>
               <textarea
                 className="textarea"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                placeholder="Visible to the applicant"
+                placeholder={i18n.t('...applications.applicationsList.visibleToTheApplicantPlaceholder')}
                 data-testid="app-note"
               />
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 16 }}>
               <button type="button" className="btn btn-outline" onClick={() => setBulk(null)}>
-                Cancel
+                {i18n.t('common.cancel')}
               </button>
               <button
                 type="button"
@@ -289,7 +290,7 @@ export function ApplicationsList({
                 data-testid="app-confirm"
                 style={{ opacity: busy ? 0.5 : 1 }}
               >
-                {busy ? "Working…" : bulk === "APPROVE" ? "Approve all" : "Reject all"}
+                {busy ? i18n.t('common.working') : bulk === "APPROVE" ? i18n.t('...applications.applicationsList.approveAll') : i18n.t('...applications.applicationsList.rejectAll')}
               </button>
             </div>
           </div>

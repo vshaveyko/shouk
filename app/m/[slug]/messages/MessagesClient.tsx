@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { toast } from "sonner";
+import { i18n } from '@shipeasy/sdk/client'
 
 export type ThreadSummary = {
   id: string;
@@ -145,12 +146,12 @@ export function MessagesClient({
       );
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
-        throw new Error(data.error ?? "Failed to send");
+        throw new Error(data.error ?? i18n.t('...messages.messagesClient.failedToSend'));
       }
       setDraft("");
       router.refresh();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to send");
+      toast.error(err instanceof Error ? err.message : i18n.t('...messages.messagesClient.failedToSend'));
     } finally {
       setSending(false);
     }
@@ -167,14 +168,13 @@ export function MessagesClient({
       <div className="msgs" data-testid="messages-root">
         <div className="msg-list">
           <div className="msg-list-head">
-            <h2>Messages</h2>
+            <h2>{i18n.t('common.messages')}</h2>
             <div className="mp-sub">{marketplaceName}</div>
           </div>
           <div className="msg-list-scroll">
             {threads.length === 0 ? (
               <div className="msg-empty-list" data-testid="messages-empty">
-                No conversations yet. Message a seller from a listing to start
-                one.
+                {i18n.t('...messages.messagesClient.noConversationsYetMessageA')}
               </div>
             ) : (
               threads.map((t) => (
@@ -199,7 +199,7 @@ export function MessagesClient({
                       <span className="mt-listing">{t.listing.title}</span>
                     ) : null}
                     <span className="mt-preview">
-                      {t.preview || "No messages yet"}
+                      {t.preview || i18n.t('...messages.messagesClient.noMessagesYet')}
                     </span>
                   </span>
                   {t.unread ? <span className="msg-unread" /> : null}
@@ -212,7 +212,7 @@ export function MessagesClient({
         <div className="msg-panel">
           {!selected ? (
             <div className="msg-empty-panel">
-              Select a conversation to view messages.
+              {i18n.t('...messages.messagesClient.selectAConversationToView')}
             </div>
           ) : (
             <>
@@ -262,7 +262,7 @@ export function MessagesClient({
               <div className="msg-body-scroll" ref={scrollRef}>
                 {selectedMessages.length === 0 ? (
                   <div style={{ color: "var(--muted)", fontSize: 12, textAlign: "center", margin: "auto" }}>
-                    Say hi — this is the start of your conversation.
+                    {i18n.t('...messages.messagesClient.sayHiThisIsThe')}
                   </div>
                 ) : (
                   selectedMessages.map((m) => (
@@ -288,7 +288,7 @@ export function MessagesClient({
                   data-testid="message-composer"
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
-                  placeholder="Write a message…"
+                  placeholder={i18n.t('...messages.messagesClient.writeAMessagePlaceholder')}
                   rows={1}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
@@ -300,7 +300,7 @@ export function MessagesClient({
                 <button
                   type="submit"
                   className="msg-send"
-                  aria-label="Send"
+                  aria-label={i18n.t('common.send')}
                   data-testid="message-send"
                   disabled={!draft.trim() || sending}
                 >

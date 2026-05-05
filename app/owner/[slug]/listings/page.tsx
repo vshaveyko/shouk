@@ -3,6 +3,7 @@ import { requireOwnerOf } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { OwnerShell } from "@/components/owner/OwnerShell";
 import { formatCents, timeAgo } from "@/lib/utils";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
 
@@ -137,7 +138,7 @@ export default async function ListingsModerationPage(
   void pendingCount;
   void flaggedCount;
   const tabs: { key: Tab; label: string; count: number }[] = [
-    { key: "active", label: "Active", count: activeCount },
+    { key: "active", label: i18n.t('common.active'), count: activeCount },
   ];
 
   return (
@@ -145,13 +146,13 @@ export default async function ListingsModerationPage(
       <style dangerouslySetInnerHTML={{ __html: listingsCss }} />
       <main className="list-body">
         <div className="page-head">
-          <h1>Listings</h1>
+          <h1>{i18n.t('common.listings')}</h1>
           <div className="lead">
-            All active listings in {marketplace.name}.
+            {i18n.t('...listings.page.allActiveListingsIn')} {marketplace.name}.
           </div>
         </div>
 
-        <nav className="listing-tabs" aria-label="Listing tabs">
+        <nav className="listing-tabs" aria-label={i18n.t('...listings.page.listingTabsAria-label')}>
           {tabs.map((t) => (
             <Link
               key={t.key}
@@ -169,15 +170,15 @@ export default async function ListingsModerationPage(
         {listings.length === 0 ? (
           <div className="empty-state">
             {tab === "pending"
-              ? "No listings waiting for review. New submissions will appear here."
+              ? i18n.t('...listings.page.noListingsWaitingForReview')
               : tab === "flagged"
-                ? "Nothing flagged right now."
-                : "No active listings yet."}
+                ? i18n.t('...listings.page.nothingFlaggedRightNow')
+                : i18n.t('...listings.page.noActiveListingsYet')}
           </div>
         ) : (
           <div className="listing-grid">
             {listings.map((l, i) => {
-              const sellerName = l.seller.displayName ?? l.seller.name ?? "Seller";
+              const sellerName = l.seller.displayName ?? l.seller.name ?? i18n.t('...listings.page.seller');
               const sellerGradient =
                 SELLER_GRADIENTS[i % SELLER_GRADIENTS.length];
               const gradient = GRADIENTS[i % GRADIENTS.length];
@@ -233,12 +234,12 @@ export default async function ListingsModerationPage(
                         {l.priceCents != null
                           ? formatCents(l.priceCents, l.currency ?? "USD")
                           : l.type === "ISO"
-                            ? "Wanted"
+                            ? i18n.t('common.wanted')
                             : "—"}
                       </div>
                       <div className="lc-specs">
                         <span className="lc-spec">{timeAgo(l.createdAt)}</span>
-                        {l.type === "AUCTION" && <span className="lc-spec">Auction</span>}
+                        {l.type === "AUCTION" && <span className="lc-spec">{i18n.t('common.auction')}</span>}
                         {l.type === "ISO" && <span className="lc-spec">ISO</span>}
                       </div>
                       <div className="lc-seller">
@@ -267,7 +268,7 @@ export default async function ListingsModerationPage(
                       >
                         <input type="hidden" name="decision" value="approve" />
                         <button type="submit" className="approve">
-                          Approve
+                          {i18n.t('common.approve')}
                         </button>
                       </form>
                       <Link
@@ -275,7 +276,7 @@ export default async function ListingsModerationPage(
                         className="request"
                         style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}
                       >
-                        Review
+                        {i18n.t('...listings.page.review')}
                       </Link>
                     </div>
                   )}

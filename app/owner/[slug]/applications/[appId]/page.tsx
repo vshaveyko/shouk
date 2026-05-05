@@ -10,6 +10,7 @@ import {
   parseQueueFilters,
 } from "../filters";
 import { ApplicationDetail } from "./ApplicationDetail";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
 
@@ -53,7 +54,7 @@ export default async function ApplicationDetailPage(
   const rows = filtered.map((a) => ({
     id: a.id,
     createdAt: a.createdAt.toISOString(),
-    userName: a.user.displayName ?? a.user.name ?? a.user.email ?? "Applicant",
+    userName: a.user.displayName ?? a.user.name ?? a.user.email ?? i18n.t('common.applicant'),
     userImage: a.user.image,
     verifiedProviders: a.user.verifiedAccounts.map((v) => v.provider),
   }));

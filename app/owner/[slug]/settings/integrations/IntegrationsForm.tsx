@@ -16,6 +16,7 @@ import {
   Label,
 } from "@/components/ui";
 import { WhatsAppQRModal } from "@/components/whatsapp/WhatsAppQRModal";
+import { i18n } from '@shipeasy/sdk/client'
 
 interface Props {
   marketplaceId: string;
@@ -48,10 +49,10 @@ export function IntegrationsForm({ marketplaceId, initial, inviteStats, whatsapp
         body: JSON.stringify({ marketplaceId, enabled }),
       });
       if (!res.ok) throw new Error("Failed");
-      toast.success(enabled ? "Auto-approval enabled" : "Auto-approval disabled");
+      toast.success(enabled ? i18n.t('...integrations.integrationsForm.autoapprovalEnabled') : i18n.t('...integrations.integrationsForm.autoapprovalDisabled'));
     } catch {
       setState((s) => ({ ...s, whatsappAutoApproval: !enabled }));
-      toast.error("Could not update auto-approval");
+      toast.error(i18n.t('...integrations.integrationsForm.couldNotUpdateAutoapproval'));
     } finally {
       setAutoSaving(false);
     }
@@ -68,10 +69,10 @@ export function IntegrationsForm({ marketplaceId, initial, inviteStats, whatsapp
       });
       if (!res.ok) throw new Error("Failed");
       setState({ whatsappGroupId: null, whatsappGroupName: null, whatsappAutoApproval: false });
-      toast.success("WhatsApp group unlinked");
+      toast.success(i18n.t('...integrations.integrationsForm.whatsappGroupUnlinked'));
       router.refresh();
     } catch {
-      toast.error("Could not unlink");
+      toast.error(i18n.t('...integrations.integrationsForm.couldNotUnlink'));
     } finally {
       setUnlinking(false);
     }
@@ -82,22 +83,21 @@ export function IntegrationsForm({ marketplaceId, initial, inviteStats, whatsapp
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            WhatsApp group
+            {i18n.t('...integrations.integrationsForm.whatsappGroup')}
             {linked ? (
               <Badge variant="approved" data-testid="whatsapp-linked-badge">
-                Linked
+                {i18n.t('common.linked')}
               </Badge>
             ) : null}
           </CardTitle>
           <CardDescription>
-            Link a WhatsApp group you admin. New group members can auto-join this marketplace by
-            scanning a QR, and you can bulk-import the current roster as phone invites.
+            {i18n.t('...integrations.integrationsForm.linkAWhatsappGroupYou')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {!whatsappEnabled && (
             <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 text-sm text-amber-900">
-              WhatsApp integration is disabled on this server. Set <code>WHATSAPP_ENABLED=true</code>{" "}
+              {i18n.t('...integrations.integrationsForm.whatsappIntegrationIsDisabledOn')} <code>{i18n.t('...integrations.integrationsForm.whatsapp_enabledtrue')}</code>{" "}
               to enable.
             </div>
           )}
@@ -106,8 +106,8 @@ export function IntegrationsForm({ marketplaceId, initial, inviteStats, whatsapp
             <div className="rounded-xl border border-line p-4 space-y-3" data-testid="whatsapp-linked-card">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="text-sm text-ink-soft">Linked group</p>
-                  <p className="font-medium truncate">{state.whatsappGroupName ?? "(unnamed)"}</p>
+                  <p className="text-sm text-ink-soft">{i18n.t('...integrations.integrationsForm.linkedGroup')}</p>
+                  <p className="font-medium truncate">{state.whatsappGroupName ?? i18n.t('...integrations.integrationsForm.unnamed')}</p>
                   <p className="text-xs text-ink-soft mt-1 font-mono truncate">
                     {state.whatsappGroupId}
                   </p>
@@ -119,18 +119,17 @@ export function IntegrationsForm({ marketplaceId, initial, inviteStats, whatsapp
                   disabled={unlinking}
                   data-testid="whatsapp-unlink"
                 >
-                  {unlinking ? "Unlinking…" : "Unlink"}
+                  {unlinking ? i18n.t('...integrations.integrationsForm.unlinking') : i18n.t('common.unlink')}
                 </Button>
               </div>
 
               <div className="flex items-center justify-between pt-3 border-t border-line">
                 <div className="pr-4">
                   <Label htmlFor="auto-approval" className="cursor-pointer">
-                    Auto-approve group members
+                    {i18n.t('...integrations.integrationsForm.autoapproveGroupMembers')}
                   </Label>
                   <p className="text-xs text-ink-soft mt-0.5">
-                    When on, anyone in the linked WhatsApp group joins instantly after scanning the
-                    QR on the apply page.
+                    {i18n.t('...integrations.integrationsForm.whenOnAnyoneInThe')}
                   </p>
                 </div>
                 <Switch
@@ -144,29 +143,29 @@ export function IntegrationsForm({ marketplaceId, initial, inviteStats, whatsapp
 
               <div className="flex gap-4 pt-3 border-t border-line text-sm text-ink-soft">
                 <span data-testid="whatsapp-invites-pending">
-                  Pending invites: <strong className="text-ink">{stats.pending}</strong>
+                  {i18n.t('...integrations.integrationsForm.pendingInvites')} <strong className="text-ink">{stats.pending}</strong>
                 </span>
                 <span data-testid="whatsapp-invites-accepted">
-                  Accepted: <strong className="text-ink">{stats.accepted}</strong>
+                  {i18n.t('...integrations.integrationsForm.accepted')} <strong className="text-ink">{stats.accepted}</strong>
                 </span>
               </div>
             </div>
           ) : (
             <div className="rounded-xl border border-dashed border-line p-6 text-center space-y-3">
-              <p className="text-sm text-ink-soft">No WhatsApp group linked yet.</p>
+              <p className="text-sm text-ink-soft">{i18n.t('...integrations.integrationsForm.noWhatsappGroupLinkedYet')}</p>
               <Button
                 onClick={() => setShowModal(true)}
                 disabled={!whatsappEnabled}
                 data-testid="whatsapp-link-button"
                 className="bg-emerald-600 hover:bg-emerald-700"
               >
-                Link a WhatsApp group
+                {i18n.t('...integrations.integrationsForm.linkAWhatsappGroup')}
               </Button>
             </div>
           )}
         </CardContent>
         <CardFooter className="text-xs text-ink-soft">
-          Nothing is posted to WhatsApp — we read your group list once, then destroy the session.
+          {i18n.t('...integrations.integrationsForm.nothingIsPostedToWhatsapp')}
         </CardFooter>
       </Card>
 
@@ -179,8 +178,8 @@ export function IntegrationsForm({ marketplaceId, initial, inviteStats, whatsapp
             setShowModal(false);
             toast.success(
               synced > 0
-                ? `Linked "${groupName}" · synced ${synced} member${synced === 1 ? "" : "s"}`
-                : `Linked "${groupName}"`,
+                ? i18n.t('...integrations.integrationsForm.linkedGroupnameSyncedSyncedMembervar2', { groupName, synced, var2: synced === 1 ? "" : "s" })
+                : i18n.t('...integrations.integrationsForm.linkedGroupname', { groupName }),
             );
             setState((s) => ({
               ...s,

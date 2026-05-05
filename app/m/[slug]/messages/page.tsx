@@ -4,9 +4,10 @@ import { prisma } from "@/lib/prisma";
 import { Navbar } from "@/components/app/Navbar";
 import { findOrCreateThread, countUnreadThreads } from "@/lib/messages";
 import { MessagesClient, type ThreadSummary, type MessageItem } from "./MessagesClient";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Messages" };
+export const metadata = { title: i18n.t('common.messages') };
 
 export default async function MarketplaceMessagesPage(
   props: {
@@ -105,7 +106,7 @@ export default async function MarketplaceMessagesPage(
       (!mine?.lastReadAt || last.createdAt > mine.lastReadAt);
     return {
       id: t.id,
-      otherName: other?.displayName ?? other?.name ?? "Member",
+      otherName: other?.displayName ?? other?.name ?? i18n.t('common.member'),
       otherImage: other?.image ?? null,
       listing: t.listing
         ? {

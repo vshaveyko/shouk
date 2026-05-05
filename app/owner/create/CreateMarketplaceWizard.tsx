@@ -35,6 +35,7 @@ import {
   SelectItem,
 } from "@/components/ui";
 import { cn, categories, slugify, verifyProviders } from "@/lib/utils";
+import { i18n } from '@shipeasy/sdk/client'
 
 // ---------- Types ----------
 
@@ -99,30 +100,30 @@ type FormState = {
 type Errors = Partial<Record<string, string>>;
 
 const FIELD_TYPE_OPTIONS: { value: FieldType; label: string }[] = [
-  { value: "SHORT_TEXT", label: "Short text" },
-  { value: "LONG_TEXT", label: "Long text" },
-  { value: "NUMBER", label: "Number" },
-  { value: "CURRENCY", label: "Currency" },
-  { value: "SELECT", label: "Single select" },
-  { value: "MULTI_SELECT", label: "Multi select" },
-  { value: "DATE", label: "Date" },
-  { value: "IMAGE", label: "Image" },
+  { value: "SHORT_TEXT", label: i18n.t('common.shortText') },
+  { value: "LONG_TEXT", label: i18n.t('common.longText') },
+  { value: "NUMBER", label: i18n.t('common.number') },
+  { value: "CURRENCY", label: i18n.t('common.currency') },
+  { value: "SELECT", label: i18n.t('common.singleSelect') },
+  { value: "MULTI_SELECT", label: i18n.t('common.multiSelect') },
+  { value: "DATE", label: i18n.t('common.date') },
+  { value: "IMAGE", label: i18n.t('common.image') },
 ];
 
 const QUESTION_TYPE_OPTIONS: { value: QuestionFieldType; label: string }[] = [
-  { value: "SHORT_TEXT", label: "Short text" },
-  { value: "LONG_TEXT", label: "Long text" },
-  { value: "NUMBER", label: "Number" },
-  { value: "SELECT", label: "Single select" },
-  { value: "MULTI_SELECT", label: "Multi select" },
-  { value: "DATE", label: "Date" },
+  { value: "SHORT_TEXT", label: i18n.t('common.shortText') },
+  { value: "LONG_TEXT", label: i18n.t('common.longText') },
+  { value: "NUMBER", label: i18n.t('common.number') },
+  { value: "SELECT", label: i18n.t('common.singleSelect') },
+  { value: "MULTI_SELECT", label: i18n.t('common.multiSelect') },
+  { value: "DATE", label: i18n.t('common.date') },
 ];
 
 const STEPS = [
-  { n: 1, title: "Identity", hint: "Name, tagline, and branding" },
-  { n: 2, title: "Listing schema", hint: "What can be sold?" },
-  { n: 3, title: "Membership rules", hint: "Who can join?" },
-  { n: 4, title: "Monetization", hint: "Pricing & moderation" },
+  { n: 1, title: i18n.t('common.identity'), hint: i18n.t('...create.createMarketplaceWizard.nameTaglineAndBrandingHint') },
+  { n: 2, title: i18n.t('common.listingSchema'), hint: i18n.t('...create.createMarketplaceWizard.whatCanBeSoldHint') },
+  { n: 3, title: i18n.t('common.membershipRules'), hint: i18n.t('...create.createMarketplaceWizard.whoCanJoinHint') },
+  { n: 4, title: i18n.t('...create.createMarketplaceWizard.monetization'), hint: i18n.t('...create.createMarketplaceWizard.pricingModerationHint') },
 ] as const;
 
 const uid = () =>
@@ -148,7 +149,7 @@ const INITIAL_STATE: FormState = {
   schemaFields: [
     {
       uid: uid(),
-      label: "Title",
+      label: i18n.t('common.title'),
       name: "title",
       type: "SHORT_TEXT",
       required: true,
@@ -156,14 +157,14 @@ const INITIAL_STATE: FormState = {
     },
     {
       uid: uid(),
-      label: "Price",
+      label: i18n.t('common.price'),
       name: "price",
       type: "CURRENCY",
       required: true,
     },
     {
       uid: uid(),
-      label: "Images",
+      label: i18n.t('...create.createMarketplaceWizard.images'),
       name: "images",
       type: "IMAGE",
       required: true,
@@ -178,7 +179,7 @@ const INITIAL_STATE: FormState = {
   applicationQuestions: [
     {
       uid: uid(),
-      label: "Why would you like to join?",
+      label: i18n.t('...create.createMarketplaceWizard.whyWouldYouLikeTo'),
       type: "LONG_TEXT",
       required: true,
     },
@@ -290,7 +291,7 @@ export function CreateMarketplaceWizard() {
         )
       )
         setStep(1);
-      else if (Object.keys(all).some((k) => k.startsWith("field-") || k === "schemaFields")) setStep(2);
+      else if (Object.keys(all).some((k) => k.startsWith(i18n.t('...create.createMarketplaceWizard.fieldStartsWith')) || k === "schemaFields")) setStep(2);
       else if (
         Object.keys(all).some(
           (k) => k === "requiredVerifications" || k.startsWith("q-"),
@@ -298,7 +299,7 @@ export function CreateMarketplaceWizard() {
       )
         setStep(3);
       else setStep(4);
-      toast.error("Please fix the highlighted fields.");
+      toast.error(i18n.t('...create.createMarketplaceWizard.pleaseFixTheHighlightedFields'));
       return;
     }
 
@@ -366,18 +367,18 @@ export function CreateMarketplaceWizard() {
       });
       const json = await res.json();
       if (!res.ok) {
-        toast.error(json?.error ?? "Couldn't create marketplace.");
+        toast.error(json?.error ?? i18n.t('...create.createMarketplaceWizard.couldntCreateMarketplace'));
         if (res.status === 409) {
           setErrors((prev) => ({ ...prev, slug: json.error }));
           setStep(1);
         }
         return;
       }
-      toast.success("Marketplace published!");
+      toast.success(i18n.t('...create.createMarketplaceWizard.marketplacePublished'));
       router.push(`/owner/${json.slug}/dashboard`);
     } catch (err) {
       console.error(err);
-      toast.error("Network error. Please try again.");
+      toast.error(i18n.t('common.networkErrorPleaseTryAgain'));
     } finally {
       setSubmitting(false);
     }
@@ -390,7 +391,7 @@ export function CreateMarketplaceWizard() {
       <style dangerouslySetInnerHTML={{ __html: wizardCss }} />
       <div className="wiz-wrap">
         <aside className="wiz-steps">
-          <div className="wiz-steps-label">Create a marketplace</div>
+          <div className="wiz-steps-label">{i18n.t('common.createAMarketplace')}</div>
           <StepRail current={step} onJump={(n) => setStep(n)} />
         </aside>
 
@@ -406,21 +407,21 @@ export function CreateMarketplaceWizard() {
           <header className="wiz-head">
             <h1>
               {step === 1
-                ? "Let's name your marketplace."
+                ? i18n.t('...create.createMarketplaceWizard.letsNameYourMarketplace')
                 : step === 2
-                  ? "What gets listed here?"
+                  ? i18n.t('...create.createMarketplaceWizard.whatGetsListedHere')
                   : step === 3
-                    ? "Who gets to join?"
-                    : "Do members pay?"}
+                    ? i18n.t('...create.createMarketplaceWizard.whoGetsToJoin')
+                    : i18n.t('...create.createMarketplaceWizard.doMembersPay')}
             </h1>
             <p className="sub">
               {step === 1
-                ? "Start with the basics. Everything here except name & URL can be changed later."
+                ? i18n.t('...create.createMarketplaceWizard.startWithTheBasicsEverything')
                 : step === 2
-                  ? "Design the listing form your members will fill out. Types, required fields, help text."
+                  ? i18n.t('...create.createMarketplaceWizard.designTheListingFormYour')
                   : step === 3
-                    ? "Public, application, or invite-only. You decide the bar for entry."
-                    : "Free to join, or charge a membership. Turn on auctions if it fits your community."}
+                    ? i18n.t('...create.createMarketplaceWizard.publicApplicationOrInviteonlyYou')
+                    : i18n.t('...create.createMarketplaceWizard.freeToJoinOrCharge')}
             </p>
           </header>
           {step === 1 && <IdentityStep state={state} setState={setState} errors={errors} />}
@@ -441,7 +442,7 @@ export function CreateMarketplaceWizard() {
             </>
           ) : (
             <div className="preview-card">
-              <div className="preview-label">Preview</div>
+              <div className="preview-label">{i18n.t('...create.createMarketplaceWizard.preview')}</div>
               <div
                 className="preview-hero"
                 style={{
@@ -452,28 +453,28 @@ export function CreateMarketplaceWizard() {
               />
               <div className="preview-body">
                 <div className="preview-name">
-                  {state.name || "Marketplace name"}
+                  {state.name || i18n.t('common.marketplaceName')}
                 </div>
                 <div className="preview-url">
-                  shouks.com/m/{state.slug || "your-slug"}
+                  {i18n.t('common.shoukscomm')}{state.slug || "your-slug"}
                 </div>
                 {state.tagline && (
                   <div className="preview-tagline">{state.tagline}</div>
                 )}
                 <div className="preview-stats">
-                  <span>{state.schemaFields.length} listing fields</span>
+                  <span>{state.schemaFields.length} {i18n.t('...create.createMarketplaceWizard.listingFields')}</span>
                   <span>·</span>
                   <span>
                     {state.entryMethod === "PUBLIC"
-                      ? "Open"
+                      ? i18n.t('common.open')
                       : state.entryMethod === "APPLICATION"
-                        ? "Application"
+                        ? i18n.t('common.application')
                         : state.entryMethod === "INVITE"
-                          ? "Invite only"
-                          : "Referral"}
+                          ? i18n.t('common.inviteOnly')
+                          : i18n.t('common.referral')}
                   </span>
                   <span>·</span>
-                  <span>{state.isPaid ? "Paid membership" : "Free"}</span>
+                  <span>{state.isPaid ? i18n.t('common.paidMembership') : i18n.t('common.free')}</span>
                 </div>
               </div>
             </div>
@@ -565,7 +566,7 @@ function fakeMockFor(type: FieldType, options?: string[]) {
     case "NUMBER": return <div className="fake-num" />;
     case "CURRENCY": return <div className="fake-num" />;
     case "DATE": return <div className="fake-num" />;
-    case "IMAGE": return <div className="fake-upload">+ Upload</div>;
+    case "IMAGE": return <div className="fake-upload">{i18n.t('...create.createMarketplaceWizard.upload')}</div>;
     case "SELECT":
     case "MULTI_SELECT": {
       const opts = (options ?? []).filter((o) => o.trim()).slice(0, 4);
@@ -604,7 +605,7 @@ function SchemaListingCardPreview({ fields, marketplaceName, primaryColor }: { f
           <rect x="3" y="3" width="18" height="18" rx="2" />
           <path d="M3 9h18M9 21V9" />
         </svg>
-        Generated listing card
+        {i18n.t('...create.createMarketplaceWizard.generatedListingCard')}
       </div>
       <div className="pv-frame">
         <div
@@ -628,16 +629,16 @@ function SchemaListingCardPreview({ fields, marketplaceName, primaryColor }: { f
               textTransform: "uppercase",
             }}
           >
-            Image
+            {i18n.t('common.image')}
           </div>
           <div style={{ padding: 10 }}>
             <div style={{ fontSize: 9.5, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--ink-soft)" }}>
-              {marketplaceName || "Your marketplace"}
+              {marketplaceName || i18n.t('...create.createMarketplaceWizard.yourMarketplace')}
             </div>
-            <div style={{ fontWeight: 500, marginTop: 2 }}>Sample listing title</div>
+            <div style={{ fontWeight: 500, marginTop: 2 }}>{i18n.t('...create.createMarketplaceWizard.sampleListingTitle')}</div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4 }}>
               <span style={{ fontWeight: 600, fontSize: 13 }}>$1,250</span>
-              <span style={{ color: "var(--muted)", fontSize: 10 }}>Posted just now</span>
+              <span style={{ color: "var(--muted)", fontSize: 10 }}>{i18n.t('...create.createMarketplaceWizard.postedJustNow')}</span>
             </div>
             {chipFields.length > 0 && (
               <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 6 }}>
@@ -652,7 +653,7 @@ function SchemaListingCardPreview({ fields, marketplaceName, primaryColor }: { f
                       color: "var(--ink-soft)",
                     }}
                   >
-                    {f.label || "Field"}: {sampleFor(f)}
+                    {f.label || i18n.t('...create.createMarketplaceWizard.field')}: {sampleFor(f)}
                   </span>
                 ))}
               </div>
@@ -672,27 +673,27 @@ function SchemaPreview({ fields, marketplaceName }: { fields: SchemaField[]; mar
           <circle cx="12" cy="12" r="3" />
           <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
         </svg>
-        Seller&rsquo;s create-listing form
+        {i18n.t('...create.createMarketplaceWizard.sellersCreatelistingForm')}g form
       </div>
       <div className="pv-frame">
         <div className="pv-card">
-          <div className="pv-title">New listing · {marketplaceName || "Your marketplace"}</div>
+          <div className="pv-title">{i18n.t('...create.createMarketplaceWizard.newListing')} {marketplaceName || i18n.t('...create.createMarketplaceWizard.yourMarketplace')}</div>
           <div className="pv-field">
-            <div className="fl">Title <span className="req">*</span></div>
+            <div className="fl">{i18n.t('common.title')} <span className="req">*</span></div>
             <div className="fake-input" />
           </div>
           <div className="pv-field">
-            <div className="fl">Price <span className="req">*</span></div>
+            <div className="fl">{i18n.t('common.price')} <span className="req">*</span></div>
             <div className="fake-num" />
           </div>
           <div className="pv-field">
-            <div className="fl">Images <span className="req">*</span></div>
-            <div className="fake-upload">+ Upload</div>
+            <div className="fl">{i18n.t('...create.createMarketplaceWizard.images')} <span className="req">*</span></div>
+            <div className="fake-upload">{i18n.t('...create.createMarketplaceWizard.upload')}</div>
           </div>
           {fields.map((f) => (
             <div key={f.uid} className="pv-field">
               <div className="fl">
-                {f.label || "Field"}
+                {f.label || i18n.t('...create.createMarketplaceWizard.field')}
                 {f.required && <span className="req">*</span>}
                 {f.helpText && <span className="tip">{f.helpText}</span>}
               </div>
@@ -700,7 +701,7 @@ function SchemaPreview({ fields, marketplaceName }: { fields: SchemaField[]; mar
             </div>
           ))}
           {fields.length === 0 && (
-            <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 4 }}>Add fields above to preview them here.</div>
+            <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 4 }}>{i18n.t('...create.createMarketplaceWizard.addFieldsAboveToPreview')}</div>
           )}
         </div>
       </div>
@@ -768,37 +769,37 @@ function IdentityStep({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Identity</CardTitle>
-        <CardDescription>How members will recognize your marketplace.</CardDescription>
+        <CardTitle>{i18n.t('common.identity')}</CardTitle>
+        <CardDescription>{i18n.t('common.howMembersWillRecognizeYour')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">
         <div>
           <Label htmlFor="mp-name" required>
-            Marketplace name
+            {i18n.t('common.marketplaceName')}
           </Label>
           <Input
             id="mp-name"
             data-testid="field-name"
             value={state.name}
             onChange={(e) => setState((s) => ({ ...s, name: e.target.value }))}
-            placeholder="e.g. Riviera Watch Club"
+            placeholder={i18n.t('...create.createMarketplaceWizard.egRivieraWatchClubPlaceholder')}
             maxLength={100}
             aria-invalid={!!errors.name}
           />
           {errors.name ? (
             <Help error>{errors.name}</Help>
           ) : (
-            <Help>3–100 characters. Shown on your public page.</Help>
+            <Help>{i18n.t('...create.createMarketplaceWizard.3100CharactersShownOnYour')}</Help>
           )}
         </div>
 
         <div>
           <Label htmlFor="mp-slug" required>
-            URL slug
+            {i18n.t('common.urlSlug')}
           </Label>
           <div className="flex items-stretch rounded-[10px] border border-line bg-surface overflow-hidden focus-within:border-blue focus-within:ring-[3px] focus-within:ring-[var(--blue-softer)]">
             <span className="inline-flex items-center px-3 text-[13px] text-muted bg-bg-panel border-r border-line select-none">
-              shouks.com/m/
+              {i18n.t('common.shoukscomm')}
             </span>
             <input
               id="mp-slug"
@@ -815,30 +816,30 @@ function IdentityStep({
           {errors.slug ? (
             <Help error>{errors.slug}</Help>
           ) : (
-            <Help>Lowercase letters, numbers, and hyphens only.</Help>
+            <Help>{i18n.t('...create.createMarketplaceWizard.lowercaseLettersNumbersAndHyphens')}</Help>
           )}
         </div>
 
         <div>
-          <Label htmlFor="mp-tagline">Tagline</Label>
+          <Label htmlFor="mp-tagline">{i18n.t('common.tagline')}</Label>
           <Input
             id="mp-tagline"
             value={state.tagline}
             onChange={(e) => setState((s) => ({ ...s, tagline: e.target.value }))}
-            placeholder="A one-liner that captures the vibe."
+            placeholder={i18n.t('common.aOnelinerThatCapturesThe')}
             maxLength={140}
           />
-          <Help>Up to 140 characters.</Help>
+          <Help>{i18n.t('common.upTo140Characters')}</Help>
         </div>
 
         <div>
-          <Label htmlFor="mp-description">Description</Label>
+          <Label htmlFor="mp-description">{i18n.t('common.description')}</Label>
           <Textarea
             id="mp-description"
             data-testid="field-description"
             value={state.description}
             onChange={(e) => setState((s) => ({ ...s, description: e.target.value }))}
-            placeholder="What's this community for? Who should join?"
+            placeholder={i18n.t('...create.createMarketplaceWizard.whatsThisCommunityForWhoPlaceholder')}
             maxLength={500}
             rows={4}
             aria-invalid={!!errors.description}
@@ -852,13 +853,13 @@ function IdentityStep({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
-            <Label required>Category</Label>
+            <Label required>{i18n.t('...create.createMarketplaceWizard.category')}</Label>
             <Select
               value={state.category || undefined}
               onValueChange={(v) => setState((s) => ({ ...s, category: v }))}
             >
               <SelectTrigger data-testid="field-category" aria-invalid={!!errors.category}>
-                <SelectValue placeholder="Choose a category" />
+                <SelectValue placeholder={i18n.t('...create.createMarketplaceWizard.chooseACategoryPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((c) => (
@@ -872,7 +873,7 @@ function IdentityStep({
           </div>
 
           <div>
-            <Label htmlFor="mp-color">Primary color</Label>
+            <Label htmlFor="mp-color">{i18n.t('common.primaryColor')}</Label>
             <div className="flex items-center gap-2">
               <div
                 className="h-[38px] w-[38px] rounded-[10px] border border-line shrink-0"
@@ -890,7 +891,7 @@ function IdentityStep({
               />
               <input
                 type="color"
-                aria-label="Pick a color"
+                aria-label={i18n.t('common.pickAColor')}
                 value={
                   /^#([0-9a-fA-F]{6})$/.test(state.primaryColor) ? state.primaryColor : "#4DB7E8"
                 }
@@ -901,7 +902,7 @@ function IdentityStep({
             {errors.primaryColor ? (
               <Help error>{errors.primaryColor}</Help>
             ) : (
-              <Help>Used for accents on your marketplace pages.</Help>
+              <Help>{i18n.t('...create.createMarketplaceWizard.usedForAccentsOnYour')}</Help>
             )}
           </div>
         </div>
@@ -992,10 +993,9 @@ function SchemaStep({
       <CardHeader>
         <div className="flex items-start justify-between gap-3">
           <div>
-            <CardTitle>Listing schema</CardTitle>
+            <CardTitle>{i18n.t('common.listingSchema')}</CardTitle>
             <CardDescription>
-              Define what every listing in this marketplace looks like. We've pre-filled three
-              essentials — tweak or add up to 25.
+              {i18n.t('...create.createMarketplaceWizard.defineWhatEveryListingIn')}
             </CardDescription>
           </div>
           <Badge>
@@ -1029,10 +1029,10 @@ function SchemaStep({
             disabled={fields.length >= 25}
             className="gap-1.5"
           >
-            <Plus size={16} /> Add field
+            <Plus size={16} /> {i18n.t('common.addField')}
           </Button>
           {fields.length >= 25 && (
-            <Help className="mt-1">You've reached the 25-field maximum.</Help>
+            <Help className="mt-1">{i18n.t('...create.createMarketplaceWizard.youveReachedThe25fieldMaximum')}</Help>
           )}
         </div>
       </CardContent>
@@ -1070,7 +1070,7 @@ function FieldRow({
             type="button"
             onClick={onMoveUp}
             disabled={index === 0}
-            aria-label="Move up"
+            aria-label={i18n.t('common.moveUp')}
             className="h-7 w-7 grid place-items-center rounded-[6px] text-ink-soft hover:bg-hover disabled:opacity-30 disabled:hover:bg-transparent"
           >
             <ArrowUp size={14} />
@@ -1079,7 +1079,7 @@ function FieldRow({
             type="button"
             onClick={onMoveDown}
             disabled={index === total - 1}
-            aria-label="Move down"
+            aria-label={i18n.t('common.moveDown')}
             className="h-7 w-7 grid place-items-center rounded-[6px] text-ink-soft hover:bg-hover disabled:opacity-30 disabled:hover:bg-transparent"
           >
             <ArrowDown size={14} />
@@ -1089,13 +1089,13 @@ function FieldRow({
         <div className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <Label htmlFor={`f-${field.uid}-label`} required>
-              Display name
+              {i18n.t('common.displayName')}
             </Label>
             <Input
               id={`f-${field.uid}-label`}
               value={field.label}
               onChange={(e) => onChange({ label: e.target.value })}
-              placeholder="e.g. Condition"
+              placeholder={i18n.t('common.egCondition')}
               maxLength={80}
               aria-invalid={!!errors[`field-${index}-label`]}
             />
@@ -1105,7 +1105,7 @@ function FieldRow({
           </div>
 
           <div>
-            <Label>Field type</Label>
+            <Label>{i18n.t('common.fieldType')}</Label>
             <Select
               value={field.type}
               onValueChange={(v) => onChange({ type: v as FieldType })}
@@ -1124,19 +1124,19 @@ function FieldRow({
           </div>
 
           <div className="md:col-span-2">
-            <Label htmlFor={`f-${field.uid}-help`}>Help text</Label>
+            <Label htmlFor={`f-${field.uid}-help`}>{i18n.t('common.helpText')}</Label>
             <Input
               id={`f-${field.uid}-help`}
               value={field.helpText ?? ""}
               onChange={(e) => onChange({ helpText: e.target.value })}
-              placeholder="Shown under the field when sellers fill it out."
+              placeholder={i18n.t('common.shownUnderTheFieldWhen')}
               maxLength={200}
             />
           </div>
 
           {(field.type === "SELECT" || field.type === "MULTI_SELECT") && (
             <div className="md:col-span-2">
-              <Label required>Options</Label>
+              <Label required>{i18n.t('common.options')}</Label>
               <OptionsEditor
                 options={field.options ?? []}
                 onChange={(opts) => onChange({ options: opts })}
@@ -1150,7 +1150,7 @@ function FieldRow({
           {field.type === "IMAGE" && (
             <>
               <div>
-                <Label htmlFor={`f-${field.uid}-min`}>Min images</Label>
+                <Label htmlFor={`f-${field.uid}-min`}>{i18n.t('common.minImages')}</Label>
                 <Input
                   id={`f-${field.uid}-min`}
                   type="number"
@@ -1165,7 +1165,7 @@ function FieldRow({
                 )}
               </div>
               <div>
-                <Label htmlFor={`f-${field.uid}-max`}>Max images</Label>
+                <Label htmlFor={`f-${field.uid}-max`}>{i18n.t('common.maxImages')}</Label>
                 <Input
                   id={`f-${field.uid}-max`}
                   type="number"
@@ -1187,7 +1187,7 @@ function FieldRow({
           <button
             type="button"
             onClick={onRemove}
-            aria-label="Remove field"
+            aria-label={i18n.t('common.removeField')}
             className="h-7 w-7 grid place-items-center rounded-[6px] text-ink-soft hover:bg-hover hover:text-danger"
           >
             <Trash2 size={14} />
@@ -1196,9 +1196,9 @@ function FieldRow({
             <Switch
               checked={field.required}
               onCheckedChange={(v) => onChange({ required: !!v })}
-              aria-label="Required field"
+              aria-label={i18n.t('common.requiredField')}
             />
-            Required
+            {i18n.t('common.required')}
           </label>
         </div>
       </div>
@@ -1231,12 +1231,12 @@ function OptionsEditor({
           <Input
             value={opt}
             onChange={(e) => update(i, e.target.value)}
-            placeholder={`Option ${i + 1}`}
+            placeholder={i18n.t('common.optionVar0', { var0: i + 1 })}
           />
           <button
             type="button"
             onClick={() => remove(i)}
-            aria-label="Remove option"
+            aria-label={i18n.t('common.removeOption')}
             className="h-[38px] w-[38px] grid place-items-center rounded-[10px] border border-line text-ink-soft hover:bg-hover hover:text-danger shrink-0"
           >
             <X size={14} />
@@ -1244,7 +1244,7 @@ function OptionsEditor({
         </div>
       ))}
       <Button type="button" variant="ghost" size="sm" className="gap-1" onClick={add}>
-        <Plus size={14} /> Add option
+        <Plus size={14} /> {i18n.t('common.addOption')}
       </Button>
     </div>
   );
@@ -1301,21 +1301,21 @@ function MembershipStep({
   const visibilityOptions: { id: Visibility; title: string; body: string; tag: string; testid: string }[] = [
     {
       id: "PUBLIC",
-      title: "Public",
+      title: i18n.t('common.public'),
       body: "Anyone can discover the marketplace and browse listings. Best for open communities and merchants who want organic traffic.",
       tag: "OPEN",
       testid: "entry-method-public",
     },
     {
       id: "CLOSED",
-      title: "Closed",
+      title: i18n.t('common.closed'),
       body: 'Marketplace is listed publicly, but only members can browse listings. Non-members see a "Request to join" page. Best for most curated communities.',
       tag: "GATED",
       testid: "entry-method-closed",
     },
     {
       id: "PRIVATE",
-      title: "Private",
+      title: i18n.t('common.private'),
       body: "Hidden from Explore and search. Only direct invite links lead to the marketplace. Best for small trusted groups and beta launches.",
       tag: "HIDDEN",
       testid: "entry-method-invite",
@@ -1325,19 +1325,19 @@ function MembershipStep({
   const joinOptions: { id: "APPLICATION" | "REFERRAL" | "INVITE"; title: string; body: string; testid: string }[] = [
     {
       id: "APPLICATION",
-      title: "Application",
+      title: i18n.t('common.application'),
       body: "Prospective members answer questions you define. You review and approve or reject each one.",
       testid: "join-method-application",
     },
     {
       id: "REFERRAL",
-      title: "Referral",
+      title: i18n.t('common.referral'),
       body: "Existing members vouch for newcomers. Optionally auto-approve referrals.",
       testid: "join-method-referral",
     },
     {
       id: "INVITE",
-      title: "Invite only",
+      title: i18n.t('common.inviteOnly'),
       body: "Only people you invite (or who follow a direct invite link) can join. No application required.",
       testid: "join-method-invite",
     },
@@ -1347,15 +1347,15 @@ function MembershipStep({
     <div className="space-y-5">
       <Card>
         <CardHeader>
-          <CardTitle>Who belongs here?</CardTitle>
+          <CardTitle>{i18n.t('...create.createMarketplaceWizard.whoBelongsHere')}</CardTitle>
           <CardDescription>
-            Choose how members find and join your marketplace. All settings can be changed later.
+            {i18n.t('...create.createMarketplaceWizard.chooseHowMembersFindAnd')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
           <div>
-            <div className="section-label">Visibility</div>
-            <div className="space-y-2" role="radiogroup" aria-label="Visibility">
+            <div className="section-label">{i18n.t('common.visibility')}</div>
+            <div className="space-y-2" role="radiogroup" aria-label={i18n.t('common.visibility')}>
               {visibilityOptions.map((opt) => {
                 const selected = visibility === opt.id;
                 return (
@@ -1382,8 +1382,8 @@ function MembershipStep({
 
           {(visibility === "CLOSED" || visibility === "PRIVATE") && (
             <div>
-              <div className="section-label" style={{ marginTop: 8 }}>Ways to join</div>
-              <div className="space-y-2" role="radiogroup" aria-label="Ways to join">
+              <div className="section-label" style={{ marginTop: 8 }}>{i18n.t('common.waysToJoin')}</div>
+              <div className="space-y-2" role="radiogroup" aria-label={i18n.t('common.waysToJoin')}>
                 {joinOptions.map((opt) => {
                   const selected = state.entryMethod === opt.id;
                   return (
@@ -1413,8 +1413,8 @@ function MembershipStep({
                     onCheckedChange={(v) => setState((s) => ({ ...s, autoApprove: !!v }))}
                   />
                   <span className="text-[13px]">
-                    <span className="font-medium">Auto-approve referrals</span>
-                    <span className="block text-muted text-[12px]">Skip manual review once a vouch is received.</span>
+                    <span className="font-medium">{i18n.t('...create.createMarketplaceWizard.autoapproveReferrals')}</span>
+                    <span className="block text-muted text-[12px]">{i18n.t('...create.createMarketplaceWizard.skipManualReviewOnceA')}</span>
                   </span>
                 </label>
               )}
@@ -1425,9 +1425,9 @@ function MembershipStep({
 
       <Card>
         <CardHeader>
-          <CardTitle>Required verifications</CardTitle>
+          <CardTitle>{i18n.t('common.requiredVerifications')}</CardTitle>
           <CardDescription>
-            Pick at least one — new members must link every account below.
+            {i18n.t('common.pickAtLeastOneNew')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -1469,9 +1469,9 @@ function MembershipStep({
           <CardHeader>
             <div className="flex items-start justify-between gap-3">
               <div>
-                <CardTitle>Application questions</CardTitle>
+                <CardTitle>{i18n.t('common.applicationQuestions')}</CardTitle>
                 <CardDescription>
-                  What do applicants need to answer? Leave empty for a frictionless apply.
+                  {i18n.t('...create.createMarketplaceWizard.whatDoApplicantsNeedTo')}
                 </CardDescription>
               </div>
               <Badge>{state.applicationQuestions.length} question{state.applicationQuestions.length === 1 ? "" : "s"}</Badge>
@@ -1502,7 +1502,7 @@ function MembershipStep({
                 />
               ))}
               {state.applicationQuestions.length === 0 && (
-                <p className="text-[13px] text-muted">No questions yet.</p>
+                <p className="text-[13px] text-muted">{i18n.t('common.noQuestionsYet')}</p>
               )}
             </div>
             <div className="mt-4">
@@ -1522,7 +1522,7 @@ function MembershipStep({
                 disabled={state.applicationQuestions.length >= 10}
                 className="gap-1.5"
               >
-                <Plus size={16} /> Add question
+                <Plus size={16} /> {i18n.t('common.addQuestion')}
               </Button>
             </div>
           </CardContent>
@@ -1550,13 +1550,13 @@ function QuestionRow({
       <div className="grid grid-cols-1 md:grid-cols-[1fr_180px_auto] gap-3 items-start">
         <div>
           <Label htmlFor={`q-${question.uid}-label`} required>
-            Question
+            {i18n.t('common.question')}
           </Label>
           <Input
             id={`q-${question.uid}-label`}
             value={question.label}
             onChange={(e) => onChange({ label: e.target.value })}
-            placeholder="e.g. What brands do you collect?"
+            placeholder={i18n.t('common.egWhatBrandsDoYou')}
             maxLength={200}
             aria-invalid={!!errors[`q-${index}-label`]}
           />
@@ -1564,7 +1564,7 @@ function QuestionRow({
         </div>
 
         <div>
-          <Label>Answer type</Label>
+          <Label>{i18n.t('common.answerType')}</Label>
           <Select
             value={question.type}
             onValueChange={(v) => {
@@ -1591,7 +1591,7 @@ function QuestionRow({
           <button
             type="button"
             onClick={onRemove}
-            aria-label="Remove question"
+            aria-label={i18n.t('common.removeQuestion')}
             className="h-7 w-7 grid place-items-center rounded-[6px] text-ink-soft hover:bg-hover hover:text-danger"
           >
             <Trash2 size={14} />
@@ -1600,15 +1600,15 @@ function QuestionRow({
             <Switch
               checked={question.required}
               onCheckedChange={(v) => onChange({ required: !!v })}
-              aria-label="Required question"
+              aria-label={i18n.t('common.requiredQuestion')}
             />
-            Required
+            {i18n.t('common.required')}
           </label>
         </div>
 
         {(question.type === "SELECT" || question.type === "MULTI_SELECT") && (
           <div className="md:col-span-3">
-            <Label required>Options</Label>
+            <Label required>{i18n.t('common.options')}</Label>
             <OptionsEditor
               options={question.options ?? []}
               onChange={(opts) => onChange({ options: opts })}
@@ -1636,22 +1636,22 @@ function MonetizationStep({
     <div className="space-y-5">
       <Card>
         <CardHeader>
-          <CardTitle>Membership pricing</CardTitle>
-          <CardDescription>Free or subscription-based.</CardDescription>
+          <CardTitle>{i18n.t('common.membershipPricing')}</CardTitle>
+          <CardDescription>{i18n.t('common.freeOrSubscriptionbased')}</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3" role="radiogroup" aria-label="Pricing">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3" role="radiogroup" aria-label={i18n.t('common.pricing')}>
             <PricingOption
               testid="pricing-free"
               active={!state.isPaid}
-              title="Free"
+              title={i18n.t('common.free')}
               body="Anyone approved can join at no cost."
               onClick={() => setState((s) => ({ ...s, isPaid: false }))}
             />
             <PricingOption
               testid="pricing-paid"
               active={state.isPaid}
-              title="Paid membership"
+              title={i18n.t('common.paidMembership')}
               body="Charge monthly, annually, or both."
               onClick={() => setState((s) => ({ ...s, isPaid: true }))}
             />
@@ -1660,7 +1660,7 @@ function MonetizationStep({
           {state.isPaid && (
             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 rounded-[10px] border border-line-soft bg-bg-panel p-4">
               <div>
-                <Label htmlFor="price-monthly">Monthly price (USD)</Label>
+                <Label htmlFor="price-monthly">{i18n.t('common.monthlyPriceUsd')}</Label>
                 <div className="flex items-stretch rounded-[10px] border border-line bg-surface overflow-hidden focus-within:border-blue focus-within:ring-[3px] focus-within:ring-[var(--blue-softer)]">
                   <span className="inline-flex items-center px-3 text-[13px] text-muted bg-bg-panel border-r border-line select-none">
                     $
@@ -1682,7 +1682,7 @@ function MonetizationStep({
                 {errors.monthlyPrice && <Help error>{errors.monthlyPrice}</Help>}
               </div>
               <div>
-                <Label htmlFor="price-annual">Annual price (USD)</Label>
+                <Label htmlFor="price-annual">{i18n.t('common.annualPriceUsd')}</Label>
                 <div className="flex items-stretch rounded-[10px] border border-line bg-surface overflow-hidden focus-within:border-blue focus-within:ring-[3px] focus-within:ring-[var(--blue-softer)]">
                   <span className="inline-flex items-center px-3 text-[13px] text-muted bg-bg-panel border-r border-line select-none">
                     $
@@ -1720,8 +1720,7 @@ function MonetizationStep({
       <div className="rounded-[10px] border border-blue/20 bg-blue-soft px-4 py-3 flex items-start gap-3">
         <Sparkles size={18} className="text-blue-ink shrink-0 mt-0.5" />
         <div className="text-[13px] text-ink-soft">
-          <span className="font-medium text-ink">Ready to launch?</span> Hit Publish and we'll spin up
-          your marketplace immediately. You can tweak any of this later from Settings.
+          <span className="font-medium text-ink">{i18n.t('...create.createMarketplaceWizard.readyToLaunch')}</span> {i18n.t('...create.createMarketplaceWizard.hitPublishAndWellSpin')}
         </div>
       </div>
     </div>
@@ -1830,7 +1829,7 @@ function StickyFooter({
     <div className="fixed bottom-0 inset-x-0 z-30 border-t border-line bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/75">
       <div className="max-w-[1200px] mx-auto px-6 py-3 flex items-center gap-3">
         <div className="text-[12.5px] text-muted hidden sm:block">
-          Step {step} of {STEPS.length} — {STEPS[step - 1].title}
+          {i18n.t('...create.createMarketplaceWizard.step')} {step} of {STEPS.length} — {STEPS[step - 1].title}
         </div>
         <div className="ml-auto flex items-center gap-2">
           <Button
@@ -1841,7 +1840,7 @@ function StickyFooter({
             disabled={step === 1 || submitting}
             className="gap-1"
           >
-            <ArrowLeft size={16} /> Back
+            <ArrowLeft size={16} /> {i18n.t('common.back')}
           </Button>
           {step < 4 ? (
             <Button
@@ -1852,7 +1851,7 @@ function StickyFooter({
               disabled={submitting}
               className="gap-1"
             >
-              Next <ArrowRight size={16} />
+              {i18n.t('common.next')} <ArrowRight size={16} />
             </Button>
           ) : (
             <Button
@@ -1864,7 +1863,7 @@ function StickyFooter({
               className="gap-1.5"
             >
               <Rocket size={16} />
-              {submitting ? "Publishing…" : "Publish marketplace"}
+              {submitting ? i18n.t('common.publishing') : i18n.t('...create.createMarketplaceWizard.publishMarketplace')}
             </Button>
           )}
         </div>

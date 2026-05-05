@@ -1,8 +1,9 @@
 import { requireOwnerOf } from "@/lib/auth-helpers";
 import { OwnerShell } from "@/components/owner/OwnerShell";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Payouts" };
+export const metadata = { title: i18n.t('common.payouts') };
 
 // Stub for owner payouts. Not in any design flow directly; placeholder so sidebar
 // link doesn't 404. TODO: wire Stripe Connect when monetization lands.
@@ -30,20 +31,19 @@ export default async function PayoutsPage(
       <style dangerouslySetInnerHTML={{ __html: payoutsCss }} />
       <main className="pay-body">
         <div className="page-head">
-          <h1>Payouts</h1>
+          <h1>{i18n.t('common.payouts')}</h1>
           <div className="lead">
-            Where your membership revenue lands — plus any platform-facilitated fees.
+            {i18n.t('...payouts.page.whereYourMembershipRevenueLands')}
           </div>
         </div>
 
         <div className="empty-card">
-          <h3>No payout account connected yet.</h3>
+          <h3>{i18n.t('...payouts.page.noPayoutAccountConnectedYet')}</h3>
           <p>
-            Connect Stripe Connect to start collecting membership fees and receive
-            payouts to your bank. Takes about 3 minutes.
+            {i18n.t('...payouts.page.connectStripeConnectToStart')}
           </p>
           <button type="button" className="cta" disabled style={{ opacity: 0.6, cursor: "not-allowed" }}>
-            Connect Stripe (coming soon)
+            {i18n.t('...payouts.page.connectStripeComingSoon')}
           </button>
         </div>
       </main>

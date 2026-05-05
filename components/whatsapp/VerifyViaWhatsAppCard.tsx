@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { WhatsAppQRModal } from "./WhatsAppQRModal";
+import { i18n } from '@shipeasy/sdk/client'
 
 export function VerifyViaWhatsAppCard({
   marketplaceId,
@@ -34,12 +35,11 @@ export function VerifyViaWhatsAppCard({
         </svg>
         <div className="flex-1">
           <h2 className="text-[15px] font-semibold">
-            Skip the application — verify with WhatsApp
+            {i18n.t('...whatsapp.verifyViaWhatsAppCard.skipTheApplicationVerifyWith')}
           </h2>
           <p className="text-[13px] text-ink-soft mt-1">
-            If you&apos;re already in{" "}
-            <strong>{groupName ?? "the linked group"}</strong> on WhatsApp, scan a QR and
-            you&apos;ll be approved instantly.
+            {i18n.t('...whatsapp.verifyViaWhatsAppCard.ifYoureAlreadyIn')}dy in{" "}
+            <strong>{groupName ?? i18n.t('...whatsapp.verifyViaWhatsAppCard.theLinkedGroup')}</strong> {i18n.t('...whatsapp.verifyViaWhatsAppCard.onWhatsappScanAQr')}ntly.
           </p>
           <div className="mt-3">
             <Button
@@ -47,7 +47,7 @@ export function VerifyViaWhatsAppCard({
               className="bg-emerald-600 hover:bg-emerald-700"
               data-testid="whatsapp-verify-open"
             >
-              Verify with WhatsApp
+              {i18n.t('common.verifyWithWhatsapp')}
             </Button>
           </div>
         </div>
@@ -61,7 +61,7 @@ export function VerifyViaWhatsAppCard({
           onDone={({ verified, approved }) => {
             setOpen(false);
             if (approved) {
-              toast.success("Approved — welcome!");
+              toast.success(i18n.t('...whatsapp.verifyViaWhatsAppCard.approvedWelcome'));
               router.push(`/m/${marketplaceSlug}`);
             } else if (verified) {
               toast("You're in the group, but approval didn't complete.");

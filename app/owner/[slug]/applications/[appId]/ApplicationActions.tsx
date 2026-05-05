@@ -20,6 +20,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/Select";
+import { i18n } from '@shipeasy/sdk/client'
 
 const REJECTION_REASONS = [
   "Insufficient verification",
@@ -51,7 +52,7 @@ export function ApplicationActions({ appId, slug }: { appId: string; slug: strin
         }),
       });
       if (!res.ok) {
-        alert((await res.json().catch(() => null))?.error ?? "Failed");
+        alert((await res.json().catch(() => null))?.error ?? i18n.t('common.failed'));
         return;
       }
       setOpen(null);
@@ -75,7 +76,7 @@ export function ApplicationActions({ appId, slug }: { appId: string; slug: strin
           }}
           data-testid="app-approve"
         >
-          <Check size={15} /> Approve
+          <Check size={15} /> {i18n.t('common.approve')}
         </Button>
         <Button
           variant="danger"
@@ -86,7 +87,7 @@ export function ApplicationActions({ appId, slug }: { appId: string; slug: strin
           }}
           data-testid="app-reject"
         >
-          <X size={15} /> Reject
+          <X size={15} /> {i18n.t('common.reject')}
         </Button>
         <Button
           variant="secondary"
@@ -96,7 +97,7 @@ export function ApplicationActions({ appId, slug }: { appId: string; slug: strin
           }}
           data-testid="app-request-info"
         >
-          <HelpCircle size={15} /> Request more info
+          <HelpCircle size={15} /> {i18n.t('...[appId].applicationActions.requestMoreInfo')}
         </Button>
       </div>
 
@@ -105,17 +106,17 @@ export function ApplicationActions({ appId, slug }: { appId: string; slug: strin
           <DialogHeader>
             <DialogTitle>
               {open === "APPROVE"
-                ? "Approve application"
+                ? i18n.t('...[appId].applicationActions.approveApplication')
                 : open === "REJECT"
-                  ? "Reject application"
-                  : "Request more info"}
+                  ? i18n.t('...[appId].applicationActions.rejectApplication')
+                  : i18n.t('...[appId].applicationActions.requestMoreInfo')}
             </DialogTitle>
           </DialogHeader>
           <DialogBody className="space-y-3">
             {open === "REJECT" && (
               <div>
                 <label className="text-[12px] text-ink-soft block mb-1.5 font-medium">
-                  Reason
+                  {i18n.t('common.reason')}
                 </label>
                 <Select value={reason} onValueChange={setReason}>
                   <SelectTrigger data-testid="app-rejection-reason">
@@ -133,17 +134,17 @@ export function ApplicationActions({ appId, slug }: { appId: string; slug: strin
             )}
             <div>
               <label className="text-[12px] text-ink-soft block mb-1.5 font-medium">
-                Note{open === "REQUEST_INFO" ? "" : " (optional)"}
+                {i18n.t('...[appId].applicationActions.note')}{open === "REQUEST_INFO" ? "" : i18n.t('common.optional2')}
               </label>
               <Textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder={
                   open === "APPROVE"
-                    ? "Welcome message (optional)"
+                    ? i18n.t('...[appId].applicationActions.welcomeMessageOptional')
                     : open === "REJECT"
-                      ? "Optional — shown to the applicant"
-                      : "What info is missing?"
+                      ? i18n.t('...[appId].applicationActions.optionalShownToTheApplicant')
+                      : i18n.t('...[appId].applicationActions.whatInfoIsMissing')
                 }
                 data-testid="app-note"
               />
@@ -151,7 +152,7 @@ export function ApplicationActions({ appId, slug }: { appId: string; slug: strin
           </DialogBody>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setOpen(null)} disabled={busy}>
-              Cancel
+              {i18n.t('common.cancel')}
             </Button>
             <Button
               variant={open === "REJECT" ? "danger" : "primary"}
@@ -160,12 +161,12 @@ export function ApplicationActions({ appId, slug }: { appId: string; slug: strin
               data-testid="app-confirm"
             >
               {busy
-                ? "Working…"
+                ? i18n.t('common.working')
                 : open === "APPROVE"
-                  ? "Approve"
+                  ? i18n.t('common.approve')
                   : open === "REJECT"
-                    ? "Reject"
-                    : "Send request"}
+                    ? i18n.t('common.reject')
+                    : i18n.t('...[appId].applicationActions.sendRequest')}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -10,6 +10,7 @@ import { BrandLockup } from "@/components/brand/Logo";
 import { verifyProviders } from "@/lib/utils";
 import { ApplyForm } from "./ApplyForm";
 import { VerifyViaWhatsAppCard } from "@/components/whatsapp/VerifyViaWhatsAppCard";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
 
@@ -88,7 +89,7 @@ export default async function ApplyPage(props: { params: Promise<Params> }) {
   const verifiedSet = new Set(verified.map((v) => v.provider));
   const missing = mp.requiredVerifications.filter((r) => !verifiedSet.has(r));
 
-  const ownerName = mp.owner.displayName ?? mp.owner.name ?? "the owners";
+  const ownerName = mp.owner.displayName ?? mp.owner.name ?? i18n.t('...[slug].page.theOwners');
 
   return (
     <div className="min-h-screen bg-bg-soft">
@@ -99,7 +100,7 @@ export default async function ApplyPage(props: { params: Promise<Params> }) {
             href={`/m/${mp.slug}`}
             className="text-[13px] text-ink-soft hover:text-ink inline-flex items-center gap-1"
           >
-            <ArrowLeft size={14} /> Back
+            <ArrowLeft size={14} /> {i18n.t('common.back')}
           </Link>
         </div>
       </header>
@@ -108,16 +109,16 @@ export default async function ApplyPage(props: { params: Promise<Params> }) {
         {/* Intro */}
         <div className="mb-6 text-center">
           <p className="text-[11px] mono uppercase tracking-[0.14em] text-blue-ink font-semibold mb-3">
-            Application
+            {i18n.t('common.application')}
           </p>
           <h1
             className="leading-[1.1] tracking-[-0.01em]"
             style={{ fontFamily: '"Instrument Serif", serif', fontWeight: 400, fontSize: 32 }}
           >
-            Apply to <em className="italic text-blue-ink">{mp.name}</em>
+            {i18n.t('common.applyTo')} <em className="italic text-blue-ink">{mp.name}</em>
           </h1>
           <p className="text-[14px] text-ink-soft mt-3 max-w-[420px] mx-auto">
-            Tell {ownerName} a bit about you. Typical review takes ~48 hours.
+            {i18n.t('...[slug].page.tell')} {ownerName} {i18n.t('...[slug].page.aBitAboutYouTypical')}
           </p>
         </div>
 
@@ -135,7 +136,7 @@ export default async function ApplyPage(props: { params: Promise<Params> }) {
         {reviewerFollowUp && (
           <div className="mb-5 rounded-[12px] border border-blue/30 bg-blue-softer p-4">
             <div className="text-[11px] mono uppercase tracking-[0.14em] text-blue-ink font-semibold mb-1.5">
-              Follow-up from the reviewer
+              {i18n.t('...[slug].page.followupFromTheReviewer')}
             </div>
             <p className="text-[13px] text-ink whitespace-pre-line">
               {reviewerFollowUp}
@@ -154,11 +155,10 @@ export default async function ApplyPage(props: { params: Promise<Params> }) {
               </span>
               <div>
                 <h2 className="text-[17px] font-semibold">
-                  Before you apply, link these accounts
+                  {i18n.t('...[slug].page.beforeYouApplyLinkThese')}
                 </h2>
                 <p className="text-[13px] text-muted mt-1">
-                  {mp.name} requires these verifications. You can return to this
-                  page right after.
+                  {mp.name} {i18n.t('...[slug].page.requiresTheseVerificationsYouCan')}
                 </p>
               </div>
             </div>
@@ -181,9 +181,9 @@ export default async function ApplyPage(props: { params: Promise<Params> }) {
                       </span>
                     </div>
                     {covered ? (
-                      <Badge variant="approved">Linked</Badge>
+                      <Badge variant="approved">{i18n.t('common.linked')}</Badge>
                     ) : (
-                      <Badge variant="neutral">Required</Badge>
+                      <Badge variant="neutral">{i18n.t('common.required')}</Badge>
                     )}
                   </li>
                 );
@@ -197,12 +197,12 @@ export default async function ApplyPage(props: { params: Promise<Params> }) {
                 data-testid={`verify-link-${missing[0]}`}
               >
                 <Button size="lg" className="w-full">
-                  Link accounts
+                  {i18n.t('common.linkAccounts')}
                 </Button>
               </Link>
               <Link href={`/m/${mp.slug}`} className="sm:flex-none">
                 <Button variant="secondary" size="lg" className="w-full">
-                  Back to marketplace
+                  {i18n.t('...[slug].page.backToMarketplace')}
                 </Button>
               </Link>
             </div>

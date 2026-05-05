@@ -1,4 +1,5 @@
 import * as React from "react";
+import { i18n } from '@shipeasy/sdk/client'
 
 /**
  * Developer-facing preview shell: shows the same email HTML rendered at
@@ -35,7 +36,7 @@ export function EmailPreview({
               color: "#6b7685",
             }}
           >
-            Email preview
+            {i18n.t('...emails.emailFrame.emailPreview')}
           </div>
           <h1
             style={{
@@ -49,7 +50,7 @@ export function EmailPreview({
             {title}
           </h1>
           <div style={{ fontSize: 13, color: "#6b7685", marginTop: 4 }}>
-            Subject: <span style={{ color: "#17212e" }}>{subject}</span>
+            {i18n.t('...emails.emailFrame.subject')} <span style={{ color: "#17212e" }}>{subject}</span>
           </div>
         </header>
 
@@ -60,10 +61,10 @@ export function EmailPreview({
             gap: 24,
           }}
         >
-          <PreviewPane label="Desktop · 600px" width={600}>
+          <PreviewPane label={i18n.t('...emails.emailFrame.desktop600px')} width={600}>
             <div dangerouslySetInnerHTML={{ __html: html }} />
           </PreviewPane>
-          <PreviewPane label="Mobile · 375px" width={375}>
+          <PreviewPane label={i18n.t('...emails.emailFrame.mobile375px')} width={375}>
             <div dangerouslySetInnerHTML={{ __html: html }} />
           </PreviewPane>
         </div>

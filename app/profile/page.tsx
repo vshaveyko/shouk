@@ -10,9 +10,10 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { verifyProviders } from "@/lib/utils";
 import { ProfileForm } from "./ProfileForm";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Your profile" };
+export const metadata = { title: i18n.t('...profile.page.yourProfile') };
 
 function providerLabel(p: string) {
   return verifyProviders.find((v) => v.id === p)?.label ?? p;
@@ -48,10 +49,10 @@ export default async function ProfilePage() {
 
       <main className="max-w-[860px] mx-auto px-6 py-10">
         <div className="mb-8">
-          <p className="text-[12px] tracking-[0.14em] uppercase text-blue-ink font-semibold mb-2">Account</p>
-          <h1 className="text-[32px] font-semibold tracking-[-0.02em]">Your profile</h1>
+          <p className="text-[12px] tracking-[0.14em] uppercase text-blue-ink font-semibold mb-2">{i18n.t('common.account')}</p>
+          <h1 className="text-[32px] font-semibold tracking-[-0.02em]">{i18n.t('...profile.page.yourProfile')}</h1>
           <p className="text-[14px] text-muted mt-1.5">
-            This is how other members see you across Shouks.
+            {i18n.t('...profile.page.thisIsHowOtherMembers')}
           </p>
         </div>
 
@@ -65,7 +66,7 @@ export default async function ProfilePage() {
                   {user.displayName ?? user.name ?? "You"}
                 </h2>
                 {user.verifiedAccounts.length > 0 && (
-                  <CheckCircle2 size={16} className="text-blue flex-none" aria-label="Verified" />
+                  <CheckCircle2 size={16} className="text-blue flex-none" aria-label={i18n.t('common.verified')} />
                 )}
               </div>
               <div className="text-[13px] text-muted">{user.email}</div>
@@ -89,19 +90,19 @@ export default async function ProfilePage() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <ShieldCheck size={16} className="text-blue-ink" />
-              <h2 className="text-[16px] font-semibold">Verified accounts</h2>
+              <h2 className="text-[16px] font-semibold">{i18n.t('common.verifiedAccounts')}</h2>
             </div>
             <Link
               href="/onboarding/verify"
               className="text-[13px] text-blue-ink hover:underline inline-flex items-center gap-1"
               data-testid="verify-accounts"
             >
-              Manage <ArrowRight size={13} />
+              {i18n.t('...profile.page.manage')} <ArrowRight size={13} />
             </Link>
           </div>
           {user.verifiedAccounts.length === 0 && !user.phoneVerified ? (
             <p className="text-[14px] text-muted">
-              You haven't linked any accounts. Most marketplaces require at least one.
+              {i18n.t('...profile.page.youHaventLinkedAnyAccounts')}
             </p>
           ) : (
             <ul className="space-y-2">
@@ -119,7 +120,7 @@ export default async function ProfilePage() {
                       <div className="text-[11px] text-muted">{a.handle}</div>
                     </div>
                   </div>
-                  <Badge variant="approved">Verified</Badge>
+                  <Badge variant="approved">{i18n.t('common.verified')}</Badge>
                 </li>
               ))}
               {user.phoneVerified && (
@@ -129,11 +130,11 @@ export default async function ProfilePage() {
                       ☎
                     </span>
                     <div>
-                      <div className="text-[13px] font-medium">Phone</div>
+                      <div className="text-[13px] font-medium">{i18n.t('common.phone')}</div>
                       <div className="text-[11px] text-muted">{user.phoneNumber}</div>
                     </div>
                   </div>
-                  <Badge variant="approved">Verified</Badge>
+                  <Badge variant="approved">{i18n.t('common.verified')}</Badge>
                 </li>
               )}
             </ul>
@@ -143,7 +144,7 @@ export default async function ProfilePage() {
         {/* Memberships */}
         {(memberships.length > 0 || owned.length > 0) && (
           <section className="bg-surface border border-line rounded-[14px] p-6 mt-6">
-            <h2 className="text-[16px] font-semibold mb-3">Your communities</h2>
+            <h2 className="text-[16px] font-semibold mb-3">{i18n.t('...profile.page.yourCommunities')}</h2>
             <ul className="space-y-2">
               {[...owned.map((m) => ({ ...m, role: "Owner" as const })), ...memberships.map((m) => ({ ...m, role: "Member" as const }))].map((m) => (
                 <li key={m.id}>

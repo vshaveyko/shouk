@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { i18n } from '@shipeasy/sdk/client'
 
 const TABS = [
-  { id: "identity", label: "Identity" },
-  { id: "schema", label: "Schema" },
-  { id: "monetization", label: "Monetization" },
-  { id: "roles", label: "Roles" },
-  { id: "integrations", label: "Integrations" },
+  { id: "identity", label: i18n.t('...owner.settingsTabs.identity') },
+  { id: "schema", label: i18n.t('...owner.settingsTabs.schema') },
+  { id: "monetization", label: i18n.t('...owner.settingsTabs.monetization') },
+  { id: "roles", label: i18n.t('...owner.settingsTabs.roles') },
+  { id: "integrations", label: i18n.t('...owner.settingsTabs.integrations') },
 ] as const;
 
 export function SettingsTabs({ slug }: { slug: string }) {
@@ -21,7 +22,7 @@ export function SettingsTabs({ slug }: { slug: string }) {
       <div
         className="inline-flex items-center gap-1 overflow-x-auto max-w-full"
         role="tablist"
-        aria-label="Settings sections"
+        aria-label={i18n.t('...owner.settingsTabs.settingsSectionsAria-label')}
       >
         {TABS.map((t) => {
           const href = `${base}/${t.id}`;

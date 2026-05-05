@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/Button";
 import { Input, Label, Help } from "@/components/ui/Input";
+import { i18n } from '@shipeasy/sdk/client'
 
 export function SignUpForm() {
   const router = useRouter();
@@ -25,7 +26,7 @@ export function SignUpForm() {
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      setError(body?.error ?? "Could not create account.");
+      setError(body?.error ?? i18n.t('...signup.signUpForm.couldNotCreateAccount'));
       setSubmitting(false);
       return;
     }
@@ -38,7 +39,7 @@ export function SignUpForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4" data-testid="signup-form">
       <div>
-        <Label htmlFor="displayName" required>Display name</Label>
+        <Label htmlFor="displayName" required>{i18n.t('common.displayName')}</Label>
         <Input
           id="displayName"
           name="displayName"
@@ -47,11 +48,11 @@ export function SignUpForm() {
           maxLength={50}
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
-          placeholder="Jane Merchant"
+          placeholder={i18n.t('...signup.signUpForm.janeMerchantPlaceholder')}
         />
       </div>
       <div>
-        <Label htmlFor="email" required>Email</Label>
+        <Label htmlFor="email" required>{i18n.t('common.email')}</Label>
         <Input
           id="email"
           name="email"
@@ -60,11 +61,11 @@ export function SignUpForm() {
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
+          placeholder={i18n.t('common.youexamplecom')}
         />
       </div>
       <div>
-        <Label htmlFor="password" required>Password</Label>
+        <Label htmlFor="password" required>{i18n.t('common.password')}</Label>
         <Input
           id="password"
           name="password"
@@ -74,9 +75,9 @@ export function SignUpForm() {
           minLength={8}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="At least 8 characters"
+          placeholder={i18n.t('...signup.signUpForm.atLeast8CharactersPlaceholder')}
         />
-        <Help>Use at least 8 characters.</Help>
+        <Help>{i18n.t('...signup.signUpForm.useAtLeast8Characters')}</Help>
       </div>
       {error && (
         <div className="text-[13px] text-danger" data-testid="signup-error">
@@ -90,7 +91,7 @@ export function SignUpForm() {
         className="w-full"
         disabled={submitting}
       >
-        {submitting ? "Creating account…" : "Create account"}
+        {submitting ? i18n.t('...signup.signUpForm.creatingAccount') : i18n.t('...signup.signUpForm.createAccount')}
       </Button>
     </form>
   );

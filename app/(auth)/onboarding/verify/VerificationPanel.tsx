@@ -6,6 +6,7 @@ import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { Check, Link2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { i18n } from '@shipeasy/sdk/client'
 
 type LinkedAccount = { provider: string; handle: string };
 
@@ -13,7 +14,7 @@ type LinkedAccount = { provider: string; handle: string };
 // (real) and phone (stub, SMS provider pending). The other providers are
 // hidden until we wire up real OAuth for them (SHK-031 / SHK-032 / SHK-035).
 const providers = [
-  { id: "GOOGLE", label: "Google", badge: "G", bg: "#4285f4" },
+  { id: "GOOGLE", label: i18n.t('...verify.verificationPanel.google'), badge: "G", bg: "#4285f4" },
 ];
 
 export function VerificationPanel({
@@ -67,7 +68,7 @@ export function VerificationPanel({
     setBusy(null);
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      setError(body?.error ?? "Could not link account.");
+      setError(body?.error ?? i18n.t('...verify.verificationPanel.couldNotLinkAccount'));
       return;
     }
     const body = await res.json();
@@ -143,7 +144,7 @@ export function VerificationPanel({
                       <Check size={12} /> {linkedItem?.handle}
                     </div>
                   ) : (
-                    <div className="text-[12px] text-muted">Not linked</div>
+                    <div className="text-[12px] text-muted">{i18n.t('common.notLinked')}</div>
                   )}
                 </div>
               </div>
@@ -154,7 +155,7 @@ export function VerificationPanel({
                   disabled={busy === p.id}
                   onClick={() => unlink(p.id)}
                 >
-                  Unlink
+                  {i18n.t('common.unlink')}
                 </Button>
               ) : (
                 <Button
@@ -164,7 +165,7 @@ export function VerificationPanel({
                   onClick={() => linkProvider(p.id)}
                   data-testid={`link-${p.id.toLowerCase()}`}
                 >
-                  <Link2 size={14} /> Link
+                  <Link2 size={14} /> {i18n.t('common.link')}
                 </Button>
               )}
             </div>
@@ -180,11 +181,11 @@ export function VerificationPanel({
             <div className="flex items-center gap-3 min-w-0">
               <span className="w-9 h-9 rounded-[8px] grid place-items-center bg-[oklch(0.3_0.02_240)] text-white font-semibold text-[14px]">☎︎</span>
               <div className="min-w-0">
-                <div className="text-[14px] font-medium">Phone (SMS)</div>
+                <div className="text-[14px] font-medium">{i18n.t('...verify.verificationPanel.phoneSms')}</div>
                 {phoneVerified ? (
                   <div className="text-[12px] text-success flex items-center gap-1.5"><Check size={12} /> {phoneNumber}</div>
                 ) : (
-                  <div className="text-[12px] text-muted">Verify by SMS code</div>
+                  <div className="text-[12px] text-muted">{i18n.t('...verify.verificationPanel.verifyBySmsCode')}</div>
                 )}
               </div>
             </div>
@@ -206,7 +207,7 @@ export function VerificationPanel({
                 onClick={sendPhoneCode}
                 data-testid="phone-send-code"
               >
-                {phoneCodeSent ? "Resend" : "Send code"}
+                {phoneCodeSent ? i18n.t('...verify.verificationPanel.resend') : i18n.t('...verify.verificationPanel.sendCode')}
               </Button>
               {phoneCodeSent && (
                 <>
@@ -226,7 +227,7 @@ export function VerificationPanel({
                     onClick={confirmPhoneCode}
                     data-testid="phone-verify"
                   >
-                    Verify
+                    {i18n.t('...verify.verificationPanel.verify')}
                   </Button>
                 </>
               )}
@@ -244,14 +245,14 @@ export function VerificationPanel({
 
       <div className="flex items-center justify-between pt-3 border-t border-line-soft">
         <Link href={nextHref} className="text-[13px] text-muted hover:text-ink" data-testid="verify-skip">
-          Skip for now
+          {i18n.t('...verify.verificationPanel.skipForNow')}
         </Link>
         <Button
           variant="primary"
           onClick={() => router.push(nextHref)}
           data-testid="verify-continue"
         >
-          Continue
+          {i18n.t('common.continue')}
         </Button>
       </div>
     </div>

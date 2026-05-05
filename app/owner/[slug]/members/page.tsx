@@ -2,6 +2,7 @@ import { requireOwnerOf } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { OwnerShell } from "@/components/owner/OwnerShell";
 import { MembersTable, type MemberRow } from "./MembersTable";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
 
@@ -87,7 +88,7 @@ export default async function MembersDirectoryPage(
 
   const rows: MemberRow[] = memberships.map((m) => ({
     userId: m.userId,
-    displayName: m.user.displayName ?? m.user.name ?? m.user.email ?? "Member",
+    displayName: m.user.displayName ?? m.user.name ?? m.user.email ?? i18n.t('common.member'),
     email: m.user.email,
     image: m.user.image,
     joinedAt: m.joinedAt.toISOString(),
@@ -101,10 +102,9 @@ export default async function MembersDirectoryPage(
       <style dangerouslySetInnerHTML={{ __html: membersCss }} />
       <main className="mem-body">
         <div className="page-head">
-          <h1>Members</h1>
+          <h1>{i18n.t('common.members')}</h1>
           <div className="lead">
-            {rows.length} member{rows.length === 1 ? "" : "s"} in {marketplace.name}.
-            Filter, sort, and change roles. Bulk actions run on selected rows.
+            {rows.length} member{rows.length === 1 ? "" : "s"} in {marketplace.name}{i18n.t('...members.page.filterSortAndChangeRoles')}
           </div>
         </div>
 

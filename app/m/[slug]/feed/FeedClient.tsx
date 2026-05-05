@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { formatCents, timeAgo, formatDuration } from "@/lib/utils";
+import { i18n } from '@shipeasy/sdk/client'
 
 type Listing = {
   id: string;
@@ -163,7 +164,7 @@ export function FeedClient({
           }));
         });
       } catch {
-        toast.error("Couldn't load listings.");
+        toast.error(i18n.t('...feed.feedClient.couldntLoadListings'));
       } finally {
         setLoading(false);
       }
@@ -212,7 +213,7 @@ export function FeedClient({
             : l,
         ),
       );
-      toast.error("Couldn't update save.");
+      toast.error(i18n.t('common.couldntUpdateSave'));
     }
   }
 
@@ -240,7 +241,7 @@ export function FeedClient({
     <>
       <style dangerouslySetInnerHTML={{ __html: mpBrowseCss }} />
 
-      <div className="mp-tabs" role="tablist" aria-label="Marketplace sections">
+      <div className="mp-tabs" role="tablist" aria-label={i18n.t('...feed.feedClient.marketplaceSectionsAria-label')}>
         <button
           type="button"
           className="active"
@@ -252,27 +253,27 @@ export function FeedClient({
             <rect x="3" y="14" width="7" height="7" rx="1" />
             <rect x="14" y="14" width="7" height="7" rx="1" />
           </svg>
-          Browse <span className="ct">{activeListingCount.toLocaleString()}</span>
+          {i18n.t('...feed.feedClient.browse')} <span className="ct">{activeListingCount.toLocaleString()}</span>
         </button>
         <Link href="/activity" className="" data-testid="mp-tab-mine">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 11l3 3L22 4" />
             <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
           </svg>
-          My listings <span className="ct">{myListingsCount}</span>
+          {i18n.t('...feed.feedClient.myListings')} <span className="ct">{myListingsCount}</span>
         </Link>
         <Link href={`/m/${slug}/messages`} className="" data-testid="mp-tab-messages">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
           </svg>
-          Messages
+          {i18n.t('common.messages')}
         </Link>
         <Link href={`/m/${slug}`} className="" data-testid="mp-tab-about">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" />
             <path d="M12 16v-4M12 8h.01" />
           </svg>
-          About
+          {i18n.t('...feed.feedClient.about')}
           {memberCount > 0 && <span className="ct">{memberCount.toLocaleString()}</span>}
         </Link>
       </div>
@@ -287,7 +288,7 @@ export function FeedClient({
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={`Search ${marketplaceName}…`}
+            placeholder={i18n.t('...feed.feedClient.searchMarketplacename', { marketplaceName })}
             data-testid="feed-search"
           />
         </div>
@@ -298,7 +299,7 @@ export function FeedClient({
             onClick={() => onTypeChange(type === "AUCTION" ? "ALL" : "AUCTION")}
             data-testid="feed-tab-auction"
           >
-            Auctions only
+            {i18n.t('...feed.feedClient.auctionsOnly')}
           </button>
         )}
         <button
@@ -307,7 +308,7 @@ export function FeedClient({
           onClick={() => onTypeChange(type === "FIXED" ? "ALL" : "FIXED")}
           data-testid="feed-tab-fixed"
         >
-          Buy now
+          {i18n.t('...feed.feedClient.buyNow')}
         </button>
         <button
           type="button"
@@ -319,20 +320,20 @@ export function FeedClient({
             <circle cx="11" cy="11" r="8" />
             <path d="m21 21-4.3-4.3" />
           </svg>
-          Wanted · ISO
+          {i18n.t('common.wantedIso')}
         </button>
         <div className="spacer" />
         <select
           className="chip-btn"
           value={sort}
           onChange={(e) => onSortChange(e.target.value)}
-          aria-label="Sort listings"
+          aria-label={i18n.t('...feed.feedClient.sortListingsAria-label')}
           data-testid="feed-sort"
         >
-          <option value="new">Sort: Newest</option>
-          <option value="price-asc">Price ↑</option>
-          <option value="price-desc">Price ↓</option>
-          <option value="ending">Ending soon</option>
+          <option value="new">{i18n.t('...feed.feedClient.sortNewest')}</option>
+          <option value="price-asc">{i18n.t('...feed.feedClient.price')}</option>
+          <option value="price-desc">{i18n.t('...feed.feedClient.price2')}</option>
+          <option value="ending">{i18n.t('...feed.feedClient.endingSoon')}</option>
         </select>
       </div>
 
@@ -341,7 +342,7 @@ export function FeedClient({
           {activeFilters.map((f) => (
             <span key={f.key} className="chip">
               {f.label}
-              <button type="button" onClick={f.onClear} aria-label={`Clear ${f.label}`}>
+              <button type="button" onClick={f.onClear} aria-label={i18n.t('...feed.feedClient.clearLabel', { label: String(f.label) })}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M18 6 6 18M6 6l12 12" />
                 </svg>
@@ -354,16 +355,16 @@ export function FeedClient({
       <div className="listings-grid" data-testid="feed-grid" aria-busy={loading || undefined}>
         {listings.length === 0 ? (
           <div className="feed-empty-grid">
-            <strong>{query || type !== "ALL" ? "No listings match." : "Nothing listed yet."}</strong>
+            <strong>{query || type !== "ALL" ? i18n.t('common.noListingsMatch') : i18n.t('...feed.feedClient.nothingListedYet')}</strong>
             {query || type !== "ALL"
-              ? "Try clearing filters or broadening your search."
-              : `Be the first to list something in ${marketplaceName}.`}
+              ? i18n.t('...feed.feedClient.tryClearingFiltersOrBroadening')
+              : i18n.t('...feed.feedClient.beTheFirstToList', { marketplaceName })}
             <div className="empty-actions">
               <Link href={`/m/${slug}/new`} className="btn btn-dark">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 5v14M5 12h14" />
                 </svg>
-                Post a listing
+                {i18n.t('common.postAListing')}
               </Link>
             </div>
           </div>
@@ -413,19 +414,19 @@ function ListingCard({
           </div>
         )}
         {isAuction && ending ? (
-          <span className="listing-badge auction">⏱ Auction · {ending}</span>
+          <span className="listing-badge auction">{i18n.t('...feed.feedClient.auction')} {ending}</span>
         ) : isISO ? (
-          <span className="listing-badge wanted">Wanted · ISO</span>
+          <span className="listing-badge wanted">{i18n.t('common.wantedIso')}</span>
         ) : fresh ? (
-          <span className="listing-badge new">New</span>
+          <span className="listing-badge new">{i18n.t('common.new')}</span>
         ) : (
-          <span className="listing-badge">For Sale</span>
+          <span className="listing-badge">{i18n.t('...feed.feedClient.forSale')}</span>
         )}
         {!isISO && (
           <button
             type="button"
             className={`listing-save${listing.isSaved ? " on" : ""}`}
-            aria-label={listing.isSaved ? "Unsave" : "Save"}
+            aria-label={listing.isSaved ? i18n.t('...feed.feedClient.unsave') : i18n.t('common.save')}
             data-testid={`save-${listing.id}`}
             onClick={(e) => {
               e.preventDefault();
@@ -446,7 +447,7 @@ function ListingCard({
         <div className="price-row">
           {isISO ? (
             <div className="price iso">
-              {price > 0 ? `Budget ${formatCents(price, listing.currency)}` : "Budget open"}
+              {price > 0 ? i18n.t('...feed.feedClient.budgetFormatcentsresult', { formatCentsResult: formatCents(price, listing.currency) }) : i18n.t('common.budgetOpen')}
             </div>
           ) : (
             <div className="price">
@@ -456,7 +457,7 @@ function ListingCard({
           )}
           <div className="meta">
             {isAuction && listing.bidCount > 0
-              ? `${listing.bidCount} bids`
+              ? i18n.t('...feed.feedClient.bidcountBids', { bidCount: String(listing.bidCount) })
               : timeAgo(listing.createdAt)}
           </div>
         </div>

@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/Select";
 import { cn } from "@/lib/utils";
+import { i18n } from '@shipeasy/sdk/client'
 
 export type ApplyQuestion = {
   id: string;
@@ -162,19 +163,19 @@ export function ApplyForm({ slug, marketplaceName, questions, prefill }: Props) 
         if (data.missing && data.missing.length > 0) {
           setMissingProviders(data.missing);
           setError(
-            data.error ?? "You're missing required verifications for this marketplace.",
+            data.error ?? i18n.t('...[slug].applyForm.youreMissingRequiredVerificationsFor'),
           );
         } else {
           setError(
             data.error ??
-              "You already have a pending application for this marketplace.",
+              i18n.t('...[slug].applyForm.youAlreadyHaveAPending'),
           );
         }
       } else if (res.status === 401) {
         setError("You need to sign in again.");
         router.push(`/signin?callbackUrl=/apply/${slug}`);
       } else {
-        setError(data.error ?? "Something went wrong. Please try again.");
+        setError(data.error ?? i18n.t('...[slug].applyForm.somethingWentWrongPleaseTry'));
       }
     } catch {
       setError("Network error. Please try again.");
@@ -192,15 +193,15 @@ export function ApplyForm({ slug, marketplaceName, questions, prefill }: Props) 
     >
       <section className="bg-surface border border-line rounded-[14px] shadow-sm p-5 sm:p-6 space-y-6">
         <div>
-          <h2 className="text-[17px] font-semibold">Your answers</h2>
+          <h2 className="text-[17px] font-semibold">{i18n.t('...[slug].applyForm.yourAnswers')}</h2>
           <p className="text-[13px] text-muted mt-1">
-            Honest, specific answers get approved faster.
+            {i18n.t('...[slug].applyForm.honestSpecificAnswersGetApproved')}
           </p>
         </div>
 
         {questions.length === 0 ? (
           <p className="text-[13px] text-muted">
-            No questions — just confirm and submit.
+            {i18n.t('...[slug].applyForm.noQuestionsJustConfirmAnd')}
           </p>
         ) : (
           questions.map((q) => {
@@ -238,9 +239,8 @@ export function ApplyForm({ slug, marketplaceName, questions, prefill }: Props) 
             data-testid="apply-agree"
           />
           <span className="text-[13px] text-ink-soft leading-[1.6]">
-            I understand my application will be reviewed by the owners of{" "}
-            <span className="font-medium text-ink">{marketplaceName}</span>. I
-            can withdraw my application at any time from my Shouks account.
+            {i18n.t('...[slug].applyForm.iUnderstandMyApplicationWill')}{" "}
+            <span className="font-medium text-ink">{marketplaceName}</span>{i18n.t('...[slug].applyForm.iCanWithdrawMyApplication')}
           </span>
         </label>
       </section>
@@ -264,7 +264,7 @@ export function ApplyForm({ slug, marketplaceName, questions, prefill }: Props) 
                     data-testid={`verify-link-${p}`}
                     className="text-[12px] text-blue-ink hover:underline"
                   >
-                    Link {p.toLowerCase()} →
+                    {i18n.t('common.link')} {p.toLowerCase()} →
                   </Link>
                 ))}
               </div>
@@ -284,10 +284,10 @@ export function ApplyForm({ slug, marketplaceName, questions, prefill }: Props) 
         >
           {submitting ? (
             <>
-              <Loader2 size={16} className="animate-spin" /> Submitting…
+              <Loader2 size={16} className="animate-spin" /> {i18n.t('common.submitting')}
             </>
           ) : (
-            "Submit application"
+            i18n.t('...[slug].applyForm.submitApplication')
           )}
         </Button>
         <Link href={`/m/${slug}`} className="sm:flex-none">
@@ -298,7 +298,7 @@ export function ApplyForm({ slug, marketplaceName, questions, prefill }: Props) 
             className="w-full"
             disabled={submitting}
           >
-            Cancel
+            {i18n.t('common.cancel')}
           </Button>
         </Link>
       </div>
@@ -327,7 +327,7 @@ function renderField(
           id={id}
           value={(value as string) ?? ""}
           onChange={(e) => handlers.onChange(e.target.value)}
-          placeholder="Your answer…"
+          placeholder={i18n.t('...[slug].applyForm.yourAnswerPlaceholder')}
           className={cn("min-h-[120px]", invalidRing)}
         />
       );
@@ -362,7 +362,7 @@ function renderField(
           onValueChange={(v) => handlers.onChange(v)}
         >
           <SelectTrigger id={id} className={invalidRing}>
-            <SelectValue placeholder="Select…" />
+            <SelectValue placeholder={i18n.t('...[slug].applyForm.selectPlaceholder')} />
           </SelectTrigger>
           <SelectContent>
             {options.map((o) => (
@@ -414,7 +414,7 @@ function renderField(
           id={id}
           value={(value as string) ?? ""}
           onChange={(e) => handlers.onChange(e.target.value)}
-          placeholder="Your answer…"
+          placeholder={i18n.t('...[slug].applyForm.yourAnswerPlaceholder')}
           className={invalidRing}
         />
       );

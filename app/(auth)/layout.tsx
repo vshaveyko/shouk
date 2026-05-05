@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ShouksMark } from "@/components/brand/Logo";
+import { i18n } from '@shipeasy/sdk/client'
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -8,9 +9,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="max-w-[1280px] mx-auto px-6 py-3 flex items-center justify-between gap-4">
           <Link href="/" className="inline-flex items-center gap-2.5 font-semibold text-[15px] tracking-[-0.01em]">
             <ShouksMark size={22} />
-            <span>Shouks</span>
+            <span>{i18n.t('common.shouks')}</span>
           </Link>
-          <Link href="/" className="text-[13px] text-ink-soft hover:text-ink">← Back to home</Link>
+          <Link href="/" className="text-[13px] text-ink-soft hover:text-ink">{i18n.t('...(auth).layout.backToHome')}</Link>
         </div>
       </header>
       {children}

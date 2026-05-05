@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/Select";
 import { cn, durationUntil, formatCents, timeAgo } from "@/lib/utils";
 import { TrackListingView } from "@/components/app/RecentlyViewed";
+import { i18n } from '@shipeasy/sdk/client'
 
 type Listing = {
   id: string;
@@ -137,7 +138,7 @@ export function ListingClient(props: Props) {
     } catch {
       setIsSaved((s) => !s);
       setSaveCount((c) => c + (isSaved ? 1 : -1));
-      toast.error("Couldn't update save.");
+      toast.error(i18n.t('common.couldntUpdateSave'));
     }
   }
 
@@ -150,13 +151,13 @@ export function ListingClient(props: Props) {
         body: JSON.stringify({ status }),
       });
       if (res.ok) {
-        toast.success(status === "SOLD" ? "Marked as sold." : "Listing closed.");
+        toast.success(status === "SOLD" ? i18n.t('...[id].listingClient.markedAsSold') : i18n.t('...[id].listingClient.listingClosed'));
         setListing((l) => ({ ...l, status }));
         setStatusConfirm(null);
         router.refresh();
       } else {
         const data = await res.json().catch(() => ({}));
-        toast.error(data.error ?? "Couldn't update listing.");
+        toast.error(data.error ?? i18n.t('...[id].listingClient.couldntUpdateListing'));
       }
     } finally {
       setStatusBusy(false);
@@ -167,19 +168,19 @@ export function ListingClient(props: Props) {
     if (!confirm("Delete this listing? This can't be undone.")) return;
     const res = await fetch(`/api/listings/${listing.id}`, { method: "DELETE" });
     if (res.ok) {
-      toast.success("Listing deleted.");
+      toast.success(i18n.t('...[id].listingClient.listingDeleted'));
       router.push(`/m/${props.marketplace.slug}/feed`);
     } else {
-      toast.error("Couldn't delete listing.");
+      toast.error(i18n.t('...[id].listingClient.couldntDeleteListing'));
     }
   }
 
   async function copyShareLink() {
     try {
       await navigator.clipboard.writeText(`${window.location.origin}/l/${listing.id}`);
-      toast.success("Link copied.");
+      toast.success(i18n.t('...[id].listingClient.linkCopied'));
     } catch {
-      toast.error("Couldn't copy link.");
+      toast.error(i18n.t('...[id].listingClient.couldntCopyLink'));
     }
   }
 
@@ -198,9 +199,9 @@ export function ListingClient(props: Props) {
       {isLocked && (
         <div className="mb-5 rounded-[12px] border border-line bg-bg-panel px-4 py-3 flex items-center gap-2.5 text-[13px] text-ink-soft" data-testid="listing-locked-banner">
           <Lock size={14} className="flex-none" />
-          {isSold ? "This listing has been marked sold."
-            : isClosed ? "This listing is closed."
-            : "This listing is under review."}
+          {isSold ? i18n.t('...[id].listingClient.thisListingHasBeenMarked')
+            : isClosed ? i18n.t('...[id].listingClient.thisListingIsClosed')
+            : i18n.t('...[id].listingClient.thisListingIsUnderReview')}
         </div>
       )}
 
@@ -221,7 +222,7 @@ export function ListingClient(props: Props) {
                 className="absolute inset-0 grid place-items-center text-muted text-[13px]"
                 style={{ background: "linear-gradient(135deg, var(--blue-softer), var(--bg-panel))" }}
               >
-                No image
+                {i18n.t('...[id].listingClient.noImage')}
               </div>
             )}
           </div>
@@ -246,7 +247,7 @@ export function ListingClient(props: Props) {
           {/* Description */}
           {listing.description && (
             <section>
-              <h2 className="text-[15px] font-semibold mb-2.5">Description</h2>
+              <h2 className="text-[15px] font-semibold mb-2.5">{i18n.t('common.description')}</h2>
               <p
                 className="text-[15px] text-ink-soft leading-[1.65] whitespace-pre-line"
                 data-testid="listing-description"
@@ -264,7 +265,7 @@ export function ListingClient(props: Props) {
             if (detailFields.length === 0) return null;
             return (
             <section>
-              <h2 className="text-[15px] font-semibold mb-3">Details</h2>
+              <h2 className="text-[15px] font-semibold mb-3">{i18n.t('common.details')}</h2>
               <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0 bg-surface border border-line rounded-[12px] divide-y sm:divide-y-0 sm:divide-x divide-line-soft overflow-hidden">
                 {detailFields
                   .map((f) => {
@@ -293,12 +294,12 @@ export function ListingClient(props: Props) {
           {isAuction && (
             <section>
               <h2 className="text-[15px] font-semibold mb-3 flex items-center gap-2">
-                <Gavel size={14} /> Bid history
+                <Gavel size={14} /> {i18n.t('...[id].listingClient.bidHistory')}
                 <span className="text-[12px] text-muted font-normal">({props.bidCount})</span>
               </h2>
               {bids.length === 0 ? (
                 <div className="bg-surface border border-line rounded-[12px] px-4 py-6 text-center text-[13px] text-muted">
-                  No bids yet. Be the first.
+                  {i18n.t('...[id].listingClient.noBidsYetBeThe')}
                 </div>
               ) : (
                 <ul className="bg-surface border border-line rounded-[12px] overflow-hidden divide-y divide-line-soft">
@@ -314,9 +315,9 @@ export function ListingClient(props: Props) {
                       <Avatar src={b.user.image} name={b.user.displayName ?? "?"} size={28} />
                       <div className="flex-1 min-w-0 flex items-center gap-2">
                         <span className="text-[13px] font-medium truncate">
-                          {b.isMine ? "You" : b.user.displayName ?? "Member"}
+                          {b.isMine ? "You" : b.user.displayName ?? i18n.t('common.member')}
                         </span>
-                        {i === 0 && <Badge variant="blue">Top bid</Badge>}
+                        {i === 0 && <Badge variant="blue">{i18n.t('...[id].listingClient.topBid')}</Badge>}
                       </div>
                       <div className="text-[14px] font-semibold tabular-nums">
                         {formatCents(b.amountCents, listing.currency)}
@@ -340,11 +341,11 @@ export function ListingClient(props: Props) {
               <div className="breadcrumb">
                 <Link href={`/m/${props.marketplace.slug}/feed`}>{props.marketplace.name}</Link>
                 <span>·</span>
-                {isAuction && <span>Auction</span>}
-                {isISO && <span>In search of</span>}
-                {isFixed && <span>Fixed price</span>}
-                {isSold && <span>Sold</span>}
-                {isClosed && <span>Closed</span>}
+                {isAuction && <span>{i18n.t('common.auction')}</span>}
+                {isISO && <span>{i18n.t('...[id].listingClient.inSearchOf')}</span>}
+                {isFixed && <span>{i18n.t('...[id].listingClient.fixedPrice')}</span>}
+                {isSold && <span>{i18n.t('...[id].listingClient.sold')}</span>}
+                {isClosed && <span>{i18n.t('common.closed')}</span>}
               </div>
               <h1 data-testid="listing-title">{listing.title}</h1>
               <div className="meta">
@@ -357,7 +358,7 @@ export function ListingClient(props: Props) {
             {/* Price */}
             {isFixed && (
               <div>
-                <div className="text-[11px] mono uppercase tracking-[0.12em] text-muted mb-1">Price</div>
+                <div className="text-[11px] mono uppercase tracking-[0.12em] text-muted mb-1">{i18n.t('common.price')}</div>
                 <div
                   className="tabular-nums"
                   style={{ fontFamily: '"Instrument Serif", serif', fontWeight: 400, fontSize: 38, lineHeight: 1, letterSpacing: "-0.015em" }}
@@ -373,7 +374,7 @@ export function ListingClient(props: Props) {
                 <div className="flex items-baseline justify-between gap-4">
                   <div>
                     <div className="text-[11px] mono uppercase tracking-[0.12em] text-muted mb-0.5">
-                      {bids.length > 0 ? "Current bid" : "Starting bid"}
+                      {bids.length > 0 ? i18n.t('...[id].listingClient.currentBid') : i18n.t('common.startingBid')}
                     </div>
                     <div
                       className="text-[28px] font-semibold tracking-[-0.02em] tabular-nums"
@@ -384,7 +385,7 @@ export function ListingClient(props: Props) {
                   </div>
                   <div className="text-right">
                     <div className="text-[11px] mono uppercase tracking-[0.12em] text-muted mb-0.5">
-                      {auctionEnded ? "Ended" : "Ends in"}
+                      {auctionEnded ? i18n.t('...[id].listingClient.ended') : i18n.t('common.endsIn')}
                     </div>
                     <Countdown endsAt={listing.auctionEndsAt} />
                   </div>
@@ -398,21 +399,21 @@ export function ListingClient(props: Props) {
                     )}
                   >
                     {reserveMet ? <CheckCircle2 size={12} /> : <Clock size={12} />}
-                    Reserve {reserveMet ? "met" : "not met"}
+                    {i18n.t('...[id].listingClient.reserve')} {reserveMet ? "met" : i18n.t('...[id].listingClient.notMet')}
                   </div>
                 )}
 
                 {props.marketplace.antiSnipe && (
-                  <div className="text-[11px] text-muted">Anti-snipe: bids in the final 5 min extend the clock.</div>
+                  <div className="text-[11px] text-muted">{i18n.t('...[id].listingClient.antisnipeBidsInTheFinal')}</div>
                 )}
               </div>
             )}
 
             {isISO && (
               <div>
-                <div className="text-[11px] mono uppercase tracking-[0.12em] text-muted mb-1">Budget</div>
+                <div className="text-[11px] mono uppercase tracking-[0.12em] text-muted mb-1">{i18n.t('common.budget')}</div>
                 <div className="text-[22px] font-semibold tracking-[-0.02em] tabular-nums">
-                  {listing.priceCents ? `Up to ${formatCents(listing.priceCents, listing.currency)}` : "Open"}
+                  {listing.priceCents ? i18n.t('...[id].listingClient.upToFormatcentsresult', { formatCentsResult: formatCents(listing.priceCents, listing.currency) }) : i18n.t('common.open')}
                 </div>
               </div>
             )}
@@ -426,7 +427,7 @@ export function ListingClient(props: Props) {
                   className="w-full gap-2"
                   data-testid="place-bid"
                 >
-                  <Gavel size={16} /> Place a bid
+                  <Gavel size={16} /> {i18n.t('...[id].listingClient.placeABid')}
                 </Button>
               )}
               {isFixed && !isLocked && !props.isSeller && (
@@ -442,7 +443,7 @@ export function ListingClient(props: Props) {
                       : router.push(`/signin?callbackUrl=/l/${listing.id}`)
                   }
                 >
-                  Message seller
+                  {i18n.t('...[id].listingClient.messageSeller')}
                 </Button>
               )}
               {isAuction && !isLocked && !props.isSeller && (
@@ -459,7 +460,7 @@ export function ListingClient(props: Props) {
                       : router.push(`/signin?callbackUrl=/l/${listing.id}`)
                   }
                 >
-                  Message seller
+                  {i18n.t('...[id].listingClient.messageSeller')}
                 </Button>
               )}
               {isISO && !isLocked && !props.isSeller && (
@@ -475,7 +476,7 @@ export function ListingClient(props: Props) {
                       : router.push(`/signin?callbackUrl=/l/${listing.id}`)
                   }
                 >
-                  Offer a match
+                  {i18n.t('...[id].listingClient.offerAMatch')}
                 </Button>
               )}
 
@@ -487,16 +488,16 @@ export function ListingClient(props: Props) {
                   data-testid="listing-save"
                 >
                   <Heart size={15} fill={isSaved ? "currentColor" : "none"} />
-                  {isSaved ? "Saved" : "Save"}
+                  {isSaved ? i18n.t('common.saved') : i18n.t('common.save')}
                   <span className="text-[11px] text-muted ml-0.5">· {saveCount}</span>
                 </Button>
                 <Button variant="secondary" onClick={copyShareLink} className="gap-1.5" data-testid="listing-share">
-                  <Share2 size={15} /> Share
+                  <Share2 size={15} /> {i18n.t('common.share')}
                 </Button>
 
                 <DropdownMenu.Root>
                   <DropdownMenu.Trigger asChild>
-                    <Button variant="secondary" size="icon" aria-label="More" data-testid="listing-menu">
+                    <Button variant="secondary" size="icon" aria-label={i18n.t('common.more')} data-testid="listing-menu">
                       <MoreHorizontal size={15} />
                     </Button>
                   </DropdownMenu.Trigger>
@@ -513,7 +514,7 @@ export function ListingClient(props: Props) {
                             className="flex items-center gap-2 px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[14px] cursor-pointer"
                             data-testid="listing-edit"
                           >
-                            <Pencil size={14} /> Edit listing
+                            <Pencil size={14} /> {i18n.t('common.editListing')}
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
                             onSelect={(e) => {
@@ -523,7 +524,7 @@ export function ListingClient(props: Props) {
                             className="flex items-center gap-2 px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[14px] cursor-pointer"
                             data-testid="listing-sold"
                           >
-                            <CheckCircle2 size={14} /> Mark as sold
+                            <CheckCircle2 size={14} /> {i18n.t('...[id].listingClient.markAsSold')}
                           </DropdownMenu.Item>
                           <DropdownMenu.Item
                             onSelect={(e) => {
@@ -533,7 +534,7 @@ export function ListingClient(props: Props) {
                             className="flex items-center gap-2 px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[14px] cursor-pointer"
                             data-testid="listing-close"
                           >
-                            <XCircle size={14} /> Close listing
+                            <XCircle size={14} /> {i18n.t('...[id].listingClient.closeListing')}
                           </DropdownMenu.Item>
                           <DropdownMenu.Separator className="h-px bg-line-soft my-1" />
                         </>
@@ -544,7 +545,7 @@ export function ListingClient(props: Props) {
                           className="flex items-center gap-2 px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[14px] text-danger cursor-pointer"
                           data-testid="listing-delete"
                         >
-                          <Trash2 size={14} /> Delete
+                          <Trash2 size={14} /> {i18n.t('common.delete')}
                         </DropdownMenu.Item>
                       )}
                       {!props.isSeller && props.isAuthed && (
@@ -553,7 +554,7 @@ export function ListingClient(props: Props) {
                           className="flex items-center gap-2 px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[14px] cursor-pointer"
                           data-testid="report-listing"
                         >
-                          <Flag size={14} /> Report
+                          <Flag size={14} /> {i18n.t('...[id].listingClient.report')}
                         </DropdownMenu.Item>
                       )}
                     </DropdownMenu.Content>
@@ -566,7 +567,7 @@ export function ListingClient(props: Props) {
           {/* Seller */}
           <div className="bg-surface border border-line rounded-[14px] p-5">
             <div className="text-[11px] mono uppercase tracking-[0.12em] text-muted mb-3">
-              Listed by
+              {i18n.t('...[id].listingClient.listedBy')}
             </div>
             <div className="flex items-start gap-3">
               <Link href={`/u/${props.seller.id}`}>
@@ -578,7 +579,7 @@ export function ListingClient(props: Props) {
                     {props.seller.displayName}
                   </Link>
                   {props.seller.verifiedProviders.length > 0 && (
-                    <CheckCircle2 size={14} className="text-blue flex-none" aria-label="Verified" />
+                    <CheckCircle2 size={14} className="text-blue flex-none" aria-label={i18n.t('common.verified')} />
                   )}
                 </div>
                 {props.seller.bio && (
@@ -636,14 +637,14 @@ export function ListingClient(props: Props) {
         <DialogContent width={420}>
           <DialogHeader>
             <DialogTitle>
-              {statusConfirm === "SOLD" ? "Mark as sold?" : "Close listing?"}
+              {statusConfirm === "SOLD" ? i18n.t('...[id].listingClient.markAsSold2') : i18n.t('...[id].listingClient.closeListing2')}
             </DialogTitle>
           </DialogHeader>
           <DialogBody>
             <p className="text-[13px] text-ink-soft">
               {statusConfirm === "SOLD"
-                ? "Buyers will no longer be able to contact or purchase this listing."
-                : "The listing is taken offline. You can delete it later if needed."}
+                ? i18n.t('...[id].listingClient.buyersWillNoLongerBe')
+                : i18n.t('...[id].listingClient.theListingIsTakenOffline')}
             </p>
           </DialogBody>
           <DialogFooter>
@@ -652,7 +653,7 @@ export function ListingClient(props: Props) {
               onClick={() => setStatusConfirm(null)}
               disabled={statusBusy}
             >
-              Cancel
+              {i18n.t('common.cancel')}
             </Button>
             <Button
               variant={statusConfirm === "SOLD" ? "primary" : "danger"}
@@ -663,10 +664,10 @@ export function ListingClient(props: Props) {
               data-testid="confirm-status-change"
             >
               {statusBusy
-                ? "Updating…"
+                ? i18n.t('...[id].listingClient.updating')
                 : statusConfirm === "SOLD"
-                  ? "Mark as sold"
-                  : "Close listing"}
+                  ? i18n.t('...[id].listingClient.markAsSold')
+                  : i18n.t('...[id].listingClient.closeListing')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -683,7 +684,7 @@ function Countdown({ endsAt }: { endsAt: string | null }) {
   }, []);
   if (!endsAt) return <span className="text-[18px] font-semibold tabular-nums">—</span>;
   const { done, days, hours, minutes, seconds } = durationUntil(endsAt);
-  if (done) return <span className="text-[18px] font-semibold text-danger" data-testid="auction-countdown">Ended</span>;
+  if (done) return <span className="text-[18px] font-semibold text-danger" data-testid="auction-countdown">{i18n.t('...[id].listingClient.ended')}</span>;
 
   const show = (n: number) => String(n).padStart(2, "0");
   return (
@@ -741,10 +742,10 @@ function PlaceBidDialog({
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? "Couldn't place bid.");
+        setError(data.error ?? i18n.t('...[id].listingClient.couldntPlaceBid'));
         return;
       }
-      toast.success("Bid placed.");
+      toast.success(i18n.t('...[id].listingClient.bidPlaced'));
       onBidPlaced(data);
       onOpenChange(false);
     } catch {
@@ -758,15 +759,15 @@ function PlaceBidDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent width={420}>
         <DialogHeader>
-          <DialogTitle>Place a bid</DialogTitle>
+          <DialogTitle>{i18n.t('...[id].listingClient.placeABid')}</DialogTitle>
           <DialogDescription>
-            Minimum bid: <span className="tabular-nums">{formatCents(minNextCents, currency)}</span>
+            {i18n.t('...[id].listingClient.minimumBid')} <span className="tabular-nums">{formatCents(minNextCents, currency)}</span>
           </DialogDescription>
         </DialogHeader>
         <DialogBody className="space-y-3">
           <div>
             <Label htmlFor="bid-input" required>
-              Your bid
+              {i18n.t('common.yourBid')}
             </Label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-[14px]">$</span>
@@ -800,15 +801,15 @@ function PlaceBidDialog({
             })}
           </div>
           <p className="text-[11px] text-muted">
-            Bids are binding. If you win, you're committed to the price.
+            {i18n.t('...[id].listingClient.bidsAreBindingIfYou')}
           </p>
         </DialogBody>
         <DialogFooter>
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
-            Cancel
+            {i18n.t('common.cancel')}
           </Button>
           <Button onClick={submit} disabled={loading} data-testid="submit-bid">
-            {loading ? "Placing…" : "Place bid"}
+            {loading ? i18n.t('...[id].listingClient.placing') : i18n.t('...[id].listingClient.placeBid')}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -817,11 +818,11 @@ function PlaceBidDialog({
 }
 
 const REPORT_REASONS: { value: "SPAM" | "MISLEADING" | "PROHIBITED" | "DUPLICATE" | "OTHER"; label: string }[] = [
-  { value: "SPAM", label: "Spam" },
-  { value: "MISLEADING", label: "Misleading or inaccurate" },
-  { value: "PROHIBITED", label: "Prohibited item" },
-  { value: "DUPLICATE", label: "Duplicate listing" },
-  { value: "OTHER", label: "Something else" },
+  { value: "SPAM", label: i18n.t('...[id].listingClient.spam') },
+  { value: "MISLEADING", label: i18n.t('...[id].listingClient.misleadingOrInaccurate') },
+  { value: "PROHIBITED", label: i18n.t('...[id].listingClient.prohibitedItem') },
+  { value: "DUPLICATE", label: i18n.t('...[id].listingClient.duplicateListing') },
+  { value: "OTHER", label: i18n.t('...[id].listingClient.somethingElse') },
 ];
 
 function ReportDialog({
@@ -846,11 +847,11 @@ function ReportDialog({
         body: JSON.stringify({ reason, detail: detail || undefined }),
       });
       if (!res.ok) throw new Error();
-      toast.success("Thanks — the team will review it.");
+      toast.success(i18n.t('...[id].listingClient.thanksTheTeamWillReview'));
       onOpenChange(false);
       setDetail("");
     } catch {
-      toast.error("Couldn't submit report.");
+      toast.error(i18n.t('...[id].listingClient.couldntSubmitReport'));
     } finally {
       setLoading(false);
     }
@@ -860,12 +861,12 @@ function ReportDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent width={480}>
         <DialogHeader>
-          <DialogTitle>Report this listing</DialogTitle>
-          <DialogDescription>Moderators will review reports within 24 hours.</DialogDescription>
+          <DialogTitle>{i18n.t('...[id].listingClient.reportThisListing')}</DialogTitle>
+          <DialogDescription>{i18n.t('...[id].listingClient.moderatorsWillReviewReportsWithin')}</DialogDescription>
         </DialogHeader>
         <DialogBody className="space-y-3">
           <div>
-            <Label>Reason</Label>
+            <Label>{i18n.t('common.reason')}</Label>
             <Select value={reason} onValueChange={setReason}>
               <SelectTrigger data-testid="report-reason">
                 <SelectValue />
@@ -880,12 +881,12 @@ function ReportDialog({
             </Select>
           </div>
           <div>
-            <Label htmlFor="report-detail">Details (optional)</Label>
+            <Label htmlFor="report-detail">{i18n.t('...[id].listingClient.detailsOptional')}</Label>
             <Textarea
               id="report-detail"
               value={detail}
               onChange={(e) => setDetail(e.target.value)}
-              placeholder="Add any context that helps us evaluate this listing."
+              placeholder={i18n.t('...[id].listingClient.addAnyContextThatHelpsPlaceholder')}
               data-testid="report-detail"
               maxLength={500}
             />
@@ -893,10 +894,10 @@ function ReportDialog({
         </DialogBody>
         <DialogFooter>
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
-            Cancel
+            {i18n.t('common.cancel')}
           </Button>
           <Button onClick={submit} disabled={loading} data-testid="submit-report">
-            {loading ? "Submitting…" : "Submit report"}
+            {loading ? i18n.t('common.submitting') : i18n.t('...[id].listingClient.submitReport')}
           </Button>
         </DialogFooter>
       </DialogContent>

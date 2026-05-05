@@ -1,6 +1,7 @@
 import { requireOwnerOf } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { OwnerShell } from "@/components/owner/OwnerShell";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
 
@@ -142,10 +143,10 @@ export default async function ApplicationsLayout(
       <main className="apps-body">
         <div className="page-head">
           <div>
-            <h1>Applications</h1>
+            <h1>{i18n.t('...applications.layout.applications')}</h1>
             {pendingOver48h > 0 ? (
               <div className="lead">
-                {pendingCount} pending · {pendingOver48h} waiting over 48h.
+                {pendingCount} {i18n.t('...applications.layout.pending')} {pendingOver48h} waiting over 48h.
               </div>
             ) : null}
           </div>

@@ -5,6 +5,7 @@ import { Navbar } from "@/components/app/Navbar";
 import { prisma } from "@/lib/prisma";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { NotificationsClient } from "./NotificationsClient";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
 
@@ -62,8 +63,8 @@ export default async function NotificationsPage() {
           <div className="bg-surface border border-line rounded-[14px]">
             <EmptyState
               icon={<Bell size={32} />}
-              title="No notifications yet"
-              description="When there's something to know — an ISO match, a new bid, a membership decision — it'll show up here."
+              title={i18n.t('...notifications.page.noNotificationsYet')}
+              description={i18n.t('...notifications.page.whenTheresSomethingToKnowDescription')}
             />
           </div>
         ) : (

@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { getUserContext } from "@/lib/auth-helpers";
 import { Navbar } from "@/components/app/Navbar";
 import { ListingClient } from "./ListingClient";
+import { i18n } from '@shipeasy/sdk/client'
 
 export const dynamic = "force-dynamic";
 
@@ -53,7 +54,7 @@ export async function generateMetadata(props: { params: Promise<{ id: string }> 
     where: { id: params.id },
     select: { title: true },
   });
-  return { title: listing?.title ?? "Listing" };
+  return { title: listing?.title ?? i18n.t('common.listing') };
 }
 
 export default async function ListingPage(props: { params: Promise<{ id: string }> }) {
@@ -149,8 +150,8 @@ export default async function ListingPage(props: { params: Promise<{ id: string 
       ) : (
         <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-line">
           <div className="max-w-[1280px] mx-auto px-6 h-14 flex items-center justify-between">
-            <Link href="/" className="text-[14px] font-semibold">Shouks</Link>
-            <Link href={`/signin?callbackUrl=/l/${listing.id}`} className="text-[13px] text-ink-soft hover:text-ink">Sign in</Link>
+            <Link href="/" className="text-[14px] font-semibold">{i18n.t('common.shouks')}</Link>
+            <Link href={`/signin?callbackUrl=/l/${listing.id}`} className="text-[13px] text-ink-soft hover:text-ink">{i18n.t('common.signIn')}</Link>
           </div>
         </header>
       )}
@@ -162,7 +163,7 @@ export default async function ListingPage(props: { params: Promise<{ id: string 
             href={`/m/${listing.marketplace.slug}/feed`}
             className="inline-flex items-center gap-1.5 text-[13px] text-ink-soft hover:text-ink"
           >
-            <ArrowLeft size={14} /> Back to {listing.marketplace.name}
+            <ArrowLeft size={14} /> {i18n.t('common.backTo')} {listing.marketplace.name}
           </Link>
         </div>
 
@@ -189,7 +190,7 @@ export default async function ListingPage(props: { params: Promise<{ id: string 
           schemaFields={schemaFieldsForClient}
           seller={{
             id: listing.seller.id,
-            displayName: listing.seller.displayName ?? listing.seller.name ?? "Member",
+            displayName: listing.seller.displayName ?? listing.seller.name ?? i18n.t('common.member'),
             image: listing.seller.image,
             bio: listing.seller.bio,
             verifiedProviders: listing.seller.verifiedAccounts.map((v) => v.provider as string),
