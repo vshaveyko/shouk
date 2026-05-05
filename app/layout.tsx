@@ -1,39 +1,10 @@
 import "@/styles/globals.css";
 import type { Metadata, Viewport } from "next";
 import { ViewTransition } from "react";
+import { headers } from "next/headers";
 import { Toaster } from "sonner";
 import { shipeasy } from "@shipeasy/sdk/server";
-import { i18n } from '@shipeasy/sdk/client'
-
-export const metadata: Metadata = {
-  title: {
-    default: "Shouks — Empower your marketplace",
-    template: "%s · Shouks",
-  },
-  description:
-    i18n.t('...app.layout.createAndJoinPrivateMarketplacesDescript'),
-  applicationName: "Shouks",
-  manifest: "/manifest.webmanifest",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: i18n.t('common.shouks'),
-  },
-  icons: {
-    icon: [
-      { url: "/icons/favicon-32.png", sizes: "32x32", type: "image/png" },
-      { url: "/icons/favicon-16.png", sizes: "16x16", type: "image/png" },
-    ],
-    apple: "/icons/apple-touch-icon.png",
-  },
-  openGraph: {
-    type: "website",
-    title: i18n.t('...app.layout.shouksEmpowerYourMarketplace'),
-    description:
-      i18n.t('...app.layout.createAndJoinPrivateMarketplacesDescript2'),
-    siteName: "Shouks",
-  },
-};
+import { i18n } from "@shipeasy/sdk/client";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -42,12 +13,57 @@ export const viewport: Viewport = {
   themeColor: "#ffffff",
 };
 
+async function configureShipeasy() {
+  const h = await headers();
+  const seSearch = h.get("x-se-search") ?? undefined;
+  return shipeasy({
+    apiKey: process.env.SHIPEASY_SERVER_KEY ?? "",
+    clientKey: process.env.NEXT_PUBLIC_SHIPEASY_CLIENT_KEY ?? "",
+    urlOverrides: seSearch,
+  });
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  await configureShipeasy();
+  return {
+    title: {
+      default: "Shouks — Empower your marketplace",
+      template: "%s · Shouks",
+    },
+    description: i18n.t(
+      "...app.layout.createAndJoinPrivateMarketplacesDescript",
+    ),
+    applicationName: "Shouks",
+    manifest: "/manifest.webmanifest",
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: i18n.t("common.shouks"),
+    },
+    icons: {
+      icon: [
+        { url: "/icons/favicon-32.png", sizes: "32x32", type: "image/png" },
+        { url: "/icons/favicon-16.png", sizes: "16x16", type: "image/png" },
+      ],
+      apple: "/icons/apple-touch-icon.png",
+    },
+    openGraph: {
+      type: "website",
+      title: i18n.t("...app.layout.shouksEmpowerYourMarketplace"),
+      description: i18n.t(
+        "...app.layout.createAndJoinPrivateMarketplacesDescript2",
+      ),
+      siteName: "Shouks",
+    },
+  };
+}
+
 export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  await shipeasy({ apiKey: process.env.SHIPEASY_SERVER_KEY ?? "" });
+  const seConfig = await configureShipeasy();
   return (
     <html lang="en">
       <head>
@@ -57,7 +73,9 @@ export default async function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Instrument+Serif:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
           rel="stylesheet"
         />
-        <script src="https://cdn.shipeasy.ai/sdk/i18n/loader.js" data-key="sdk_client_48e56ead511b4643919fa69cc11d8f98" data-profile="default" defer></script>
+        <script
+          dangerouslySetInnerHTML={{ __html: seConfig.getBootstrapHtml() }}
+        />
       </head>
       <body>
         <div id="app-root">
@@ -69,7 +87,7 @@ export default async function RootLayout({
             classNames: {
               toast: "!rounded-[10px] !border !border-line !shadow",
               title: "!text-ink !font-medium",
-              description: i18n.t('...app.layout.textmutedDescription'),
+              description: i18n.t("...app.layout.textmutedDescription"),
             },
           }}
         />
