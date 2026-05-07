@@ -9,6 +9,7 @@ import { PostListingButton } from "@/components/app/PostListingButton";
 import { HomeFeedSentinel } from "@/components/app/HomeFeedSentinel";
 import { RecentlyViewedSection } from "@/components/app/RecentlyViewed";
 import { SectionedDashboard } from "@/components/app/SectionedDashboard";
+import { loadDashboardData } from "@/lib/dashboard";
 import { prisma } from "@/lib/prisma";
 import { countUnreadThreads } from "@/lib/messages";
 import { i18n } from '@shipeasy/sdk/client'
@@ -191,12 +192,13 @@ export default async function HomeDashboard(
   }
 
   if (sectionedDashboardEnabled) {
-    const [unread, unreadMessages] = await Promise.all([
+    const [unread, unreadMessages, dashboardData] = await Promise.all([
       prisma.notification.count({ where: { userId: user.id, readAt: null } }),
       countUnreadThreads(user.id),
+      loadDashboardData(user.id),
     ]);
     return (
-      <div className="min-h-screen" style={{ background: "var(--bg-soft)" }}>
+      <div style={{ background: "var(--bg-soft)" }}>
         <Navbar
           user={{
             id: user.id,
@@ -210,7 +212,7 @@ export default async function HomeDashboard(
           notificationCount={unread}
           unreadMessagesCount={unreadMessages}
         />
-        <SectionedDashboard />
+        <SectionedDashboard data={dashboardData} />
       </div>
     );
   }
