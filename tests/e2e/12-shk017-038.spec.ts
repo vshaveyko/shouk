@@ -103,6 +103,25 @@ test.describe("SHK-030: Recently viewed section on homepage", () => {
     await page.goto("/home");
     await expect(page.locator(".dash")).toBeVisible();
   });
+
+  test("recently viewed section renders after browsing a listing", async ({ page }) => {
+    await signIn(page, "member@shouks.test", "Test123!@#");
+    // Visit a listing so TrackListingView writes to localStorage.
+    await page.goto("/m/ferrari-frenzy/feed");
+    const firstListing = page.locator("a[href^='/l/']").first();
+    const href = await firstListing.getAttribute("href");
+    if (!href) test.skip(true, "no listings seeded for ferrari-frenzy");
+    await page.goto(href!);
+    // Give TrackListingView's effect a tick to flush to localStorage.
+    await expect(page.locator("body")).toBeVisible();
+    await page.waitForTimeout(200);
+    // Now go back to /home and confirm the Recently viewed section is present.
+    await page.goto("/home");
+    await expect(page.getByTestId("recently-viewed")).toBeVisible();
+    // It should contain at least one thumbnail link.
+    const items = page.locator('[data-testid="recently-viewed"] a[href^="/l/"]');
+    expect(await items.count()).toBeGreaterThan(0);
+  });
 });
 
 // SHK-031: Alerts link includes tab param
