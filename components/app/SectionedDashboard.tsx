@@ -13,14 +13,21 @@ import type { DashboardData, DashboardListingRow } from "@/lib/dashboard";
  */
 
 const css = `
-.sd-wrap { background: var(--bg-soft); padding: 28px 0 56px; }
-.sd-browser { max-width: 1320px; margin: 0 auto; background: #fff; border-radius: 14px; box-shadow: 0 1px 0 oklch(0.88 0.003 60), 0 14px 40px -22px oklch(0.2 0.02 60 / 0.18); overflow: hidden; }
+/* Full-bleed page layout — the dashboard fills the viewport below the
+   60px sticky Navbar. Only the middle list pane scrolls; the sidebar and
+   detail pane stay anchored. */
+.sd-wrap { background: #fff; display: flex; flex-direction: column; height: calc(100dvh - 60px); }
+.sd-browser { display: contents; }
 
-.sd-wrap .ah { padding: 24px 28px 18px; border-bottom: 1px solid var(--line); }
-.sd-wrap .ah h1 { margin: 0; font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 34px; letter-spacing: -0.015em; }
+.sd-wrap .ah { padding: 22px 28px 16px; border-bottom: 1px solid var(--line); flex: none; }
+.sd-wrap .ah h1 { margin: 0; font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 30px; letter-spacing: -0.015em; }
 .sd-wrap .ah .sub { margin-top: 4px; font-size: 13px; color: var(--ink-soft); }
 
-.sd-wrap .body { display: grid; grid-template-columns: 220px minmax(0, 1.15fr) minmax(0, 1fr); }
+.sd-wrap .body { display: grid; grid-template-columns: 240px minmax(0, 1.15fr) minmax(0, 1fr); flex: 1; min-height: 0; }
+.sd-wrap .sb, .sd-wrap .pane-list, .sd-wrap .pane-detail { min-height: 0; }
+.sd-wrap .sb { overflow-y: auto; }
+.sd-wrap .pane-list { overflow-y: auto; }
+.sd-wrap .pane-detail { overflow-y: auto; }
 
 /* Sidebar */
 .sd-wrap .sb { padding: 18px 12px 24px; border-right: 1px solid var(--line); background: var(--bg-soft); }

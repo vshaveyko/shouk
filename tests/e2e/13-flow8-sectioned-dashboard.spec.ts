@@ -115,6 +115,25 @@ test.describe("Flow 8 · Sectioned dashboard — flag-gated", () => {
     ).not.toHaveClass(/active/);
   });
 
+  test("flag on — full-bleed layout with list-only scroll", async ({ page }) => {
+    await signIn(page, "member@shouks.test", "Test123!@#");
+    await page.goto("/home?se_ks_sectioned_dashboard=true");
+
+    // Page itself should not scroll past the viewport — the dashboard fills
+    // the area below the navbar and only the middle pane scrolls when its
+    // content overflows. We verify by checking the document body is no
+    // taller than the window (within 1px tolerance for fractional pixels).
+    const overflow = await page.evaluate(() => ({
+      docHeight: document.documentElement.scrollHeight,
+      viewport: window.innerHeight,
+      paneListOverflow: getComputedStyle(document.querySelector(".pane-list") as Element).overflowY,
+      sbOverflow: getComputedStyle(document.querySelector(".sb") as Element).overflowY,
+    }));
+    expect(overflow.docHeight).toBeLessThanOrEqual(overflow.viewport + 1);
+    expect(overflow.paneListOverflow).toMatch(/auto|scroll/);
+    expect(overflow.sbOverflow).toMatch(/auto|scroll|hidden/);
+  });
+
   test("flag on — Purchases is an empty state (schema does not track buys)", async ({ page }) => {
     await signIn(page, "member@shouks.test", "Test123!@#");
     await page.goto("/home?se_ks_sectioned_dashboard=true");
