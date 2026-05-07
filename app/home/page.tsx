@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
+import { shipeasy } from "@shipeasy/sdk/server";
 import { getUserContext } from "@/lib/auth-helpers";
 import { Navbar } from "@/components/app/Navbar";
 import { JoinViaWhatsAppButton } from "@/components/whatsapp/JoinViaWhatsAppButton";
 import { PostListingButton } from "@/components/app/PostListingButton";
 import { HomeFeedSentinel } from "@/components/app/HomeFeedSentinel";
 import { RecentlyViewedSection } from "@/components/app/RecentlyViewed";
+import { SectionedDashboard } from "@/components/app/SectionedDashboard";
 import { prisma } from "@/lib/prisma";
 import { countUnreadThreads } from "@/lib/messages";
 import { i18n } from '@shipeasy/sdk/client'
@@ -140,13 +143,37 @@ type ScopeValue = "all" | "owner" | "member" | "favorites";
 
 export default async function HomeDashboard(
   props: {
-    searchParams?: Promise<{ stay?: string; scope?: string }>;
+    searchParams?: Promise<Record<string, string | string[] | undefined>>;
   }
 ) {
   const searchParams = await props.searchParams;
   const ctx = await getUserContext();
   if (!ctx) redirect("/signin?callbackUrl=/home");
   const { user, memberships, owned } = ctx;
+
+  // Resolve the `sectioned_dashboard` Shipeasy flag for this request. We
+  // re-evaluate per-page so URL overrides (?se_ks_sectioned_dashboard=true)
+  // work even without a middleware that injects x-se-search. The existing
+  // Flow 6A dashboard remains the default; the flag opts users into the
+  // Flow 8 sectioned dashboard.
+  const overrideQs = searchParams
+    ? new URLSearchParams(
+        Object.entries(searchParams).flatMap(([k, v]) =>
+          Array.isArray(v) ? v.map((x) => [k, x] as [string, string]) : v != null ? [[k, v] as [string, string]] : [],
+        ),
+      ).toString()
+    : "";
+  const headerOverride = (await headers()).get("x-se-search") ?? undefined;
+  const seHandle = await shipeasy({
+    apiKey: process.env.SHIPEASY_SERVER_KEY ?? "",
+    clientKey: process.env.NEXT_PUBLIC_SHIPEASY_CLIENT_KEY ?? "",
+    urlOverrides: headerOverride ?? (overrideQs ? `?${overrideQs}` : undefined),
+    user: { user_id: user.id },
+  });
+  const sectionedDashboardEnabled = seHandle.flags["sectioned_dashboard"] === true;
+
+  const stayParam = typeof searchParams?.stay === "string" ? searchParams.stay : undefined;
+  const scopeParam = typeof searchParams?.scope === "string" ? searchParams.scope : undefined;
 
   // When a user owns or belongs to multiple marketplaces there's no
   // sensible "default" to drop them into, and picking owned[0] made the
@@ -155,7 +182,7 @@ export default async function HomeDashboard(
   // marketplace and zero member marketplaces — the unambiguous case.
   // `?stay=1` always opts out (SHK-028 brand-logo loop).
   if (
-    searchParams?.stay !== "1" &&
+    stayParam !== "1" &&
     user.defaultRole === "OWNER" &&
     owned.length === 1 &&
     memberships.length === 0
@@ -163,8 +190,33 @@ export default async function HomeDashboard(
     redirect(`/owner/${owned[0].slug}/dashboard`);
   }
 
-  const scope: ScopeValue = ["owner", "member", "favorites"].includes(searchParams?.scope ?? "")
-    ? (searchParams!.scope as ScopeValue)
+  if (sectionedDashboardEnabled) {
+    const [unread, unreadMessages] = await Promise.all([
+      prisma.notification.count({ where: { userId: user.id, readAt: null } }),
+      countUnreadThreads(user.id),
+    ]);
+    return (
+      <div className="min-h-screen" style={{ background: "var(--bg-soft)" }}>
+        <Navbar
+          user={{
+            id: user.id,
+            name: user.displayName ?? user.name,
+            image: user.image,
+            email: user.email,
+          }}
+          activeMarketplace={null}
+          marketplaces={[...owned, ...memberships]}
+          mode="member"
+          notificationCount={unread}
+          unreadMessagesCount={unreadMessages}
+        />
+        <SectionedDashboard />
+      </div>
+    );
+  }
+
+  const scope: ScopeValue = ["owner", "member", "favorites"].includes(scopeParam ?? "")
+    ? (scopeParam as ScopeValue)
     : "all";
 
   const ownedIds = owned.map((m) => m.id);

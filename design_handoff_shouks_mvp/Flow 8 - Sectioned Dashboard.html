@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Shouks — Dashboard (sectioned)</title>
+
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44' fill='none'><path d='M22 3 38.5 12.5v19L22 41 5.5 31.5v-19L22 3Z' stroke='%230f1a2e' stroke-width='3' stroke-linejoin='round'/><circle cx='22' cy='22' r='5' fill='%234a7aff'/></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Instrument+Serif&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --bg: oklch(0.98 0.002 60);
+    --bg-soft: oklch(0.955 0.002 60);
+    --bg-panel: oklch(0.93 0.003 60);
+    --surface: #ffffff;
+    --ink: oklch(0.2 0.01 60);
+    --ink-soft: oklch(0.4 0.005 60);
+    --muted: oklch(0.56 0.004 60);
+    --line: oklch(0.89 0.003 60);
+    --line-soft: oklch(0.93 0.002 60);
+    --blue: oklch(0.63 0.13 232);
+    --blue-ink: oklch(0.48 0.14 234);
+    --blue-soft: oklch(0.63 0.13 232 / 0.1);
+    --blue-wash: oklch(0.96 0.018 232);
+    --hover: oklch(0.93 0.003 60);
+    --success: oklch(0.58 0.12 155);
+    --amber: oklch(0.72 0.13 70);
+    --danger: oklch(0.58 0.18 25);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg-soft); color: var(--ink);
+    font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+  .browser { max-width: 1320px; margin: 28px auto; background: #fff; border-radius: 14px; box-shadow: 0 1px 0 oklch(0.88 0.003 60), 0 14px 40px -22px oklch(0.2 0.02 60 / 0.18); overflow: hidden; }
+  .browser-bar { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--line); background: var(--bg-soft); }
+  .dots { display: flex; gap: 6px; }
+  .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--line); }
+  .url { font-family: ui-monospace, monospace; font-size: 12px; color: var(--muted); background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 5px 12px; flex: 1; max-width: 460px; }
+
+  /* Page header */
+  .ah { padding: 24px 28px 18px; border-bottom: 1px solid var(--line); }
+  .ah h1 { margin: 0; font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 34px; letter-spacing: -0.015em; }
+  .ah .sub { margin-top: 4px; font-size: 13px; color: var(--ink-soft); }
+
+  /* Body — 3-pane: sidebar / list / detail */
+  .body { display: grid; grid-template-columns: 220px minmax(0, 1.15fr) minmax(0, 1fr); min-height: 760px; }
+
+  /* Sidebar */
+  .sb { padding: 18px 12px 24px; border-right: 1px solid var(--line); background: var(--bg-soft); }
+  .sb-section { margin-bottom: 4px; }
+  .sb-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px; border-radius: 8px; cursor: pointer;
+    font-size: 13.5px; font-weight: 600; color: var(--ink); letter-spacing: -0.005em;
+  }
+  .sb-head:hover { background: var(--hover); }
+  .sb-head.active { background: #fff; box-shadow: 0 1px 0 oklch(0.88 0.003 60); }
+  .sb-head .l { display: inline-flex; align-items: center; gap: 9px; }
+  .sb-head .l svg { width: 14px; height: 14px; opacity: 0.7; }
+  .sb-head .ct { font-size: 10.5px; font-weight: 600; padding: 1px 7px; border-radius: 10px; background: var(--bg-panel); color: var(--ink-soft); letter-spacing: 0.02em; }
+  .sb-head.active .ct { background: var(--ink); color: #fff; }
+  .sb-head .new-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); margin-left: 4px; }
+  .sb-subs { padding: 2px 0 6px 22px; display: flex; flex-direction: column; gap: 1px; }
+  .sb-section.collapsed .sb-subs { display: none; }
+  .sb-sub {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 10px; border-radius: 6px; cursor: pointer;
+    font-size: 12.5px; font-weight: 500; color: var(--muted);
+  }
+  .sb-sub:hover { color: var(--ink); }
+  .sb-sub.active { color: var(--ink); background: #fff; }
+  .sb-sub .ct-mini { font-size: 10.5px; color: var(--muted); font-weight: 500; }
+  .sb-sub.active .ct-mini { color: var(--ink-soft); }
+  .sb-sub .new-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--blue); }
+
+  .sb-foot { margin-top: 18px; padding: 10px 12px; font-size: 11px; color: var(--muted); line-height: 1.45; }
+  .sb-section-spaced { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line-soft); }
+
+  /* List pane */
+  .pane-list { padding: 18px 24px 28px; border-right: 1px solid var(--line); }
+
+  .lp-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; gap: 12px; flex-wrap: wrap; }
+  .lp-title { font-family: 'Instrument Serif', serif; font-size: 22px; font-weight: 400; letter-spacing: -0.005em; }
+  .lp-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .lp-act { display: flex; gap: 6px; }
+
+  .lh { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 10px; flex-wrap: wrap; }
+  .lh-l { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .lh-r { display: flex; align-items: center; gap: 6px; }
+  .ftr { font-size: 12px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 7px; color: var(--ink-soft); background: #fff; display: inline-flex; align-items: center; gap: 5px; font-weight: 500; cursor: pointer; }
+  .ftr.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .privacy-banner { font-size: 11.5px; color: var(--muted); display: inline-flex; align-items: center; gap: 5px; padding: 4px 0 10px; }
+  .privacy-banner svg { width: 11px; height: 11px; }
+
+  /* Purchases summary strip */
+  .purchase-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; padding: 14px 0 18px; margin-bottom: 14px; border-bottom: 1px solid var(--line-soft); }
+  .ps-stat { padding: 0 14px; border-right: 1px solid var(--line-soft); }
+  .ps-stat:last-child { border-right: 0; }
+  .ps-stat:first-child { padding-left: 0; }
+  .ps-stat .v { font-family: 'Instrument Serif', serif; font-size: 22px; font-weight: 400; letter-spacing: -0.005em; color: var(--ink); line-height: 1.1; }
+  .ps-stat .l { font-size: 10.5px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .lr-list-label { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 500; padding: 4px 10px 8px; }
+
+  /* Listing rows */
+  .lr-list { display: flex; flex-direction: column; gap: 0; }
+  .lr-row { display: grid; grid-template-columns: 56px minmax(0,1fr) auto; gap: 14px; padding: 12px 10px; border-radius: 8px; align-items: center; cursor: pointer; border: 1px solid transparent; }
+  .lr-row + .lr-row { border-top: 1px solid var(--line-soft); border-radius: 0; }
+  .lr-row:hover { background: var(--bg-soft); }
+  .lr-row.active { background: var(--blue-wash); border-color: oklch(0.85 0.04 232); border-radius: 8px; }
+  .lr-row.active + .lr-row { border-top-color: transparent; }
+  .lr-row .th { width: 56px; height: 56px; border-radius: 8px; flex: none; }
+  .lr-row .t { font-size: 13.5px; font-weight: 500; letter-spacing: -0.005em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lr-row .s { font-size: 11.5px; color: var(--muted); margin-top: 3px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .lr-row .mp-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; color: var(--ink-soft); background: var(--bg-soft); padding: 1px 7px; border-radius: 4px; font-weight: 500; }
+  .lr-row.active .mp-tag { background: #fff; }
+  .lr-row .right { text-align: right; }
+  .lr-row .price { font-size: 13.5px; font-weight: 600; }
+  .lr-row .meta-r { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .pill-state { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 500; padding: 2px 7px; border-radius: 4px; }
+  .pill-state.live { background: oklch(0.95 0.04 150); color: oklch(0.35 0.12 150); }
+  .pill-state.draft { background: var(--bg-soft); color: var(--muted); }
+  .pill-state.sold { background: oklch(0.94 0.02 240); color: var(--ink-soft); }
+  .pill-state.ended { background: oklch(0.94 0.04 25); color: oklch(0.45 0.13 25); }
+  .pill-state.new { background: var(--blue); color: #fff; }
+  .pill-state.shipped { background: oklch(0.94 0.04 232); color: oklch(0.4 0.12 232); }
+  .pill-state.delivered { background: oklch(0.95 0.04 150); color: oklch(0.35 0.12 150); }
+  .pill-state.escrow { background: oklch(0.95 0.05 70); color: oklch(0.42 0.12 70); }
+  .pill-state.action { background: oklch(0.94 0.07 25); color: oklch(0.45 0.16 25); }
+
+  /* Cfg rows */
+  .cfg-list { display: flex; flex-direction: column; gap: 8px; }
+  .cfg-row { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; cursor: pointer; }
+  .cfg-row:hover { border-color: oklch(0.78 0.02 240); }
+  .cfg-row.active { border-color: var(--blue); background: var(--blue-wash); box-shadow: 0 0 0 2px oklch(0.63 0.13 232 / 0.1); }
+  .cfg-row .cr-t { font-size: 13.5px; font-weight: 500; letter-spacing: -0.005em; }
+  .cfg-row .cr-q { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+  .chip-q { background: var(--bg-soft); color: var(--ink-soft); font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 4px; }
+  .cfg-row.active .chip-q { background: #fff; }
+  .cfg-row .cr-meta { font-size: 11.5px; color: var(--muted); margin-top: 7px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .cfg-row .cr-meta .new-ct { color: var(--blue-ink); font-weight: 600; }
+  .cfg-row .cr-act { display: flex; align-items: center; gap: 10px; }
+
+  .switch { position: relative; width: 32px; height: 18px; background: var(--blue); border-radius: 10px; flex: none; cursor: pointer; }
+  .switch::after { content: ""; position: absolute; width: 14px; height: 14px; background: #fff; border-radius: 50%; top: 2px; right: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.15); transition: all 0.18s; }
+  .switch.off { background: var(--line); }
+  .switch.off::after { left: 2px; right: auto; }
+
+  /* Match groups */
+  .match-group { background: #fff; border: 1px solid var(--line); border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+  .mg-head { padding: 11px 14px; background: var(--bg-soft); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line-soft); }
+  .mg-head .mg-t { font-size: 12.5px; font-weight: 600; letter-spacing: -0.005em; display: flex; align-items: center; gap: 7px; }
+  .mg-head .mg-q { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .mg-head .mg-ct { background: var(--blue); color: #fff; font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 4px; letter-spacing: 0.02em; }
+  .mg-body { padding: 2px 10px; }
+  .mg-body .lr-row { padding: 10px 8px; }
+
+  /* Detail pane */
+  .pane-detail { padding: 22px 26px 28px; background: var(--bg-soft); }
+  .dp-empty { display: grid; place-items: center; height: 100%; color: var(--muted); font-size: 13px; padding: 60px 20px; text-align: center; }
+  .dp-empty svg { width: 28px; height: 28px; opacity: 0.4; margin-bottom: 10px; }
+  .dp-card { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+  .dp-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--line-soft); }
+  .dp-head .dp-t { font-family: 'Instrument Serif', serif; font-size: 22px; font-weight: 400; letter-spacing: -0.005em; }
+  .dp-head .dp-s { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .dp-head .dp-act { display: flex; gap: 6px; flex: none; flex-wrap: wrap; justify-content: flex-end; }
+  .dp-meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+  .dp-meta.three { grid-template-columns: repeat(3, 1fr); }
+  .dp-meta .m-stat { background: var(--bg-soft); border-radius: 8px; padding: 10px 12px; }
+  .dp-meta .m-stat .v { font-family: 'Instrument Serif', serif; font-size: 22px; font-weight: 400; letter-spacing: -0.01em; }
+  .dp-meta .m-stat .l { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-top: 2px; }
+  .dp-section-t { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin: 14px 0 8px; }
+  .activity-list { font-size: 12.5px; color: var(--ink-soft); line-height: 1.7; }
+  .activity-list > div { display: flex; gap: 6px; align-items: baseline; }
+  .criteria-grid { display: grid; grid-template-columns: 130px 1fr; gap: 10px 16px; font-size: 13px; }
+  .criteria-grid .ck { color: var(--muted); }
+  .criteria-grid .cv { color: var(--ink); font-weight: 500; }
+
+  .chip-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 8px; font-size: 12px; background: #fff; border: 1px solid var(--line); color: var(--ink-soft); font-weight: 500; cursor: pointer; }
+  .chip-btn:hover { border-color: var(--ink); color: var(--ink); }
+  .chip-btn.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .chip-btn.danger { color: var(--danger); }
+  .chip-btn.danger:hover { border-color: var(--danger); }
+
+  /* Section panel + sub-tab visibility */
+  .section-panel { display: none; }
+  .section-panel.active { display: block; }
+  .sub-panel { display: none; }
+  .sub-panel.active { display: block; }
+
+  /* Caption */
+  .caption { max-width: 1320px; margin: 28px auto 0; padding: 0 28px; }
+  .caption .cap-num { font-family: ui-monospace, monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; }
+  .caption h2 { margin: 4px 0 0; font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 28px; letter-spacing: -0.01em; }
+  .caption .sub { font-size: 13.5px; color: var(--ink-soft); margin-top: 6px; max-width: 720px; line-height: 1.55; }
+
+  .mocknote { max-width: 1320px; margin: 18px auto 60px; padding: 14px 18px; background: oklch(0.96 0.018 232); border: 1px solid oklch(0.86 0.04 232); border-radius: 10px; font-size: 12.5px; color: oklch(0.32 0.07 232); display: flex; gap: 10px; line-height: 1.55; }
+  .mocknote b { color: oklch(0.25 0.1 232); }
+  .mocknote .tag { font-family: ui-monospace, monospace; font-size: 10px; padding: 2px 7px; background: oklch(0.63 0.13 232); color: #fff; border-radius: 4px; letter-spacing: 0.06em; height: fit-content; flex: none; align-self: center; }
+</style>
+</head>
+<body>
+
+<div class="caption">
+  <span class="cap-num">08 · Dashboard (sectioned)</span>
+  <h2>Dashboard — by section</h2>
+  <div class="sub">Four role-based sections in a left rail (Listings · Purchases · ISO · Alerts), each with its own sub-tabs. Symmetric treatment of buying and selling: Purchases now has parity with Listings, with an "In progress" sub-tab for active orders that need attention.</div>
+</div>
+
+<div class="browser">
+  <div class="browser-bar">
+    <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+    <div class="url">shouks.com / me / dashboard</div>
+  </div>
+
+  <div class="ah">
+    <h1>Dashboard</h1>
+    <div class="sub">Everything I'm selling, buying, asking for, or tracking — organized by what I'm doing.</div>
+  </div>
+
+  <div class="body">
+
+    <!-- ============== SIDEBAR ============== -->
+    <nav class="sb">
+      <!-- Listings -->
+      <div class="sb-section active" data-section="listings">
+        <div class="sb-head active">
+          <span class="l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M3 12h18M3 17h18"/></svg>Listings</span>
+          <span class="ct">6</span>
+        </div>
+        <div class="sb-subs">
+          <div class="sb-sub active" data-sub="listings-active">Active <span class="ct-mini">3</span></div>
+          <div class="sb-sub" data-sub="listings-drafts">Drafts <span class="ct-mini">1</span></div>
+          <div class="sb-sub" data-sub="listings-sold">Sold <span class="ct-mini">2</span></div>
+        </div>
+      </div>
+
+      <!-- ISO -->
+      <div class="sb-section" data-section="iso">
+        <div class="sb-head">
+          <span class="l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>ISO</span>
+          <span class="ct">5</span>
+          <span class="new-dot"></span>
+        </div>
+        <div class="sb-subs">
+          <div class="sb-sub" data-sub="iso-open">Open <span class="ct-mini">2</span></div>
+          <div class="sb-sub" data-sub="iso-matches">Matches <span class="ct-mini">3</span><span class="new-dot"></span></div>
+          <div class="sb-sub" data-sub="iso-closed">Closed <span class="ct-mini">0</span></div>
+        </div>
+      </div>
+
+      <!-- Alerts -->
+      <div class="sb-section" data-section="alerts">
+        <div class="sb-head">
+          <span class="l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>Alerts</span>
+          <span class="ct">19</span>
+          <span class="new-dot"></span>
+        </div>
+        <div class="sb-subs">
+          <div class="sb-sub" data-sub="alerts-active">Active <span class="ct-mini">7</span></div>
+          <div class="sb-sub" data-sub="alerts-matches">Matches <span class="ct-mini">12</span><span class="new-dot"></span></div>
+        </div>
+      </div>
+
+      <!-- Purchases (flat — moved to bottom; no sub-tabs) -->
+      <div class="sb-section sb-section-spaced" data-section="purchases">
+        <div class="sb-head">
+          <span class="l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>Purchases</span>
+          <span class="ct">2</span>
+        </div>
+      </div>
+
+      <div class="sb-foot">
+        Sections group by role: <b>Listings</b> = selling, <b>Purchases</b> = buying, <b>ISO</b> = sourcing, <b>Alerts</b> = monitoring.
+      </div>
+    </nav>
+
+    <!-- ============== LIST PANE ============== -->
+    <div class="pane-list">
+
+      <!-- ============ LISTINGS ============ -->
+      <div class="section-panel active" data-section-panel="listings">
+
+        <div class="lp-head">
+          <div>
+            <div class="lp-title">Listings</div>
+            <div class="lp-sub">Things I'm selling across my marketplaces.</div>
+          </div>
+          <div class="lp-act"><button class="chip-btn on">+ New listing</button></div>
+        </div>
+
+        <!-- Active -->
+        <div class="sub-panel active" data-sub-panel="listings-active">
+          <div class="lh">
+            <div class="lh-l">
+              <button class="ftr on">All marketplaces</button>
+              <button class="ftr">Auction</button>
+              <button class="ftr">Buy now</button>
+            </div>
+            <div class="lh-r"><button class="ftr">Sort: Recent ▾</button></div>
+          </div>
+          <div class="privacy-banner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h0"/></svg>
+            Public — visible to everyone in each listing's marketplace.
+          </div>
+          <div class="lr-list">
+            <div class="lr-row" data-id="L1">
+              <div class="th" style="background: linear-gradient(135deg, oklch(0.42 0.14 280), oklch(0.22 0.08 280));"></div>
+              <div><div class="t">Vintage Eames LCW · walnut, original glides</div><div class="s"><span class="mp-tag">Mid-Century Trade</span> Buy now · 3 watchers · 4d ago</div></div>
+              <div class="right"><div class="price">$2,400</div><div class="meta-r"><span class="pill-state live">● Live</span></div></div>
+            </div>
+            <div class="lr-row active" data-id="L2">
+              <div class="th" style="background: linear-gradient(135deg, oklch(0.32 0.05 240), oklch(0.18 0.02 240));"></div>
+              <div><div class="t">1989 Testarossa · Nero / Bordeaux, 41k mi</div><div class="s"><span class="mp-tag">Ferrari Frenzy</span> Auction · 12 bids · 1 ISO match</div></div>
+              <div class="right"><div class="price">$184,000</div><div class="meta-r"><span class="pill-state live">● Live</span> · 1h 47m</div></div>
+            </div>
+            <div class="lr-row" data-id="L3">
+              <div class="th" style="background: linear-gradient(135deg, oklch(0.55 0.11 110), oklch(0.3 0.08 110));"></div>
+              <div><div class="t">Kapital Century Denim selvedge · size M</div><div class="s"><span class="mp-tag">Heritage Denim</span> Buy now · 1 offer</div></div>
+              <div class="right"><div class="price">$640</div><div class="meta-r"><span class="pill-state live">● Live</span></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Drafts -->
+        <div class="sub-panel" data-sub-panel="listings-drafts">
+          <div class="privacy-banner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Private — drafts are only visible to you until published.
+          </div>
+          <div class="lr-list">
+            <div class="lr-row" data-id="L4">
+              <div class="th" style="background: linear-gradient(135deg, oklch(0.62 0.04 60), oklch(0.4 0.03 60));"></div>
+              <div><div class="t">Herman Miller Aeron · size B, posture-fit</div><div class="s"><span class="mp-tag">Mid-Century Trade</span> Last edited 2d ago</div></div>
+              <div class="right"><div class="price">$520</div><div class="meta-r"><span class="pill-state draft">Draft</span></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sold -->
+        <div class="sub-panel" data-sub-panel="listings-sold">
+          <div class="privacy-banner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h0"/></svg>
+            Public history — buyers can see your sold record on your profile.
+          </div>
+          <div class="lr-list">
+            <div class="lr-row" data-id="L5">
+              <div class="th" style="background: linear-gradient(135deg, oklch(0.5 0.1 195), oklch(0.28 0.06 200));"></div>
+              <div><div class="t">PSA 9 Blastoise Base Set · 1999</div><div class="s"><span class="mp-tag">Graded &amp; Holo</span> Sold 11 days ago to <b>cardvault_22</b></div></div>
+              <div class="right"><div class="price">$2,200</div><div class="meta-r"><span class="pill-state sold">Sold</span></div></div>
+            </div>
+            <div class="lr-row" data-id="L6">
+              <div class="th" style="background: linear-gradient(135deg, oklch(0.45 0.16 25), oklch(0.2 0.07 25));"></div>
+              <div><div class="t">1990 348 ts · Rosso Corsa, books &amp; tools</div><div class="s"><span class="mp-tag">Ferrari Frenzy</span> Auction ended · no bids met reserve</div></div>
+              <div class="right"><div class="price">$78,000</div><div class="meta-r"><span class="pill-state ended">Ended</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ PURCHASES (flat — completed) ============ -->
+      <div class="section-panel" data-section-panel="purchases">
+        <div class="lp-head">
+          <div>
+            <div class="lp-title">Purchases</div>
+            <div class="lp-sub">Things I've bought across my marketplaces.</div>
+          </div>
+        </div>
+        <div class="sub-panel active">
+          <div class="purchase-summary">
+            <div class="ps-stat"><div class="v">$2,070</div><div class="l">Spent in 2026</div></div>
+            <div class="ps-stat"><div class="v">2</div><div class="l">Orders this year</div></div>
+            <div class="ps-stat"><div class="v">$1,035</div><div class="l">Avg. order</div></div>
+            <div class="ps-stat"><div class="v">★ 5.0</div><div class="l">Avg. seller rating</div></div>
+          </div>
+          <div class="lh">
+            <div class="lh-l">
+              <button class="ftr on">All time</button>
+              <button class="ftr">2026</button>
+              <button class="ftr">2025</button>
+              <button class="ftr">Earlier</button>
+            </div>
+            <div class="lh-r"><button class="ftr">Sort: Recent ▾</button></div>
+          </div>
+          <div class="lr-list-label">2026 — 2 orders</div>
+          <div class="lr-list">
+            <div class="lr-row active" data-id="P4">
+              <div class="th" style="background: linear-gradient(135deg, oklch(0.62 0.04 60), oklch(0.4 0.03 60));"></div>
+              <div><div class="t">Vitra Eames Plywood Lounge · birch</div><div class="s"><span class="mp-tag">Mid-Century Trade</span> from <b>Helen B.</b> · delivered Mar 12</div></div>
+              <div class="right"><div class="price">$1,850</div><div class="meta-r"><span class="pill-state delivered">Delivered</span></div></div>
+            </div>
+            <div class="lr-row" data-id="P5">
+              <div class="th" style="background: linear-gradient(135deg, oklch(0.42 0.14 280), oklch(0.22 0.08 280));"></div>
+              <div><div class="t">Noguchi Akari 1A · paper lantern</div><div class="s"><span class="mp-tag">Mid-Century Trade</span> from <b>moma_estate</b> · delivered Feb 04</div></div>
+              <div class="right"><div class="price">$220</div><div class="meta-r"><span class="pill-state delivered">Delivered</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ ISO ============ -->
+      <div class="section-panel" data-section-panel="iso">
+
+        <div class="lp-head">
+          <div>
+            <div class="lp-title">In Search Of</div>
+            <div class="lp-sub">Public requests posted to marketplaces — sellers can reply.</div>
+          </div>
+          <div class="lp-act"><button class="chip-btn on">+ Post a wanted</button></div>
+        </div>
+
+        <!-- Open -->
+        <div class="sub-panel active" data-sub-panel="iso-open">
+          <div class="privacy-banner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h0"/></svg>
+            Public — visible to every seller in that marketplace.
+          </div>
+          <div class="cfg-list">
+            <div class="cfg-row active" data-id="I1">
+              <div>
+                <div class="cr-t">1987–1991 Testarossa · Nero or Rosso Corsa <span class="pill-state live" style="margin-left:6px;vertical-align:1px;">● Open</span></div>
+                <div class="cr-q"><span class="chip-q">Ferrari Frenzy</span><span class="chip-q">$150k–$200k</span><span class="chip-q">Classiche cert preferred</span><span class="chip-q">&lt;50k miles</span></div>
+                <div class="cr-meta"><span><span class="new-ct">3 new replies</span> · 47 views</span><span>Posted 8d ago</span></div>
+              </div>
+              <div class="cr-act"><button class="chip-btn" style="font-size:11px;padding:5px 9px;">Edit</button></div>
+            </div>
+            <div class="cfg-row" data-id="I2">
+              <div>
+                <div class="cr-t">Kapital Century selvedge · size M, raw <span class="pill-state live" style="margin-left:6px;vertical-align:1px;">● Open</span></div>
+                <div class="cr-q"><span class="chip-q">Heritage Denim</span><span class="chip-q">Up to $700</span><span class="chip-q">Unwashed</span></div>
+                <div class="cr-meta"><span>0 replies yet · 12 views</span><span>Posted yesterday</span></div>
+              </div>
+              <div class="cr-act"><button class="chip-btn" style="font-size:11px;padding:5px 9px;">Edit</button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Matches -->
+        <div class="sub-panel" data-sub-panel="iso-matches">
+          <div class="privacy-banner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h0"/></svg>
+            Public — sellers see your wanted ad and reply.
+          </div>
+          <div class="match-group">
+            <div class="mg-head">
+              <div>
+                <div class="mg-t">1987–1991 Testarossa · Nero / Rosso</div>
+                <div class="mg-q">Ferrari Frenzy · $150–200k</div>
+              </div>
+              <span class="mg-ct">3 new</span>
+            </div>
+            <div class="mg-body">
+              <div class="lr-row" data-id="IM1">
+                <div class="th" style="background: linear-gradient(135deg, oklch(0.32 0.05 240), oklch(0.18 0.02 240));"></div>
+                <div><div class="t">1989 Testarossa · Nero, 41k mi · Classiche</div><div class="s">From <b>Marco C.</b> · ✓ matches all 4 · 8m ago</div></div>
+                <div class="right"><div class="price">asks $184k</div><div class="meta-r"><span class="pill-state new">● New</span></div></div>
+              </div>
+              <div class="lr-row" data-id="IM2">
+                <div class="th" style="background: linear-gradient(135deg, oklch(0.45 0.16 25), oklch(0.2 0.07 25));"></div>
+                <div><div class="t">1990 Testarossa · Rosso Corsa, 33k mi</div><div class="s">From <b>James W.</b> · ⚠ no Classiche · 2d ago</div></div>
+                <div class="right"><div class="price">asks $169k</div><div class="meta-r" style="color:var(--ink-soft);">View →</div></div>
+              </div>
+              <div class="lr-row" data-id="IM3">
+                <div class="th" style="background: linear-gradient(135deg, oklch(0.4 0.1 25), oklch(0.22 0.05 25));"></div>
+                <div><div class="t">Atelier Rossini · 2 candidates</div><div class="s">From <b>Atelier Rossini</b> · workshop reply · 5d</div></div>
+                <div class="right"><div class="price">on request</div><div class="meta-r" style="color:var(--ink-soft);">View →</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Closed -->
+        <div class="sub-panel" data-sub-panel="iso-closed">
+          <div class="dp-empty" style="height:auto;padding:60px 20px;background:#fff;border:1px dashed var(--line);border-radius:10px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></svg>
+            <div>No closed wanted ads yet. Closed ads stay here for your records.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ ALERTS ============ -->
+      <div class="section-panel" data-section-panel="alerts">
+
+        <div class="lp-head">
+          <div>
+            <div class="lp-title">Alerts</div>
+            <div class="lp-sub">Saved searches that ping you when something matches.</div>
+          </div>
+          <div class="lp-act"><button class="chip-btn on">+ New alert</button></div>
+        </div>
+
+        <!-- Active alerts -->
+        <div class="sub-panel active" data-sub-panel="alerts-active">
+          <div class="privacy-banner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Private — saved searches that run in the background.
+          </div>
+          <div class="cfg-list">
+            <div class="cfg-row active" data-id="A1">
+              <div>
+                <div class="cr-t">F40 under $3M · any color</div>
+                <div class="cr-q"><span class="chip-q">Ferrari Frenzy</span><span class="chip-q">≤ $3,000,000</span><span class="chip-q">Auction or buy-now</span></div>
+                <div class="cr-meta"><span><span class="new-ct">2 new matches</span> · 4 this month</span><span>Notify: instant</span></div>
+              </div>
+              <div class="cr-act"><button class="chip-btn" style="font-size:11px;padding:5px 9px;">Edit</button><div class="switch" data-switch></div></div>
+            </div>
+            <div class="cfg-row" data-id="A2">
+              <div>
+                <div class="cr-t">PSA 10 Charizard · Base Set 1999 only</div>
+                <div class="cr-q"><span class="chip-q">Graded &amp; Holo</span><span class="chip-q">$15k–$22k</span><span class="chip-q">Sealed slab</span></div>
+                <div class="cr-meta"><span><span class="new-ct">5 new matches</span></span><span>Notify: daily digest</span></div>
+              </div>
+              <div class="cr-act"><button class="chip-btn" style="font-size:11px;padding:5px 9px;">Edit</button><div class="switch" data-switch></div></div>
+            </div>
+            <div class="cfg-row" data-id="A3">
+              <div>
+                <div class="cr-t">Eames LCW · walnut, original glides</div>
+                <div class="cr-q"><span class="chip-q">Mid-Century Trade</span><span class="chip-q">≤ $3,500</span></div>
+                <div class="cr-meta"><span>1 new match · 2 this month</span><span>Notify: instant</span></div>
+              </div>
+              <div class="cr-act"><button class="chip-btn" style="font-size:11px;padding:5px 9px;">Edit</button><div class="switch" data-switch></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alert matches -->
+        <div class="sub-panel" data-sub-panel="alerts-matches">
+          <div class="match-group">
+            <div class="mg-head">
+              <div>
+                <div class="mg-t">F40 under $3M</div>
+                <div class="mg-q">Ferrari Frenzy</div>
+              </div>
+              <span class="mg-ct">2 new</span>
+            </div>
+            <div class="mg-body">
+              <div class="lr-row" data-id="AM1">
+                <div class="th" style="background: linear-gradient(135deg, oklch(0.62 0.16 25), oklch(0.35 0.12 25));"></div>
+                <div><div class="t">1991 Ferrari F40 · LM ext., 14k km</div><div class="s">Just listed · 23 bids · 3h ago</div></div>
+                <div class="right"><div class="price">$2.95M</div><div class="meta-r"><span class="pill-state new">● New</span></div></div>
+              </div>
+              <div class="lr-row" data-id="AM2">
+                <div class="th" style="background: linear-gradient(135deg, oklch(0.4 0.1 25), oklch(0.22 0.05 25));"></div>
+                <div><div class="t">1989 F40 · Rosso, books &amp; tools</div><div class="s">Buy now · listed yesterday</div></div>
+                <div class="right"><div class="price">$2.78M</div><div class="meta-r"><span class="pill-state new">● New</span></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="match-group">
+            <div class="mg-head">
+              <div>
+                <div class="mg-t">PSA 10 Charizard · Base Set</div>
+                <div class="mg-q">Graded &amp; Holo · $15k–$22k</div>
+              </div>
+              <span class="mg-ct">5 new</span>
+            </div>
+            <div class="mg-body">
+              <div class="lr-row" data-id="AM3">
+                <div class="th" style="background: linear-gradient(135deg, oklch(0.5 0.1 195), oklch(0.28 0.06 200));"></div>
+                <div><div class="t">PSA 10 Charizard · pop 121</div><div class="s">Auction · 18 bids · ends 2d</div></div>
+                <div class="right"><div class="price">$18,500</div><div class="meta-r"><span class="pill-state new">● New</span></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============== DETAIL PANE ============== -->
+    <div class="pane-detail" id="detail">
+
+      <!-- L2 — Testarossa listing (default for Listings) -->
+      <div class="dp-card" data-detail="L2">
+        <div class="dp-head">
+          <div><div class="dp-t">1989 Testarossa · Nero / Bordeaux</div><div class="dp-s">Ferrari Frenzy · Auction · ends in 1h 47m</div></div>
+          <div class="dp-act"><button class="chip-btn">Edit</button><button class="chip-btn on">Promote</button></div>
+        </div>
+        <div class="dp-meta">
+          <div class="m-stat"><div class="v">12</div><div class="l">Bids</div></div>
+          <div class="m-stat"><div class="v">$184k</div><div class="l">Top bid</div></div>
+          <div class="m-stat"><div class="v">847</div><div class="l">Views</div></div>
+          <div class="m-stat"><div class="v">1</div><div class="l">ISO match</div></div>
+        </div>
+        <div class="dp-section-t" style="margin-top:0;">Buyer activity · live</div>
+        <div class="activity-list">
+          <div>● Marco C. raised to $184,000 · 8m ago</div>
+          <div>● James W. messaged about Classiche cert · 14m ago</div>
+          <div>● 3 new watchers since this morning</div>
+        </div>
+      </div>
+
+      <!-- P4 — Completed purchase -->
+      <div class="dp-card" data-detail="P4" hidden>
+        <div class="dp-head">
+          <div><div class="dp-t">Vitra Eames Plywood Lounge · birch</div><div class="dp-s">Mid-Century Trade · from Helen B. · delivered Mar 12, 2026</div></div>
+          <div class="dp-act"><button class="chip-btn">Leave review</button><button class="chip-btn">Buy again</button></div>
+        </div>
+        <div class="dp-meta three">
+          <div class="m-stat"><div class="v">$1,850</div><div class="l">Paid</div></div>
+          <div class="m-stat"><div class="v">8 days</div><div class="l">In transit</div></div>
+          <div class="m-stat"><div class="v">★★★★★</div><div class="l">Your review</div></div>
+        </div>
+        <div class="dp-section-t" style="margin-top:0;">Order summary</div>
+        <div class="criteria-grid">
+          <div class="ck">Item</div><div class="cv">Vitra Eames LCW · birch, 1958 reissue</div>
+          <div class="ck">Condition</div><div class="cv">Excellent — minor wear consistent with age</div>
+          <div class="ck">Shipped</div><div class="cv">Mar 04 via blanket-wrap freight</div>
+          <div class="ck">Delivered</div><div class="cv">Mar 12 · signed for at door</div>
+          <div class="ck">Receipt</div><div class="cv" style="color:var(--blue-ink);">Download invoice →</div>
+        </div>
+      </div>
+
+      <!-- W1 — Watching detail -->
+      <div class="dp-card" data-detail="W1" hidden>
+        <div style="display:grid;grid-template-columns:130px 1fr;gap:14px;">
+          <div style="background: linear-gradient(135deg, oklch(0.45 0.16 25), oklch(0.2 0.07 25)); height:130px; border-radius:10px;"></div>
+          <div>
+            <div style="font-family:'Instrument Serif',serif;font-size:22px;font-weight:400;letter-spacing:-0.005em;">1992 512 TR · Rosso Corsa</div>
+            <div style="font-size:11.5px;color:var(--muted);margin-top:3px;">Ferrari Frenzy · Single-owner · Saved 6d ago</div>
+            <div style="font-size:14.5px;font-weight:600;margin-top:10px;"><span style="color:var(--muted);text-decoration:line-through;font-weight:400;font-size:12.5px;margin-right:6px;">$222k</span>$218,000 <span style="color:oklch(0.45 0.13 150);font-size:11.5px;font-weight:500;margin-left:4px;">↓ $4k</span></div>
+            <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;"><button class="chip-btn on" style="font-size:11px;padding:5px 9px;">View listing →</button><button class="chip-btn" style="font-size:11px;padding:5px 9px;">Place bid</button><button class="chip-btn danger" style="font-size:11px;padding:5px 9px;">Unsave</button></div>
+          </div>
+        </div>
+        <div class="dp-section-t">Why I'm watching</div>
+        <div class="activity-list">
+          <div>● Price has dropped $4k since you saved it</div>
+          <div>● 8 active bids · current high $218,000</div>
+          <div>● Auction ends in 5h 12m</div>
+        </div>
+      </div>
+
+      <!-- I1 — ISO ad -->
+      <div class="dp-card" data-detail="I1" hidden>
+        <div class="dp-head">
+          <div><div class="dp-t">1987–1991 Testarossa · Nero / Rosso</div><div class="dp-s">Ferrari Frenzy · Public wanted · 8 days live · 47 views</div></div>
+          <div class="dp-act"><button class="chip-btn">Edit</button><button class="chip-btn">Close</button><button class="chip-btn danger">Delete</button></div>
+        </div>
+        <div class="dp-meta three">
+          <div class="m-stat"><div class="v">3</div><div class="l">Replies</div></div>
+          <div class="m-stat"><div class="v">47</div><div class="l">Views</div></div>
+          <div class="m-stat"><div class="v">67d</div><div class="l">Until expiry</div></div>
+        </div>
+        <div class="dp-section-t" style="margin-top:0;">Criteria</div>
+        <div class="criteria-grid">
+          <div class="ck">Year</div><div class="cv">1987 – 1991</div>
+          <div class="ck">Color</div><div class="cv"><span class="chip-q">Nero</span><span class="chip-q">Rosso Corsa</span></div>
+          <div class="ck">Mileage</div><div class="cv">Under 50,000 mi</div>
+          <div class="ck">Budget</div><div class="cv">$150,000 – $200,000</div>
+        </div>
+      </div>
+
+      <!-- A1 — Alert -->
+      <div class="dp-card" data-detail="A1" hidden>
+        <div class="dp-head">
+          <div><div class="dp-t">F40 under $3M · any color</div><div class="dp-s">Ferrari Frenzy · 6 weeks active · saved search</div></div>
+          <div class="dp-act"><button class="chip-btn">Edit</button><button class="chip-btn">Pause</button><button class="chip-btn danger">Delete</button></div>
+        </div>
+        <div class="dp-meta three">
+          <div class="m-stat"><div class="v">2</div><div class="l">New this week</div></div>
+          <div class="m-stat"><div class="v">11</div><div class="l">All-time</div></div>
+          <div class="m-stat"><div class="v">Instant</div><div class="l">Frequency</div></div>
+        </div>
+        <div class="dp-section-t" style="margin-top:0;">Criteria</div>
+        <div class="criteria-grid">
+          <div class="ck">Marketplace</div><div class="cv">Ferrari Frenzy</div>
+          <div class="ck">Model</div><div class="cv">F40 only</div>
+          <div class="ck">Max price</div><div class="cv">$3,000,000</div>
+          <div class="ck">Notify</div><div class="cv">Push + email · instant</div>
+        </div>
+      </div>
+
+      <!-- placeholder -->
+      <div class="dp-card" data-detail="placeholder" hidden>
+        <div class="dp-empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 12h8M8 8h8M8 16h5"/></svg>
+          <div>Select a row to see its full detail here.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="mocknote">
+  <span class="tag">Notes</span>
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <div><b>Sectioned dashboard — final.</b> Sidebar groups by role: <b>Listings</b> (selling, sub-tabs Active/Drafts/Sold), <b>ISO</b> (sourcing, sub-tabs Open/Matches/Closed), <b>Alerts</b> (monitoring, sub-tabs Active/Matches), and <b>Purchases</b> (flat — record of completed buys, pinned to bottom of sidebar with a divider since it has no sub-tabs).</div>
+
+    <div><b>Empty states</b> — please respect these in build:
+      <ul style="margin:6px 0 0 18px;padding:0;line-height:1.55;">
+        <li><b>Listings · Active</b> — "No live listings. <u>Create your first listing →</u>" Show recent drafts (if any) below CTA.</li>
+        <li><b>Listings · Drafts</b> — "No drafts. Drafts auto-save here as you build a listing."</li>
+        <li><b>Listings · Sold</b> — "Nothing sold yet. Your sales history will live here."</li>
+        <li><b>Purchases</b> — "No purchases yet. Once you buy something, it shows up here with the receipt and seller record." (No filter chips when empty.)</li>
+        <li><b>ISO · Open</b> — "No active wanted ads. <u>Post a wanted →</u>" Brief one-liner explaining ISO is public to sellers in that marketplace.</li>
+        <li><b>ISO · Matches</b> — "No matches yet. We'll notify you when a seller responds." Show this even when Open has 0.</li>
+        <li><b>ISO · Closed</b> — already handled in mock: "No closed wanted ads yet. Closed ads stay here for your records." (See dashed-border treatment.)</li>
+        <li><b>Alerts · Active</b> — "No saved searches. <u>Create an alert →</u>" Mention alerts run in the background and can notify instant or daily.</li>
+        <li><b>Alerts · Matches</b> — "No new matches. New listings that match your saved searches will appear here." Group by alert when matches exist (see mock for grouping pattern).</li>
+        <li><b>Detail pane (no row selected)</b> — already handled: small icon + "Select a row to see its full detail here." Use this whenever the active sub-tab has zero rows OR the user hasn't clicked one.</li>
+      </ul>
+    </div>
+
+    <div><b>Privacy banners</b> are intentional — public sub-tabs (Listings · Active/Sold, ISO · Open) get the eye/info icon line; private sub-tabs (Drafts, Purchases, Alerts · Active) get the lock icon line. Keep these in empty states too — they help orient users.</div>
+
+    <div><b>Counts in the sidebar</b> reflect total items across all sub-tabs of that section. New-dot indicator only appears if there are unread/new items in any sub-tab.</div>
+  </div>
+</div>
+
+<script>
+  // Section switching (left rail)
+  const sections = document.querySelectorAll('.sb-section');
+  const sectionPanels = document.querySelectorAll('.section-panel');
+
+  function showSection(name) {
+    sections.forEach(s => s.classList.toggle('active', s.dataset.section === name));
+    sections.forEach(s => s.querySelector('.sb-head').classList.toggle('active', s.dataset.section === name));
+    sectionPanels.forEach(p => p.classList.toggle('active', p.dataset.sectionPanel === name));
+    // Pick first sub of that section as active list, and surface a default detail
+    const sec = document.querySelector(`.sb-section[data-section="${name}"]`);
+    const firstSub = sec.querySelector('.sb-sub.active') || sec.querySelector('.sb-sub');
+    if (firstSub) {
+      showSub(firstSub.dataset.sub);
+    } else {
+      // Flat section (no sub-tabs) — surface first row in the section panel directly
+      const panel = document.querySelector(`.section-panel[data-section-panel="${name}"]`);
+      const firstRow = panel?.querySelector('.lr-row.active') || panel?.querySelector('.lr-row, .cfg-row');
+      if (firstRow) showDetail(firstRow.dataset.id);
+      else showDetail('placeholder');
+    }
+  }
+
+  sections.forEach(s => {
+    s.querySelector('.sb-head').addEventListener('click', () => showSection(s.dataset.section));
+  });
+
+  // Sub-tab switching (within active section)
+  function showSub(name) {
+    document.querySelectorAll('.sb-sub').forEach(b => b.classList.toggle('active', b.dataset.sub === name));
+    document.querySelectorAll('.sub-panel').forEach(p => p.classList.toggle('active', p.dataset.subPanel === name));
+    // Surface first row's detail
+    const panel = document.querySelector(`.sub-panel[data-sub-panel="${name}"]`);
+    const firstRow = panel?.querySelector('.lr-row.active, .cfg-row.active') || panel?.querySelector('.lr-row, .cfg-row');
+    if (firstRow) showDetail(firstRow.dataset.id);
+    else showDetail('placeholder');
+  }
+  document.querySelectorAll('.sb-sub').forEach(b => b.addEventListener('click', () => showSub(b.dataset.sub)));
+
+  // Row → detail panel
+  const details = document.querySelectorAll('.dp-card');
+  function showDetail(id) {
+    let found = false;
+    details.forEach(d => {
+      if (d.dataset.detail === id) { d.hidden = false; found = true; }
+      else { d.hidden = true; }
+    });
+    if (!found) {
+      const ph = document.querySelector('.dp-card[data-detail="placeholder"]');
+      if (ph) ph.hidden = false;
+    }
+  }
+  document.querySelectorAll('[data-id]').forEach(row => {
+    row.addEventListener('click', e => {
+      if (e.target.closest('button, .switch')) return;
+      const panel = row.closest('.sub-panel');
+      if (panel) panel.querySelectorAll('.lr-row.active, .cfg-row.active').forEach(x => x.classList.remove('active'));
+      row.classList.add('active');
+      showDetail(row.dataset.id);
+    });
+  });
+
+  // Switches
+  document.querySelectorAll('[data-switch]').forEach(s => {
+    s.addEventListener('click', e => { e.stopPropagation(); s.classList.toggle('off'); });
+  });
+</script>
+</body>
+</html>
