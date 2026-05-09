@@ -24,6 +24,8 @@ export async function getUserContext() {
             select: { id: true, name: true, slug: true, logoUrl: true, primaryColor: true, status: true, category: true },
           },
         },
+        // SHK-077: also pull `role` so the switcher can render the
+        // user's role pill alongside each marketplace.
       },
       ownedMarketplaces: {
         where: { status: { in: ["ACTIVE", "DRAFT"] } },
@@ -48,11 +50,22 @@ export async function getUserContext() {
   // Tag each marketplace with isOwner so the Navbar switcher can route
   // owner-owned entries into /owner/<slug> and member-only entries into
   // /m/<slug> (SHK-051).
-  const owned = user.ownedMarketplaces.map((m) => ({ ...m, isOwner: true, isFavorite: favIds.has(m.id) }));
+  const owned = user.ownedMarketplaces.map((m) => ({
+    ...m,
+    isOwner: true,
+    isFavorite: favIds.has(m.id),
+    // SHK-077: surface the role for switcher pills. Owners' Membership
+    // record is auto-created with role=OWNER but we don't read it here.
+    role: "OWNER" as const,
+  }));
   const memberships = user.memberships
-    .map((m) => m.marketplace)
-    .filter((mp) => !ownedIds.has(mp.id) && mp.status === "ACTIVE")
-    .map((m) => ({ ...m, isOwner: false, isFavorite: favIds.has(m.id) }))
+    .filter((m) => !ownedIds.has(m.marketplace.id) && m.marketplace.status === "ACTIVE")
+    .map((m) => ({
+      ...m.marketplace,
+      isOwner: false,
+      isFavorite: favIds.has(m.marketplace.id),
+      role: m.role,
+    }))
     .sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite));
 
   return { user, memberships, owned, favoriteIds: favIds };

@@ -9,6 +9,52 @@ test.describe("May 2026 batch", () => {
     await request.post("/api/e2e-reset");
   });
 
+  // SHK-076 — favorited marketplaces should be visually marked. Show a
+  // star indicator on the home Your-Marketplaces chip and on the navbar
+  // switcher row.
+  test("SHK-076: favorited marketplaces show a star on /home and in the switcher", async ({
+    page,
+  }) => {
+    await signIn(page, "member@shouks.test", "Test123!@#");
+    // Make sure ferrari-frenzy is favorited regardless of prior state.
+    await page.request.post("/api/marketplaces/ferrari-frenzy/favorite");
+    try {
+      await page.goto("/home?stay=1");
+      const chip = page.getByTestId("marketplace-chip-ferrari-frenzy");
+      await expect(chip).toBeVisible();
+      await expect(chip.getByTestId("favorite-star")).toBeVisible();
+
+      await page.getByTestId("marketplace-switcher").click();
+      const menu = page.getByRole("menu");
+      await expect(menu).toBeVisible();
+      const switcherRow = menu
+        .getByRole("menuitem")
+        .filter({ hasText: /ferrari frenzy/i })
+        .first();
+      await expect(switcherRow.getByTestId("favorite-star")).toBeVisible();
+    } finally {
+      await page.request.delete("/api/marketplaces/ferrari-frenzy/favorite");
+    }
+  });
+
+  // SHK-077 — In the marketplace switcher each row should call out the
+  // current user's role (Owner / Admin / Member).
+  test("SHK-077: marketplace switcher shows the user's role on each row", async ({
+    page,
+  }) => {
+    await signIn(page, "owner@shouks.test", "Test123!@#");
+    await page.goto("/home?stay=1");
+    await page.getByTestId("marketplace-switcher").click();
+    const menu = page.getByRole("menu");
+    await expect(menu).toBeVisible();
+    const row = menu
+      .getByRole("menuitem")
+      .filter({ hasText: /ferrari frenzy/i })
+      .first();
+    await expect(row.getByTestId("role-pill")).toBeVisible();
+    await expect(row.getByTestId("role-pill")).toHaveText(/owner/i);
+  });
+
   // SHK-072 / SHK-078 — Recently viewed disappeared from /home for users
   // on the sectioned_dashboard flag. The legacy dashboard branch still
   // rendered <RecentlyViewedSection />, but the new branch returned

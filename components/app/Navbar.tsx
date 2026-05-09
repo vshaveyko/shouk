@@ -22,6 +22,14 @@ type Marketplace = {
    * member-facing /m/<slug> (SHK-051).
    */
   isOwner?: boolean;
+  /** SHK-076: favorited marketplaces show a star in the switcher. */
+  isFavorite?: boolean;
+  /**
+   * SHK-077: role pill ("Owner" / "Admin" / "Member") shown alongside the
+   * marketplace name in the switcher. Optional so legacy callers that
+   * don't pass it still render.
+   */
+  role?: "OWNER" | "ADMIN" | "MODERATOR" | "MEMBER";
 };
 
 const navbarCss = `
@@ -256,26 +264,55 @@ function MarketplaceSwitcher({
               {i18n.t('...app.navbar.youHaventJoinedAnyMarketplaces')}
             </div>
           ) : (
-            marketplaces.map((m) => (
-              <DropdownMenu.Item key={m.id} asChild>
-                <Link
-                  href={`/m/${m.slug}/feed`}
-                  className="flex items-center gap-2 px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[14px]"
-                >
-                  <span
-                    className="w-6 h-6 rounded-[6px] grid place-items-center text-white font-semibold text-[11px] overflow-hidden"
-                    style={{ background: m.primaryColor ?? "var(--blue)" }}
+            marketplaces.map((m) => {
+              const role = m.role ?? (m.isOwner ? "OWNER" : "MEMBER");
+              const roleLabel =
+                role === "OWNER"
+                  ? "Owner"
+                  : role === "ADMIN"
+                    ? "Admin"
+                    : role === "MODERATOR"
+                      ? "Mod"
+                      : "Member";
+              return (
+                <DropdownMenu.Item key={m.id} asChild>
+                  <Link
+                    href={`/m/${m.slug}/feed`}
+                    className="flex items-center gap-2 px-2.5 py-2 rounded-[6px] hover:bg-hover outline-none text-[14px]"
                   >
-                    {m.logoUrl ? (
-                      <img src={m.logoUrl} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      m.name[0]
+                    <span
+                      className="relative w-6 h-6 rounded-[6px] grid place-items-center text-white font-semibold text-[11px] overflow-hidden"
+                      style={{ background: m.primaryColor ?? "var(--blue)" }}
+                    >
+                      {m.logoUrl ? (
+                        <img src={m.logoUrl} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        m.name[0]
+                      )}
+                    </span>
+                    {/* SHK-076: star indicator for favorited marketplaces. */}
+                    {m.isFavorite && (
+                      <span
+                        data-testid="favorite-star"
+                        aria-label="Favorited"
+                        className="text-[12px] leading-none"
+                        style={{ color: "#f5b400" }}
+                      >
+                        ★
+                      </span>
                     )}
-                  </span>
-                  <span className="flex-1 truncate">{m.name}</span>
-                </Link>
-              </DropdownMenu.Item>
-            ))
+                    <span className="flex-1 truncate">{m.name}</span>
+                    {/* SHK-077: role pill on the right side of each row. */}
+                    <span
+                      data-testid="role-pill"
+                      className="text-[10px] uppercase tracking-[0.06em] font-semibold px-1.5 py-0.5 rounded-[4px] bg-bg-soft text-muted"
+                    >
+                      {roleLabel}
+                    </span>
+                  </Link>
+                </DropdownMenu.Item>
+              );
+            })
           )}
           <DropdownMenu.Separator className="h-px bg-line-soft my-1" />
           <DropdownMenu.Item asChild>

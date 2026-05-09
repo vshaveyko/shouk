@@ -57,6 +57,7 @@ const dashCss = `
 .mp-chip.favorited { border-color: var(--blue); box-shadow: inset 3px 0 0 var(--blue); }
 .mp-chip .mp-thumb { width: 56px; height: 56px; border-radius: 10px; flex: none; position: relative; overflow: hidden; display: grid; place-items: center; color: #fff; font-size: 18px; font-weight: 600; }
 .mp-chip .mp-thumb::after { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(0,0,0,0.2)); pointer-events: none; }
+.mp-chip .mp-fav-star { position: absolute; top: 4px; left: 4px; z-index: 1; width: 16px; height: 16px; display: grid; place-items: center; font-size: 11px; line-height: 1; color: #f5b400; text-shadow: 0 0 2px rgba(0,0,0,0.45); pointer-events: none; }
 .mp-chip .mp-meta { min-width: 0; flex: 1; }
 .mp-chip .mp-meta .n { font-size: 13.5px; font-weight: 600; letter-spacing: -0.005em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mp-chip .mp-meta .c { font-size: 11.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -400,6 +401,16 @@ export default async function HomeDashboard(
                       }}
                     >
                       {!m.logoUrl && m.name[0]}
+                      {/* SHK-076: top-left star marks favorited marketplaces. */}
+                      {favorited && (
+                        <span
+                          className="mp-fav-star"
+                          data-testid="favorite-star"
+                          aria-label="Favorited"
+                        >
+                          ★
+                        </span>
+                      )}
                     </span>
                     <div className="mp-meta">
                       <div className="n">{m.name}</div>
