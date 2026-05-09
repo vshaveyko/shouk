@@ -262,7 +262,9 @@ export function RulesForm({
                 </CardDescription>
               </div>
               <Badge>
-                {questions.length} question{questions.length === 1 ? "" : "s"}
+                {questions.length === 1
+                  ? i18n.t('...rules.rulesForm.questionCount', { length: questions.length })
+                  : i18n.t('...rules.rulesForm.questionCountPlural', { length: questions.length })}
               </Badge>
             </div>
           </CardHeader>

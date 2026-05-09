@@ -152,7 +152,7 @@ export function NotificationBell({ initialCount = 0 }: { initialCount?: number }
             <div className="text-[14px] font-semibold">{i18n.t('...app.notificationBell.notificationsAria-label')}</div>
             {count > 0 && (
               <span className="inline-flex items-center h-5 px-2 rounded-full bg-blue-soft text-blue-ink text-[11px] font-semibold">
-                {count} unread
+                {i18n.t('...app.notificationBell.countUnread', { count })}
               </span>
             )}
           </div>

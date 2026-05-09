@@ -130,7 +130,7 @@ export function StatusBanner({ slug, status, reviewerNote, rejectionReason }: Pr
           <div className="space-y-1">
             <h2 className="text-[20px] tracking-[-0.02em]">
               {i18n.t('...[slug].statusBanner.yourReviewerAskedForA')}{" "}
-              <em className="serif italic text-blue-ink">follow-up</em>.
+              <em className="serif italic text-blue-ink">{i18n.t('...[slug].statusBanner.followUp')}</em>.
             </h2>
             <p className="text-[13px] text-muted">
               {i18n.t('...[slug].statusBanner.yourApplicationIsOnHold')}

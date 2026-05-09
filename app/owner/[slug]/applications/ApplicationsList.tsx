@@ -129,7 +129,7 @@ export function ApplicationsList({
             fontSize: 12,
           }}
         >
-          <span style={{ fontWeight: 600 }}>{selectedIds.size} selected</span>
+          <span style={{ fontWeight: 600 }}>{i18n.t('...applications.applicationsList.sizeSelected', { size: selectedIds.size })}</span>
           <div style={{ display: "flex", gap: 6 }}>
             <button
               type="button"
@@ -210,7 +210,7 @@ export function ApplicationsList({
                     </svg>
                   )}
                   {verifiedCount}
-                  {totalRequiredVerifications > 0 ? `/${totalRequiredVerifications}` : ""} verified
+                  {totalRequiredVerifications > 0 ? `/${totalRequiredVerifications}` : ""} {i18n.t('...applications.applicationsList.verified')}
                 </span>
                 {r.subtitle && <span className="verif-pill">{r.subtitle}</span>}
               </div>
@@ -248,8 +248,9 @@ export function ApplicationsList({
               {bulk === "APPROVE" ? i18n.t('...applications.applicationsList.approveSelected') : i18n.t('...applications.applicationsList.rejectSelected')}
             </h2>
             <div style={{ fontSize: 13, color: "var(--ink-soft)", marginBottom: 12 }}>
-              {i18n.t('...applications.applicationsList.applyThisDecisionTo')} <b>{selectedIds.size}</b> application
-              {selectedIds.size === 1 ? "" : "s"}.
+              {i18n.t('...applications.applicationsList.applyThisDecisionTo')} <b>{selectedIds.size}</b> {selectedIds.size === 1
+                ? i18n.t('...applications.applicationsList.application')
+                : i18n.t('...applications.applicationsList.applicationPlural')}.
             </div>
             {bulk === "REJECT" && (
               <div style={{ marginBottom: 12 }}>

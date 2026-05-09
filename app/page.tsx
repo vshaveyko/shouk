@@ -76,7 +76,7 @@ export default async function LandingPage() {
           </span>
           <h1 className="text-[clamp(40px,6.2vw,72px)] font-semibold leading-[1.02] tracking-[-0.035em] mb-5">
             {i18n.t('...app.page.whereCommunities')}<br />
-            {i18n.t('...app.page.runTheir')} <span className="serif italic text-blue inline-block px-0.5">own markets.</span>
+            {i18n.t('...app.page.runTheir')} <span className="serif italic text-blue inline-block px-0.5">{i18n.t('...app.page.ownMarkets')}</span>
           </h1>
           <div className="mb-7" aria-hidden />
           <div className="inline-flex gap-2.5 flex-wrap justify-center">
@@ -220,7 +220,7 @@ export default async function LandingPage() {
                   <Link key={m.slug} href={`/m/${m.slug}`} className="bg-surface border border-line rounded-xl overflow-hidden transition hover:-translate-y-0.5 hover:shadow">
                     <div className="relative h-[132px]" style={{ background: m.gradient }}>
                       <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 40%, rgba(0,0,0,.45) 100%)" }} />
-                      <div className="absolute top-3 left-3 mono text-[10px] tracking-[0.08em] uppercase text-white/60">&lt;-- {m.label} --&gt;</div>
+                      <div className="absolute top-3 left-3 mono text-[10px] tracking-[0.08em] uppercase text-white/60">{i18n.t('...app.page.labelFraming', { label: m.label })}</div>
                       <div className="absolute bottom-3 left-3.5 right-3.5 text-white font-semibold text-[16px] tracking-[-0.015em]">{m.name}</div>
                     </div>
                     <div className="p-4 flex flex-col gap-2.5">
@@ -229,8 +229,8 @@ export default async function LandingPage() {
                         <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-blue-soft text-blue-ink">{m.entry}</span>
                       </div>
                       <div className="flex gap-3.5 text-[12px] text-muted">
-                        <span>{m.members} members</span>
-                        <span>{m.listings} listings</span>
+                        <span>{i18n.t('...app.page.membersCount', { members: m.members })}</span>
+                        <span>{i18n.t('...app.page.listingsCount', { listings: m.listings })}</span>
                       </div>
                     </div>
                   </Link>
@@ -249,8 +249,8 @@ export default async function LandingPage() {
                     <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-blue-soft text-blue-ink capitalize">{m.entryMethod.toLowerCase()}</span>
                   </div>
                   <div className="flex gap-3.5 text-[12px] text-muted">
-                    <span>{m._count.memberships} members</span>
-                    <span>{m._count.listings} listings</span>
+                    <span>{i18n.t('...app.page.membersCount', { members: m._count.memberships })}</span>
+                    <span>{i18n.t('...app.page.listingsCount', { listings: m._count.listings })}</span>
                   </div>
                 </div>
               </Link>
@@ -258,7 +258,7 @@ export default async function LandingPage() {
 
             <Link href="/owner/create" className="grid place-items-center bg-surface border border-dashed border-[oklch(0.85_0.008_240)] rounded-xl min-h-[228px] text-center p-5">
               <div>
-                <div className="mono text-[11px] uppercase tracking-[0.12em] text-muted mb-2">{i18n.t('...app.page.yourCommunity')}--&gt;</div>
+                <div className="mono text-[11px] uppercase tracking-[0.12em] text-muted mb-2">{i18n.t('...app.page.yourCommunity')}</div>
                 <div className="text-[13px] text-ink-soft max-w-[200px] mb-4">{i18n.t('...app.page.thisCouldBeYourWatch')}</div>
                 <Button variant="secondary">{i18n.t('...app.page.startOne')}</Button>
               </div>

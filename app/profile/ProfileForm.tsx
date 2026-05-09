@@ -93,7 +93,7 @@ export function ProfileForm({
             />
           </div>
           <div>
-            <Label htmlFor="bio">Bio</Label>
+            <Label htmlFor="bio">{i18n.t('...profile.profileForm.bio')}</Label>
             <Textarea
               id="bio"
               value={bio}
@@ -102,7 +102,7 @@ export function ProfileForm({
               maxLength={500}
               data-testid="bio-input"
             />
-            <Help>{bio.length}/500 characters</Help>
+            <Help>{i18n.t('...profile.profileForm.length500Characters', { length: bio.length })}</Help>
           </div>
           {error && (
             <div className="rounded-[10px] border border-danger/30 bg-danger-soft p-2.5 text-[13px] text-danger">
@@ -125,7 +125,7 @@ export function ProfileForm({
             <div className="text-[15px] text-ink">{savedDisplayName || "—"}</div>
           </div>
           <div className="pt-1">
-            <div className="text-[11px] mono uppercase tracking-[0.12em] text-muted mb-0.5">Bio</div>
+            <div className="text-[11px] mono uppercase tracking-[0.12em] text-muted mb-0.5">{i18n.t('...profile.profileForm.bio')}</div>
             {savedBio ? (
               <p className="text-[14px] text-ink-soft leading-[1.6] whitespace-pre-line" data-testid="bio-display">
                 {savedBio}

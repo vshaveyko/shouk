@@ -174,7 +174,7 @@ export async function ApplicationDetail({
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <span style={{ color: "var(--muted)" }}>{i18n.t('common.verifiedAccounts')}</span>
-                <span style={{ fontWeight: 500 }}>{user.verifiedAccounts.length} linked</span>
+                <span style={{ fontWeight: 500 }}>{i18n.t('...[appId].applicationDetail.lengthLinked', { length: user.verifiedAccounts.length })}</span>
               </div>
             </div>
           </div>

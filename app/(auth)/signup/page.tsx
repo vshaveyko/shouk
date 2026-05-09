@@ -19,7 +19,7 @@ export default function SignUpPage() {
       <div className="w-full max-w-[440px]">
         <div className="bg-surface border border-line rounded-[14px] shadow p-8">
           <h1 className="text-[28px] font-semibold tracking-[-0.02em] mb-1.5">
-            {i18n.t('...signup.page.createYour')} <span className="serif italic text-blue">account</span>
+            {i18n.t('...signup.page.createYour')} <span className="serif italic text-blue">{i18n.t('...signup.page.account')}</span>
           </h1>
           <p className="text-[14px] text-ink-soft mb-7">
             {i18n.t('...signup.page.oneAccountForEveryMarketplace')}

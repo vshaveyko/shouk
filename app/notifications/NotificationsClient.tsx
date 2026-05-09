@@ -191,7 +191,7 @@ export function NotificationsClient({
           <h1 className="text-[20px] font-semibold">{i18n.t('common.notifications')}</h1>
           {unreadCount > 0 && (
             <span className="inline-flex items-center h-[22px] px-2 rounded-full bg-blue-soft text-blue-ink text-[12px] font-semibold">
-              {unreadCount} unread
+              {i18n.t('...notifications.notificationsClient.unreadCountUnread', { unreadCount })}
             </span>
           )}
         </div>
@@ -214,7 +214,7 @@ export function NotificationsClient({
         <TabButton label={i18n.t('common.all')} count={counts.all} active={tab === "all"} onClick={() => setTab("all")} testId="tab-all" />
         <TabButton label={i18n.t('...notifications.notificationsClient.mentions')} count={counts.mentions} active={tab === "mentions"} onClick={() => setTab("mentions")} testId="tab-mentions" />
         <TabButton label={i18n.t('...notifications.notificationsClient.sales')} count={counts.sales} active={tab === "sales"} onClick={() => setTab("sales")} testId="tab-sales" />
-        <TabButton label="ISO" count={counts.iso} active={tab === "iso"} onClick={() => setTab("iso")} testId="tab-iso" />
+        <TabButton label={i18n.t('...notifications.notificationsClient.iso')} count={counts.iso} active={tab === "iso"} onClick={() => setTab("iso")} testId="tab-iso" />
       </div>
 
       <div data-testid="notifications-list">

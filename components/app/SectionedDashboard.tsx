@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import { i18n } from "@shipeasy/sdk/client";
 import type { DashboardData, DashboardListingRow } from "@/lib/dashboard";
 
 /**
@@ -367,12 +368,12 @@ function ListingRowEl({ row, type }: { row: DashboardListingRow; type: "active" 
           : `Posted ${shortAgo(row.publishedAt ?? row.createdAt)}`;
   const pill =
     type === "draft"
-      ? <span className="pill-state draft">Draft</span>
+      ? <span className="pill-state draft">{i18n.t('...app.sectionedDashboard.draft')}</span>
       : type === "sold"
         ? row.status === "RESERVE_NOT_MET"
-          ? <span className="pill-state ended">Ended</span>
-          : <span className="pill-state sold">Sold</span>
-        : <span className="pill-state live">● Live</span>;
+          ? <span className="pill-state ended">{i18n.t('...app.sectionedDashboard.ended')}</span>
+          : <span className="pill-state sold">{i18n.t('...app.sectionedDashboard.sold')}</span>
+        : <span className="pill-state live">{i18n.t('...app.sectionedDashboard.liveStatus')}</span>;
   return (
     <Link href={`/l/${row.id}`} className="lr-row" data-id={row.id}>
       <div className="th" style={{ background: thumbBg(row.marketplaceColor, row.cover) }} />
@@ -500,8 +501,8 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
       <style dangerouslySetInnerHTML={{ __html: css }} />
       <div className="sd-browser">
         <div className="ah">
-          <h1>Dashboard</h1>
-          <div className="sub">Everything you&apos;re selling, buying, asking for, or tracking — organized by what you&apos;re doing.</div>
+          <h1>{i18n.t('...app.sectionedDashboard.dashboard')}</h1>
+          <div className="sub">{i18n.t('...app.sectionedDashboard.dashboardSub')}</div>
         </div>
 
         <div className="body">
@@ -509,22 +510,22 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
           <nav className="sb">
             <div className="sb-section active" data-section="listings">
               <div className="sb-head active">
-                <span className="l">{ICON_LIST}Listings</span>
+                <span className="l">{ICON_LIST}{i18n.t('common.listings')}</span>
                 <span className="r">
                   <span className="ct">{listings.counts.total}</span>
                   {ICON_CARET}
                 </span>
               </div>
               <div className="sb-subs">
-                <div className="sb-sub active" data-sub="listings-active">Active <span className="ct-mini">{listings.counts.active}</span></div>
-                <div className="sb-sub" data-sub="listings-drafts">Drafts <span className="ct-mini">{listings.counts.drafts}</span></div>
-                <div className="sb-sub" data-sub="listings-sold">Sold <span className="ct-mini">{listings.counts.sold}</span></div>
+                <div className="sb-sub active" data-sub="listings-active">{i18n.t('common.active')} <span className="ct-mini">{listings.counts.active}</span></div>
+                <div className="sb-sub" data-sub="listings-drafts">{i18n.t('...app.sectionedDashboard.drafts')} <span className="ct-mini">{listings.counts.drafts}</span></div>
+                <div className="sb-sub" data-sub="listings-sold">{i18n.t('...app.sectionedDashboard.sold')} <span className="ct-mini">{listings.counts.sold}</span></div>
               </div>
             </div>
 
             <div className="sb-section" data-section="iso">
               <div className="sb-head">
-                <span className="l">{ICON_SEARCH}ISO</span>
+                <span className="l">{ICON_SEARCH}{i18n.t('...app.sectionedDashboard.iso')}</span>
                 <span className="r">
                   <span className="ct">{iso.counts.total}</span>
                   {iso.counts.newMatches > 0 && <span className="new-dot" />}
@@ -532,15 +533,15 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
                 </span>
               </div>
               <div className="sb-subs">
-                <div className="sb-sub" data-sub="iso-open">Open <span className="ct-mini">{iso.counts.open}</span></div>
-                <div className="sb-sub" data-sub="iso-matches">Matches <span className="ct-mini">{iso.counts.matches}</span>{iso.counts.newMatches > 0 && <span className="new-dot" />}</div>
-                <div className="sb-sub" data-sub="iso-closed">Closed <span className="ct-mini">{iso.counts.closed}</span></div>
+                <div className="sb-sub" data-sub="iso-open">{i18n.t('common.open')} <span className="ct-mini">{iso.counts.open}</span></div>
+                <div className="sb-sub" data-sub="iso-matches">{i18n.t('...app.sectionedDashboard.matches')} <span className="ct-mini">{iso.counts.matches}</span>{iso.counts.newMatches > 0 && <span className="new-dot" />}</div>
+                <div className="sb-sub" data-sub="iso-closed">{i18n.t('common.closed')} <span className="ct-mini">{iso.counts.closed}</span></div>
               </div>
             </div>
 
             <div className="sb-section" data-section="alerts">
               <div className="sb-head">
-                <span className="l">{ICON_BELL}Alerts</span>
+                <span className="l">{ICON_BELL}{i18n.t('common.alerts')}</span>
                 <span className="r">
                   <span className="ct">{alerts.counts.total}</span>
                   {alerts.counts.newMatches > 0 && <span className="new-dot" />}
@@ -548,20 +549,20 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
                 </span>
               </div>
               <div className="sb-subs">
-                <div className="sb-sub" data-sub="alerts-active">Active <span className="ct-mini">{alerts.counts.active}</span></div>
-                <div className="sb-sub" data-sub="alerts-matches">Matches <span className="ct-mini">{alerts.counts.matches}</span>{alerts.counts.newMatches > 0 && <span className="new-dot" />}</div>
+                <div className="sb-sub" data-sub="alerts-active">{i18n.t('common.active')} <span className="ct-mini">{alerts.counts.active}</span></div>
+                <div className="sb-sub" data-sub="alerts-matches">{i18n.t('...app.sectionedDashboard.matches')} <span className="ct-mini">{alerts.counts.matches}</span>{alerts.counts.newMatches > 0 && <span className="new-dot" />}</div>
               </div>
             </div>
 
             <div className="sb-section sb-section-spaced" data-section="purchases">
               <div className="sb-head">
-                <span className="l">{ICON_BAG}Purchases</span>
+                <span className="l">{ICON_BAG}{i18n.t('...app.sectionedDashboard.purchases')}</span>
                 <span className="ct">{purchases.counts.total}</span>
               </div>
             </div>
 
             <div className="sb-foot">
-              Sections group by role: <b>Listings</b> = selling, <b>Purchases</b> = buying, <b>ISO</b> = sourcing, <b>Alerts</b> = monitoring.
+              {i18n.t('...app.sectionedDashboard.sectionsGroupByRole')} <b>{i18n.t('common.listings')}</b> {i18n.t('...app.sectionedDashboard.equalsSelling')} <b>{i18n.t('...app.sectionedDashboard.purchases')}</b> {i18n.t('...app.sectionedDashboard.equalsBuying')} <b>{i18n.t('...app.sectionedDashboard.iso')}</b> {i18n.t('...app.sectionedDashboard.equalsSourcing')} <b>{i18n.t('common.alerts')}</b> {i18n.t('...app.sectionedDashboard.equalsMonitoring')}
             </div>
           </nav>
 
@@ -571,23 +572,23 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
             <div className="section-panel active" data-section-panel="listings">
               <div className="lp-head">
                 <div>
-                  <div className="lp-title">Listings</div>
-                  <div className="lp-sub">Things you&apos;re selling across your marketplaces.</div>
+                  <div className="lp-title">{i18n.t('common.listings')}</div>
+                  <div className="lp-sub">{i18n.t('...app.sectionedDashboard.listingsPanelSub')}</div>
                 </div>
-                <div className="lp-act"><Link href="/explore" className="chip-btn on">+ New listing</Link></div>
+                <div className="lp-act"><Link href="/explore" className="chip-btn on">{i18n.t('...app.sectionedDashboard.newListing')}</Link></div>
               </div>
 
               <div className="sub-panel active" data-sub-panel="listings-active">
                 {listings.active.length === 0 ? (
                   <EmptyState
                     art={ART_LISTINGS}
-                    title="No live listings"
+                    title={i18n.t('...app.sectionedDashboard.noLiveListings')}
                     sub="Once you publish something, it shows up here with bids, watchers, and views in one glance."
                     cta={{ href: "/explore", label: "Create your first listing" }}
                   />
                 ) : (
                   <>
-                    <div className="privacy-banner">{ICON_INFO}Public — visible to everyone in each listing&apos;s marketplace.</div>
+                    <div className="privacy-banner">{ICON_INFO}{i18n.t('...app.sectionedDashboard.publicVisibleToEveryoneInMarketplace')}</div>
                     <div className="lr-list">
                       {listings.active.map((row, i) => (
                         <div key={row.id} className={`lr-row${i === 0 ? " active" : ""}`} data-id={row.id}>
@@ -604,7 +605,7 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
                           <div className="right">
                             <div className="price">{fmtMoneyLong(row.priceCents ?? null)}</div>
                             <div className="meta-r">
-                              <span className="pill-state live">● Live</span>
+                              <span className="pill-state live">{i18n.t('...app.sectionedDashboard.liveStatus')}</span>
                               {row.type === "AUCTION" && row.auctionEndsAt && ` · ${endsIn(row.auctionEndsAt)}`}
                             </div>
                           </div>
@@ -619,12 +620,12 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
                 {listings.drafts.length === 0 ? (
                   <EmptyState
                     art={ART_DRAFTS}
-                    title="No drafts"
+                    title={i18n.t('...app.sectionedDashboard.noDrafts')}
                     sub="Drafts auto-save here as you build a listing — you can come back any time and finish."
                   />
                 ) : (
                   <>
-                    <div className="privacy-banner">{ICON_LOCK}Private — drafts are only visible to you until published.</div>
+                    <div className="privacy-banner">{ICON_LOCK}{i18n.t('...app.sectionedDashboard.privateDraftsOnlyVisibleToYou')}</div>
                     <div className="lr-list">
                       {listings.drafts.map((r) => <ListingRowEl key={r.id} row={r} type="draft" />)}
                     </div>
@@ -636,12 +637,12 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
                 {listings.sold.length === 0 ? (
                   <EmptyState
                     art={ART_SOLD}
-                    title="Nothing sold yet"
+                    title={i18n.t('...app.sectionedDashboard.nothingSoldYet')}
                     sub="Your sales history will live here. Buyers can see your sold record on your profile."
                   />
                 ) : (
                   <>
-                    <div className="privacy-banner">{ICON_INFO}Public history — buyers can see your sold record on your profile.</div>
+                    <div className="privacy-banner">{ICON_INFO}{i18n.t('...app.sectionedDashboard.publicHistoryBuyersSeeSoldRecord')}</div>
                     <div className="lr-list">
                       {listings.sold.map((r) => <ListingRowEl key={r.id} row={r} type="sold" />)}
                     </div>
@@ -654,14 +655,14 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
             <div className="section-panel" data-section-panel="purchases">
               <div className="lp-head">
                 <div>
-                  <div className="lp-title">Purchases</div>
-                  <div className="lp-sub">Things you&apos;ve bought across your marketplaces.</div>
+                  <div className="lp-title">{i18n.t('...app.sectionedDashboard.purchases')}</div>
+                  <div className="lp-sub">{i18n.t('...app.sectionedDashboard.purchasesPanelSub')}</div>
                 </div>
               </div>
               <div className="sub-panel active">
                 <EmptyState
                   art={ART_PURCHASES}
-                  title="No purchases yet"
+                  title={i18n.t('...app.sectionedDashboard.noPurchasesYet')}
                   sub="Once you buy something, it shows up here with the receipt, delivery status, and seller record."
                   cta={{ href: "/explore", label: "Browse marketplaces" }}
                 />
@@ -672,35 +673,35 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
             <div className="section-panel" data-section-panel="iso">
               <div className="lp-head">
                 <div>
-                  <div className="lp-title">In Search Of</div>
-                  <div className="lp-sub">Public requests posted to marketplaces — sellers can reply.</div>
+                  <div className="lp-title">{i18n.t('...app.sectionedDashboard.inSearchOf')}</div>
+                  <div className="lp-sub">{i18n.t('...app.sectionedDashboard.isoPanelSub')}</div>
                 </div>
-                <div className="lp-act"><Link href="/explore" className="chip-btn on">+ Post a wanted</Link></div>
+                <div className="lp-act"><Link href="/explore" className="chip-btn on">{i18n.t('...app.sectionedDashboard.postAWanted')}</Link></div>
               </div>
 
               <div className="sub-panel active" data-sub-panel="iso-open">
                 {iso.open.length === 0 ? (
                   <EmptyState
                     art={ART_ISO_OPEN}
-                    title="No active wanted ads"
+                    title={i18n.t('...app.sectionedDashboard.noActiveWantedAds')}
                     sub="An ISO post is a public request to sellers in a marketplace. They reply when they have what you're looking for."
                     cta={{ href: "/explore", label: "Post a wanted" }}
                   />
                 ) : (
                   <>
-                    <div className="privacy-banner">{ICON_INFO}Public — visible to every seller in that marketplace.</div>
+                    <div className="privacy-banner">{ICON_INFO}{i18n.t('...app.sectionedDashboard.publicVisibleToEverySeller')}</div>
                     <div className="cfg-list">
                       {iso.open.map((row, i) => (
                         <div key={row.id} className={`cfg-row${i === 0 ? " active" : ""}`} data-id={row.id}>
                           <div>
-                            <div className="cr-t">{row.title} <span className="pill-state live" style={{ marginLeft: 6, verticalAlign: 1 }}>● Open</span></div>
-                            <div className="cr-q"><span className="chip-q">{row.marketplaceName}</span>{row.priceCents ? <span className="chip-q">Up to {fmtMoneyLong(row.priceCents)}</span> : null}</div>
+                            <div className="cr-t">{row.title} <span className="pill-state live" style={{ marginLeft: 6, verticalAlign: 1 }}>{i18n.t('...app.sectionedDashboard.openStatus')}</span></div>
+                            <div className="cr-q"><span className="chip-q">{row.marketplaceName}</span>{row.priceCents ? <span className="chip-q">{i18n.t('...app.sectionedDashboard.upTo')} {fmtMoneyLong(row.priceCents)}</span> : null}</div>
                             <div className="cr-meta">
                               <span>{row.watcherCount > 0 ? `${row.watcherCount} replies · ` : "0 replies yet · "}{row.views} views</span>
-                              <span>Posted {shortAgo(row.publishedAt ?? row.createdAt)}</span>
+                              <span>{i18n.t('...app.sectionedDashboard.posted')} {shortAgo(row.publishedAt ?? row.createdAt)}</span>
                             </div>
                           </div>
-                          <div className="cr-act"><Link href={`/l/${row.id}`} className="chip-btn" style={{ fontSize: 11, padding: "5px 9px" }}>Edit</Link></div>
+                          <div className="cr-act"><Link href={`/l/${row.id}`} className="chip-btn" style={{ fontSize: 11, padding: "5px 9px" }}>{i18n.t('common.edit')}</Link></div>
                         </div>
                       ))}
                     </div>
@@ -712,12 +713,12 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
                 {iso.matches.length === 0 ? (
                   <EmptyState
                     art={ART_ISO_MATCHES}
-                    title="No matches yet"
+                    title={i18n.t('...app.sectionedDashboard.noMatchesYet')}
                     sub="We'll notify you here when a seller responds to one of your wanted ads."
                   />
                 ) : (
                   <>
-                    <div className="privacy-banner">{ICON_INFO}Public — sellers see your wanted ad and reply.</div>
+                    <div className="privacy-banner">{ICON_INFO}{i18n.t('...app.sectionedDashboard.publicSellersSeeWantedAd')}</div>
                     {iso.matches.map((g, gi) => (
                       <div key={`${g.isoListingId}-${gi}`} className="match-group">
                         <div className="mg-head">
@@ -736,7 +737,7 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
                                 <div className="s">{m.preview ?? "—"} · {shortAgo(m.createdAt)}</div>
                               </div>
                               <div className="right">
-                                {m.unread ? <span className="pill-state new">● New</span> : <span className="meta-r" style={{ color: "var(--ink-soft)" }}>View →</span>}
+                                {m.unread ? <span className="pill-state new">{i18n.t('...app.sectionedDashboard.newStatus')}</span> : <span className="meta-r" style={{ color: "var(--ink-soft)" }}>{i18n.t('...app.sectionedDashboard.viewArrow')}</span>}
                               </div>
                             </div>
                           ))}
@@ -765,30 +766,30 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
             <div className="section-panel" data-section-panel="alerts">
               <div className="lp-head">
                 <div>
-                  <div className="lp-title">Alerts</div>
-                  <div className="lp-sub">Saved searches that ping you when something matches.</div>
+                  <div className="lp-title">{i18n.t('common.alerts')}</div>
+                  <div className="lp-sub">{i18n.t('...app.sectionedDashboard.alertsPanelSub')}</div>
                 </div>
-                <div className="lp-act"><Link href="/explore" className="chip-btn on">+ New alert</Link></div>
+                <div className="lp-act"><Link href="/explore" className="chip-btn on">{i18n.t('...app.sectionedDashboard.newAlert')}</Link></div>
               </div>
 
               <div className="sub-panel active" data-sub-panel="alerts-active">
                 {alerts.active.length === 0 ? (
                   <EmptyState
                     art={ART_ALERTS_ACTIVE}
-                    title="No saved searches"
+                    title={i18n.t('...app.sectionedDashboard.noSavedSearches')}
                     sub="Alerts run in the background and notify you the moment a new listing matches — instantly or as a daily digest."
                     cta={{ href: "/explore", label: "Create an alert" }}
                   />
                 ) : (
                   <>
-                    <div className="privacy-banner">{ICON_LOCK}Private — saved searches that run in the background.</div>
+                    <div className="privacy-banner">{ICON_LOCK}{i18n.t('...app.sectionedDashboard.privateSavedSearchesBackground')}</div>
                     <div className="cfg-list">
                       {alerts.active.map((s, i) => (
                         <div key={s.id} className={`cfg-row${i === 0 ? " active" : ""}`} data-id={s.id}>
                           <div>
                             <div className="cr-t">{s.name}</div>
                             <div className="cr-q"><span className="chip-q">{s.marketplaceName}</span></div>
-                            <div className="cr-meta"><span>Saved {shortAgo(s.createdAt)}</span><span>Notify: {s.frequency.toLowerCase()}</span></div>
+                            <div className="cr-meta"><span>{i18n.t('common.saved')} {shortAgo(s.createdAt)}</span><span>{i18n.t('...app.sectionedDashboard.notify')} {s.frequency.toLowerCase()}</span></div>
                           </div>
                         </div>
                       ))}
@@ -801,7 +802,7 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
                 {alerts.matches.length === 0 ? (
                   <EmptyState
                     art={ART_ALERTS_MATCHES}
-                    title="No new matches"
+                    title={i18n.t('...app.sectionedDashboard.noNewMatches')}
                     sub="New listings that match one of your saved searches will appear here as soon as they go live."
                   />
                 ) : (
@@ -822,7 +823,7 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
                               <div className="s">{m.preview ?? "—"} · {shortAgo(m.createdAt)}</div>
                             </div>
                             <div className="right">
-                              {m.unread ? <span className="pill-state new">● New</span> : <span className="meta-r" style={{ color: "var(--ink-soft)" }}>View →</span>}
+                              {m.unread ? <span className="pill-state new">{i18n.t('...app.sectionedDashboard.newStatus')}</span> : <span className="meta-r" style={{ color: "var(--ink-soft)" }}>{i18n.t('...app.sectionedDashboard.viewArrow')}</span>}
                             </div>
                           </div>
                         ))}
@@ -848,21 +849,21 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
                     </div>
                   </div>
                   <div className="dp-act">
-                    <Link href={`/l/${row.id}`} className="chip-btn">Open</Link>
+                    <Link href={`/l/${row.id}`} className="chip-btn">{i18n.t('common.open')}</Link>
                   </div>
                 </div>
                 <div className="dp-meta">
-                  <div className="m-stat"><div className="v">{row.bidCount}</div><div className="l">Bids</div></div>
+                  <div className="m-stat"><div className="v">{row.bidCount}</div><div className="l">{i18n.t('...app.sectionedDashboard.bids')}</div></div>
                   <div className="m-stat"><div className="v">{fmtMoney(row.priceCents)}</div><div className="l">{row.type === "AUCTION" ? "Top bid" : "Price"}</div></div>
-                  <div className="m-stat"><div className="v">{row.views}</div><div className="l">Views</div></div>
-                  <div className="m-stat"><div className="v">{row.watcherCount}</div><div className="l">Watchers</div></div>
+                  <div className="m-stat"><div className="v">{row.views}</div><div className="l">{i18n.t('...app.sectionedDashboard.views')}</div></div>
+                  <div className="m-stat"><div className="v">{row.watcherCount}</div><div className="l">{i18n.t('...app.sectionedDashboard.watchers')}</div></div>
                 </div>
-                <div className="dp-section-t" style={{ marginTop: 0 }}>Listing details</div>
+                <div className="dp-section-t" style={{ marginTop: 0 }}>{i18n.t('...app.sectionedDashboard.listingDetails')}</div>
                 <div className="criteria-grid">
-                  <div className="ck">Marketplace</div><div className="cv">{row.marketplaceName}</div>
-                  <div className="ck">Type</div><div className="cv">{row.type}</div>
-                  <div className="ck">Posted</div><div className="cv">{shortAgo(row.publishedAt ?? row.createdAt)}</div>
-                  <div className="ck">Status</div><div className="cv">{row.status}</div>
+                  <div className="ck">{i18n.t('...app.sectionedDashboard.marketplace')}</div><div className="cv">{row.marketplaceName}</div>
+                  <div className="ck">{i18n.t('...app.sectionedDashboard.type')}</div><div className="cv">{row.type}</div>
+                  <div className="ck">{i18n.t('...app.sectionedDashboard.posted')}</div><div className="cv">{shortAgo(row.publishedAt ?? row.createdAt)}</div>
+                  <div className="ck">{i18n.t('common.status')}</div><div className="cv">{row.status}</div>
                 </div>
               </div>
             ))}
@@ -876,13 +877,13 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
                     <div className="dp-s">{row.marketplaceName} · {row.status.toLowerCase()}</div>
                   </div>
                   <div className="dp-act">
-                    <Link href={`/l/${row.id}`} className="chip-btn">Open</Link>
+                    <Link href={`/l/${row.id}`} className="chip-btn">{i18n.t('common.open')}</Link>
                   </div>
                 </div>
                 <div className="dp-meta three">
                   <div className="m-stat"><div className="v">{fmtMoney(row.priceCents)}</div><div className="l">{row.status === "SOLD" ? "Sold for" : "Price"}</div></div>
-                  <div className="m-stat"><div className="v">{row.views}</div><div className="l">Views</div></div>
-                  <div className="m-stat"><div className="v">{row.bidCount}</div><div className="l">Bids</div></div>
+                  <div className="m-stat"><div className="v">{row.views}</div><div className="l">{i18n.t('...app.sectionedDashboard.views')}</div></div>
+                  <div className="m-stat"><div className="v">{row.bidCount}</div><div className="l">{i18n.t('...app.sectionedDashboard.bids')}</div></div>
                 </div>
               </div>
             ))}
@@ -893,11 +894,11 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
                 <div className="dp-head">
                   <div>
                     <div className="dp-t">{s.name}</div>
-                    <div className="dp-s">{s.marketplaceName} · saved {shortAgo(s.createdAt)}</div>
+                    <div className="dp-s">{i18n.t('...app.sectionedDashboard.marketplaceSaved', { marketplaceName: s.marketplaceName })} {shortAgo(s.createdAt)}</div>
                   </div>
                   <div className="dp-act"><span className="chip-btn">{s.frequency.toLowerCase()}</span></div>
                 </div>
-                <div className="dp-section-t" style={{ marginTop: 0 }}>Criteria</div>
+                <div className="dp-section-t" style={{ marginTop: 0 }}>{i18n.t('...app.sectionedDashboard.criteria')}</div>
                 <div className="criteria-grid">
                   {Object.entries(s.query).slice(0, 6).map(([k, v]) => (
                     <span key={k} style={{ display: "contents" }}>
@@ -915,10 +916,10 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
                 <div className="dp-head">
                   <div>
                     <div className="dp-t">{m.title}</div>
-                    <div className="dp-s">{m.marketplaceName} · ISO match · {shortAgo(m.createdAt)}</div>
+                    <div className="dp-s">{i18n.t('...app.sectionedDashboard.marketplaceIsoMatch', { marketplaceName: m.marketplaceName })} {shortAgo(m.createdAt)}</div>
                   </div>
                 </div>
-                <div className="dp-section-t" style={{ marginTop: 0 }}>Why it matched</div>
+                <div className="dp-section-t" style={{ marginTop: 0 }}>{i18n.t('...app.sectionedDashboard.whyItMatched')}</div>
                 <div className="activity-list"><div>● {m.preview ?? "Seller responded to your wanted ad."}</div></div>
               </div>
             ))}
@@ -927,13 +928,13 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
                 <div className="dp-head">
                   <div>
                     <div className="dp-t">{m.title}</div>
-                    <div className="dp-s">Alert match · {shortAgo(m.createdAt)}</div>
+                    <div className="dp-s">{i18n.t('...app.sectionedDashboard.alertMatch')} {shortAgo(m.createdAt)}</div>
                   </div>
-                  {m.deeplink && <div className="dp-act"><Link href={m.deeplink} className="chip-btn on">Open →</Link></div>}
+                  {m.deeplink && <div className="dp-act"><Link href={m.deeplink} className="chip-btn on">{i18n.t('...app.sectionedDashboard.openArrow')}</Link></div>}
                 </div>
                 {m.preview && (
                   <>
-                    <div className="dp-section-t" style={{ marginTop: 0 }}>Preview</div>
+                    <div className="dp-section-t" style={{ marginTop: 0 }}>{i18n.t('...app.sectionedDashboard.preview')}</div>
                     <div className="activity-list"><div>● {m.preview}</div></div>
                   </>
                 )}
@@ -949,7 +950,7 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
                   <line x1={42} y1={62} x2={70} y2={62} stroke="oklch(0.88 0.01 60)" strokeWidth={2} strokeLinecap="round" />
                   <line x1={42} y1={74} x2={66} y2={74} stroke="oklch(0.88 0.01 60)" strokeWidth={2} strokeLinecap="round" />
                 </svg>
-                <div className="es-sub">Select a row on the left to see its details here.</div>
+                <div className="es-sub">{i18n.t('...app.sectionedDashboard.selectRowToSeeDetails')}</div>
               </div>
             </div>
           </div>

@@ -673,7 +673,7 @@ function SchemaPreview({ fields, marketplaceName }: { fields: SchemaField[]; mar
           <circle cx="12" cy="12" r="3" />
           <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
         </svg>
-        {i18n.t('...create.createMarketplaceWizard.sellersCreatelistingForm')}g form
+        {i18n.t('...create.createMarketplaceWizard.sellersCreatelistingForm')}
       </div>
       <div className="pv-frame">
         <div className="pv-card">
@@ -808,7 +808,7 @@ function IdentityStep({
               onChange={(e) =>
                 setState((s) => ({ ...s, slug: e.target.value.toLowerCase(), slugTouched: true }))
               }
-              placeholder="riviera-watch-club"
+              placeholder={i18n.t('...create.createMarketplaceWizard.slugPlaceholder')}
               className="flex-1 h-[38px] px-3 bg-transparent text-[14px] outline-none"
               aria-invalid={!!errors.slug}
             />
@@ -847,7 +847,7 @@ function IdentityStep({
           {errors.description ? (
             <Help error>{errors.description}</Help>
           ) : (
-            <Help>{state.description.length}/500 characters.</Help>
+            <Help>{i18n.t('...create.createMarketplaceWizard.length500Characters', { length: state.description.length })}</Help>
           )}
         </div>
 
@@ -885,7 +885,7 @@ function IdentityStep({
                 data-testid="field-primary-color"
                 value={state.primaryColor}
                 onChange={(e) => setState((s) => ({ ...s, primaryColor: e.target.value }))}
-                placeholder="#4DB7E8"
+                placeholder={i18n.t('...create.createMarketplaceWizard.colorPlaceholder')}
                 maxLength={7}
                 aria-invalid={!!errors.primaryColor}
               />
@@ -999,7 +999,7 @@ function SchemaStep({
             </CardDescription>
           </div>
           <Badge>
-            {fields.length}/25 fields
+            {i18n.t('...create.createMarketplaceWizard.length25Fields', { length: fields.length })}
           </Badge>
         </div>
       </CardHeader>
@@ -1474,7 +1474,9 @@ function MembershipStep({
                   {i18n.t('...create.createMarketplaceWizard.whatDoApplicantsNeedTo')}
                 </CardDescription>
               </div>
-              <Badge>{state.applicationQuestions.length} question{state.applicationQuestions.length === 1 ? "" : "s"}</Badge>
+              <Badge>{state.applicationQuestions.length === 1
+                ? i18n.t('...create.createMarketplaceWizard.questionCount', { length: state.applicationQuestions.length })
+                : i18n.t('...create.createMarketplaceWizard.questionCountPlural', { length: state.applicationQuestions.length })}</Badge>
             </div>
           </CardHeader>
           <CardContent>
@@ -1676,7 +1678,7 @@ function MonetizationStep({
                     className="flex-1 h-[38px] px-3 bg-transparent text-[14px] outline-none"
                   />
                   <span className="inline-flex items-center px-3 text-[13px] text-muted bg-bg-panel border-l border-line select-none">
-                    /mo
+                    {i18n.t('...create.createMarketplaceWizard.perMonth')}
                   </span>
                 </div>
                 {errors.monthlyPrice && <Help error>{errors.monthlyPrice}</Help>}
@@ -1698,7 +1700,7 @@ function MonetizationStep({
                     className="flex-1 h-[38px] px-3 bg-transparent text-[14px] outline-none"
                   />
                   <span className="inline-flex items-center px-3 text-[13px] text-muted bg-bg-panel border-l border-line select-none">
-                    /yr
+                    {i18n.t('...create.createMarketplaceWizard.perYear')}
                   </span>
                 </div>
                 {errors.annualPrice && <Help error>{errors.annualPrice}</Help>}
@@ -1829,7 +1831,7 @@ function StickyFooter({
     <div className="fixed bottom-0 inset-x-0 z-30 border-t border-line bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/75">
       <div className="max-w-[1200px] mx-auto px-6 py-3 flex items-center gap-3">
         <div className="text-[12.5px] text-muted hidden sm:block">
-          {i18n.t('...create.createMarketplaceWizard.step')} {step} of {STEPS.length} — {STEPS[step - 1].title}
+          {i18n.t('...create.createMarketplaceWizard.stepXOfYTitle', { step, length: STEPS.length, title: STEPS[step - 1].title })}
         </div>
         <div className="ml-auto flex items-center gap-2">
           <Button

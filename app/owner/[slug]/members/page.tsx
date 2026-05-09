@@ -104,7 +104,9 @@ export default async function MembersDirectoryPage(
         <div className="page-head">
           <h1>{i18n.t('common.members')}</h1>
           <div className="lead">
-            {rows.length} member{rows.length === 1 ? "" : "s"} in {marketplace.name}{i18n.t('...members.page.filterSortAndChangeRoles')}
+            {rows.length === 1
+              ? i18n.t('...members.page.memberCount', { length: rows.length })
+              : i18n.t('...members.page.memberCountPlural', { length: rows.length })} in {marketplace.name}{i18n.t('...members.page.filterSortAndChangeRoles')}
           </div>
         </div>
 

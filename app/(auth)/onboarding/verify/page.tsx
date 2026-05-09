@@ -33,7 +33,7 @@ export default async function VerifyPage(
         <div className="text-center mb-8">
           <p className="text-[12px] tracking-[0.14em] uppercase text-blue-ink font-semibold mb-3">{i18n.t('...verify.page.step2')}</p>
           <h1 className="text-[32px] font-semibold tracking-[-0.03em] mb-3">
-            {i18n.t('...verify.page.verifyYour')} <span className="serif italic text-blue">identity</span>
+            {i18n.t('...verify.page.verifyYour')} <span className="serif italic text-blue">{i18n.t('...verify.page.identity')}</span>
           </h1>
           <p className="text-[15px] text-ink-soft max-w-[480px] mx-auto">
             {i18n.t('...verify.page.linkAccountsYouAlreadyUse')}

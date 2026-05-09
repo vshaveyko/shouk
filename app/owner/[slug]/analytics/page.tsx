@@ -308,7 +308,7 @@ export default async function AnalyticsPage(
         <div className="page-head">
           <div>
             <h1>
-              How <em>{marketplace.name}</em> {i18n.t('...analytics.page.isTrending')}
+              {i18n.t('...analytics.page.howIsTrendingPrefix')} <em>{marketplace.name}</em> {i18n.t('...analytics.page.isTrending')}
             </h1>
             <div className="lead">
               {i18n.t('...analytics.page.theLast30DaysMember')}
@@ -316,8 +316,8 @@ export default async function AnalyticsPage(
           </div>
           <div className="range-picker" role="tablist" aria-label={i18n.t('...analytics.page.timeRangeAria-label')}>
             <button type="button">7d</button>
-            <button type="button" className="on" aria-pressed="true">30d</button>
-            <button type="button">90d</button>
+            <button type="button" className="on" aria-pressed="true">{i18n.t('...analytics.page.30d')}</button>
+            <button type="button">{i18n.t('...analytics.page.90d')}</button>
             <button type="button">{i18n.t('common.all')}</button>
           </div>
         </div>
@@ -511,7 +511,7 @@ export default async function AnalyticsPage(
                     <div className="tr-body">
                       <div className="tr-name">{s.name}</div>
                       <div className="tr-meta">
-                        {s.sold} {i18n.t('...analytics.page.sold')} {s.active} active
+                        {s.sold} {i18n.t('...analytics.page.sold')} {i18n.t('...analytics.page.activeCount', { active: s.active })}
                       </div>
                     </div>
                     <div className="tr-val">{shortCurrency(s.gmvCents)}</div>

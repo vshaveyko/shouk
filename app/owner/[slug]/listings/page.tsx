@@ -224,7 +224,9 @@ export default async function ListingsModerationPage(
                             <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
                             <line x1="4" y1="22" x2="4" y2="15" />
                           </svg>
-                          {reportCount} report{reportCount === 1 ? "" : "s"}
+                          {reportCount === 1
+                            ? i18n.t('...listings.page.reportCount', { reportCount })
+                            : i18n.t('...listings.page.reportCountPlural', { reportCount })}
                         </span>
                       )}
                     </div>
@@ -240,7 +242,7 @@ export default async function ListingsModerationPage(
                       <div className="lc-specs">
                         <span className="lc-spec">{timeAgo(l.createdAt)}</span>
                         {l.type === "AUCTION" && <span className="lc-spec">{i18n.t('common.auction')}</span>}
-                        {l.type === "ISO" && <span className="lc-spec">ISO</span>}
+                        {l.type === "ISO" && <span className="lc-spec">{i18n.t('...listings.page.iso')}</span>}
                       </div>
                       <div className="lc-seller">
                         <div

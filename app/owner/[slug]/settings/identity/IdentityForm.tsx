@@ -250,7 +250,7 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
               maxLength={500}
               rows={4}
             />
-            <Help>{description.length}/500 characters.</Help>
+            <Help>{i18n.t('...identity.identityForm.length500Characters', { length: description.length })}</Help>
           </div>
 
           <div>
@@ -313,7 +313,7 @@ export function IdentityForm({ slug, initial }: { slug: string; initial: Initial
                 data-testid="identity-color"
                 value={primaryColor}
                 onChange={(e) => setPrimaryColor(e.target.value)}
-                placeholder="#4DB7E8"
+                placeholder={i18n.t('...identity.identityForm.colorPlaceholder')}
                 maxLength={7}
               />
               <input

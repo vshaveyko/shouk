@@ -316,14 +316,14 @@ export default async function MarketplaceLanding(props: { params: Promise<Params
               <span className="tabular-nums text-ink">
                 {mp._count.memberships.toLocaleString()}
               </span>{" "}
-              members
+              {i18n.t('...[slug].page.members')}
             </span>
             <span className="inline-flex items-center gap-1.5">
               <Package size={14} />
               <span className="tabular-nums text-ink">
                 {mp._count.listings.toLocaleString()}
               </span>{" "}
-              listings
+              {i18n.t('...[slug].page.listings')}
             </span>
             <span className="inline-flex items-center gap-1.5">
               {i18n.t('...[slug].page.runBy')} <span className="text-ink">{ownerName}</span>
@@ -405,8 +405,10 @@ export default async function MarketplaceLanding(props: { params: Promise<Params
                 {i18n.t('...[slug].page.whatOwnersWillAsk')}
               </h3>
               <p className="text-[12px] text-muted mb-3">
-                {mp.applicationQuestions.length} question
-                {mp.applicationQuestions.length === 1 ? "" : "s"} {i18n.t('...[slug].page.takes3Min')}
+                {mp.applicationQuestions.length === 1
+                  ? i18n.t('...[slug].page.questionCount', { length: mp.applicationQuestions.length })
+                  : i18n.t('...[slug].page.questionCountPlural', { length: mp.applicationQuestions.length })}{" "}
+                {i18n.t('...[slug].page.takes3Min')}
               </p>
               <ul className="space-y-2.5">
                 {mp.applicationQuestions.slice(0, 4).map((q) => (

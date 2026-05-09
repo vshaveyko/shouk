@@ -214,7 +214,7 @@ export function VerificationPanel({
                   <input
                     type="text"
                     inputMode="numeric"
-                    placeholder="6-digit code"
+                    placeholder={i18n.t('...verify.verificationPanel.6DigitCode')}
                     value={phoneCode}
                     onChange={(e) => setPhoneCode(e.target.value)}
                     className="h-[36px] px-3 rounded-[8px] border border-line bg-surface text-[14px] focus:outline-none focus:border-blue focus:ring-[3px] focus:ring-[var(--blue-softer)]"

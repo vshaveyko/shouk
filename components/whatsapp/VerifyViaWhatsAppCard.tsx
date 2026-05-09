@@ -38,8 +38,8 @@ export function VerifyViaWhatsAppCard({
             {i18n.t('...whatsapp.verifyViaWhatsAppCard.skipTheApplicationVerifyWith')}
           </h2>
           <p className="text-[13px] text-ink-soft mt-1">
-            {i18n.t('...whatsapp.verifyViaWhatsAppCard.ifYoureAlreadyIn')}dy in{" "}
-            <strong>{groupName ?? i18n.t('...whatsapp.verifyViaWhatsAppCard.theLinkedGroup')}</strong> {i18n.t('...whatsapp.verifyViaWhatsAppCard.onWhatsappScanAQr')}ntly.
+            {i18n.t('...whatsapp.verifyViaWhatsAppCard.ifYoureAlreadyIn')}{" "}
+            <strong>{groupName ?? i18n.t('...whatsapp.verifyViaWhatsAppCard.theLinkedGroup')}</strong> {i18n.t('...whatsapp.verifyViaWhatsAppCard.onWhatsappScanAQr')}
           </p>
           <div className="mt-3">
             <Button

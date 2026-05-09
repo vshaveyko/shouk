@@ -96,14 +96,14 @@ export default async function UserSettingsPage() {
                 <path d="m9 12 2 2 4-4" />
                 <path d="M12 2l3 3 5-2-2 5 3 3-3 3 2 5-5-2-3 3-3-3-5 2 2-5-3-3 3-3-2-5 5 2 3-3z" />
               </svg>
-              {i18n.t('...settings.page.identityTrust')}rust
+              {i18n.t('...settings.page.identityTrust')}
             </Link>
             <a href="#payments">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="2" y="5" width="20" height="14" rx="2" />
                 <line x1="2" y1="10" x2="22" y2="10" />
               </svg>
-              {i18n.t('...settings.page.paymentsPayouts')}outs
+              {i18n.t('...settings.page.paymentsPayouts')}
             </a>
             <a href="#notifications">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -117,7 +117,7 @@ export default async function UserSettingsPage() {
                 <rect x="3" y="11" width="18" height="11" rx="2" />
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
-              {i18n.t('...settings.page.privacyData')}data
+              {i18n.t('...settings.page.privacyData')}
             </a>
           </nav>
 
@@ -142,14 +142,14 @@ export default async function UserSettingsPage() {
             </section>
 
             <section className="set-section" id="identity">
-              <h3>{i18n.t('...settings.page.identityTrust')}rust</h3>
+              <h3>{i18n.t('...settings.page.identityTrust')}</h3>
               <p>
-                {i18n.t('...settings.page.verifiedAccountsSignalToOther')}join.
+                {i18n.t('...settings.page.verifiedAccountsSignalToOther')}
               </p>
               <div className="set-field">
                 <label>{i18n.t('common.verifiedAccounts')}</label>
                 <span className="val">
-                  {verified.length} linked
+                  {i18n.t('...settings.page.lengthLinked', { length: verified.length })}
                   <Link
                     href="/onboarding/verify"
                     className="linkout"
@@ -162,9 +162,9 @@ export default async function UserSettingsPage() {
             </section>
 
             <section className="set-section" id="payments">
-              <h3>{i18n.t('...settings.page.paymentsPayouts')}outs</h3>
+              <h3>{i18n.t('...settings.page.paymentsPayouts')}</h3>
               <p>
-                {i18n.t('...settings.page.shouksDoesntProcessPaymentsBetween')}ling.
+                {i18n.t('...settings.page.shouksDoesntProcessPaymentsBetween')}
               </p>
             </section>
 
@@ -180,7 +180,7 @@ export default async function UserSettingsPage() {
             </section>
 
             <section className="set-section" id="privacy">
-              <h3>{i18n.t('...settings.page.privacyData')}data</h3>
+              <h3>{i18n.t('...settings.page.privacyData')}</h3>
               <p>{i18n.t('...settings.page.exportYourDataOrDelete')}</p>
               <div className="set-field">
                 <label>{i18n.t('...settings.page.dataExport')}</label>

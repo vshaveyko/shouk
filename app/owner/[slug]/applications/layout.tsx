@@ -146,7 +146,7 @@ export default async function ApplicationsLayout(
             <h1>{i18n.t('...applications.layout.applications')}</h1>
             {pendingOver48h > 0 ? (
               <div className="lead">
-                {pendingCount} {i18n.t('...applications.layout.pending')} {pendingOver48h} waiting over 48h.
+                {pendingCount} {i18n.t('...applications.layout.pending')} {i18n.t('...applications.layout.waitingOver48h', { pendingOver48h })}
               </div>
             ) : null}
           </div>

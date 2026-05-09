@@ -71,9 +71,9 @@ export default async function ProfilePage() {
               </div>
               <div className="text-[13px] text-muted">{user.email}</div>
               <div className="flex flex-wrap gap-4 mt-3 text-[12px] text-muted">
-                <span><span className="tabular-nums text-ink">{listingCount}</span> listing{listingCount === 1 ? "" : "s"}</span>
+                <span><span className="tabular-nums text-ink">{listingCount}</span> {listingCount === 1 ? i18n.t('...profile.page.listing') : i18n.t('...profile.page.listingPlural')}</span>
                 <span><span className="tabular-nums text-ink">{saveCount}</span> saved</span>
-                <span><span className="tabular-nums text-ink">{memberships.length}</span> membership{memberships.length === 1 ? "" : "s"}</span>
+                <span><span className="tabular-nums text-ink">{memberships.length}</span> {memberships.length === 1 ? i18n.t('...profile.page.membership') : i18n.t('...profile.page.membershipPlural')}</span>
               </div>
             </div>
           </div>

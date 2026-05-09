@@ -41,7 +41,7 @@ export default async function OwnerSettingsLayout(
         <div className="max-w-[1180px] mx-auto px-8 pt-8 pb-24 w-full">
           <header className="mb-6">
             <h1 className="serif text-[34px] leading-[1.05] tracking-[-0.01em]" style={{ fontWeight: 400 }}>
-              {mp.name} <em className="italic text-blue-ink">settings</em>
+              {mp.name} <em className="italic text-blue-ink">{i18n.t('...settings.layout.settings')}</em>
             </h1>
             <p className="text-[13px] text-muted mt-1.5 max-w-[560px]">
               {i18n.t('...settings.layout.identitySchemaRulesAndMore')}

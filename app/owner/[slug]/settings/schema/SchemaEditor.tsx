@@ -335,7 +335,7 @@ export function SchemaEditor({
               </CardDescription>
             </div>
             <Badge>
-              {fields.length}/25 fields
+              {i18n.t('...schema.schemaEditor.length25Fields', { length: fields.length })}
             </Badge>
           </div>
         </CardHeader>
@@ -395,8 +395,9 @@ export function SchemaEditor({
               <div>
                 <CardTitle>{i18n.t('...schema.schemaEditor.archivedFields')}</CardTitle>
                 <CardDescription>
-                  {archived.length} field{archived.length === 1 ? "" : "s"} hidden
-                  from the listing form but preserved on existing listings.
+                  {archived.length === 1
+                    ? i18n.t('...schema.schemaEditor.fieldHiddenFromListingForm', { length: archived.length })
+                    : i18n.t('...schema.schemaEditor.fieldsHiddenFromListingForm', { length: archived.length })}
                 </CardDescription>
               </div>
               {showArchived ? (
@@ -461,8 +462,7 @@ export function SchemaEditor({
               <li>{i18n.t('...schema.schemaEditor.newRequiredFieldsArentBackfilled')}</li>
               {removedFromActive.length > 0 && (
                 <li>
-                  {removedFromActive.length} field(s) will be removed or archived
-                  if referenced by listings.
+                  {i18n.t('...schema.schemaEditor.fieldSWillBeRemovedOrArchived', { length: removedFromActive.length })}
                 </li>
               )}
               <li>{i18n.t('...schema.schemaEditor.optionChangesApplyToNew')}</li>

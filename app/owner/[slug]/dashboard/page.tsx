@@ -265,7 +265,7 @@ export default async function OwnerDashboardPage(
         feed.push(
           a.status === "APPROVED"
             ? { when: a.reviewedAt, kind: "ok", text: <><b>{nm}</b> {i18n.t('...dashboard.page.approvedAutonotifiedByEmail')}</> }
-            : { when: a.reviewedAt, kind: "no", text: <><b>{nm}</b> rejected</> },
+            : { when: a.reviewedAt, kind: "no", text: <><b>{nm}</b> {i18n.t('...dashboard.page.rejected')}</> },
         );
       }
       for (const l of newListings) {
@@ -279,7 +279,7 @@ export default async function OwnerDashboardPage(
           feed.push({
             when: l.createdAt,
             kind: "new",
-            text: <>{i18n.t('common.listing')} <b>{l.title}</b> published</>,
+            text: <>{i18n.t('common.listing')} <b>{l.title}</b> {i18n.t('...dashboard.page.published')}</>,
           });
         }
       }
@@ -337,9 +337,9 @@ export default async function OwnerDashboardPage(
               {pendingApps + totalListingsToApprove > 0 ? (
                 <>
                   {i18n.t('...dashboard.page.youHave')}{" "}
-                  <b style={{ color: "var(--ink)" }}>{pendingApps} applications</b>
-                  {" "}and{" "}
-                  <b style={{ color: "var(--ink)" }}>{totalListingsToApprove} listings</b>
+                  <b style={{ color: "var(--ink)" }}>{i18n.t('...dashboard.page.pendingAppsApplications', { pendingApps })}</b>
+                  {" "}{i18n.t('...dashboard.page.and')}{" "}
+                  <b style={{ color: "var(--ink)" }}>{i18n.t('...dashboard.page.totalListingsToApproveListings', { totalListingsToApprove })}</b>
                   {" "}{i18n.t('...dashboard.page.waitingForReviewMostOwners')}
                 </>
               ) : (
@@ -392,7 +392,7 @@ export default async function OwnerDashboardPage(
             </div>
             <div className="m-num">{totalListingsToApprove}</div>
             <div className="m-delta">
-              {pendingListingsNew} {i18n.t('...dashboard.page.new')} {pendingListingsEdited} edited
+              {pendingListingsNew} {i18n.t('...dashboard.page.new')} {i18n.t('...dashboard.page.pendingListingsEditedEdited', { pendingListingsEdited })}
             </div>
             <span className="m-arrow">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

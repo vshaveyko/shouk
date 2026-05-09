@@ -146,7 +146,7 @@ export function MonetizationForm({
                     className="flex-1 h-[38px] px-3 bg-transparent text-[14px] outline-none"
                   />
                   <span className="inline-flex items-center px-3 text-[13px] text-muted bg-bg-panel border-l border-line select-none">
-                    /mo
+                    {i18n.t('...monetization.monetizationForm.perMonth')}
                   </span>
                 </div>
               </div>
@@ -166,7 +166,7 @@ export function MonetizationForm({
                     className="flex-1 h-[38px] px-3 bg-transparent text-[14px] outline-none"
                   />
                   <span className="inline-flex items-center px-3 text-[13px] text-muted bg-bg-panel border-l border-line select-none">
-                    /yr
+                    {i18n.t('...monetization.monetizationForm.perYear')}
                   </span>
                 </div>
               </div>
@@ -202,7 +202,7 @@ export function MonetizationForm({
               />
               <Stat
                 testid="monetization-mrr"
-                label="MRR"
+                label={i18n.t('...monetization.monetizationForm.mrr')}
                 value={formatCents(mrrCents)}
               />
               <Stat

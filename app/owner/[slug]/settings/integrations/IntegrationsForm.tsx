@@ -98,7 +98,7 @@ export function IntegrationsForm({ marketplaceId, initial, inviteStats, whatsapp
           {!whatsappEnabled && (
             <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 text-sm text-amber-900">
               {i18n.t('...integrations.integrationsForm.whatsappIntegrationIsDisabledOn')} <code>{i18n.t('...integrations.integrationsForm.whatsapp_enabledtrue')}</code>{" "}
-              to enable.
+              {i18n.t('...integrations.integrationsForm.toEnable')}
             </div>
           )}
 

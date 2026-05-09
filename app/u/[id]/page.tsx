@@ -143,7 +143,7 @@ export default async function PublicProfilePage(props: { params: Promise<{ id: s
             <div className="pf-meta">
               <span>{i18n.t('common.joined')} {timeAgo(user.createdAt)}</span>
               <span className="dot" />
-              <span>{user.listings.length} listings</span>
+              <span>{i18n.t('...[id].page.lengthListings', { length: user.listings.length })}</span>
               <span className="dot" />
               <span>{user.verifiedAccounts.length} {i18n.t('common.verifiedAccount')}{user.verifiedAccounts.length === 1 ? "" : "s"}</span>
             </div>
