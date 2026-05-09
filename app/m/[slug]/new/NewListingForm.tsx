@@ -387,9 +387,9 @@ export function NewListingForm({
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-[14px]">$</span>
               <Input
                 id="price"
-                type="number"
-                min="0"
-                step="0.01"
+                type="text"
+                inputMode="decimal"
+                pattern="[0-9]*\.?[0-9]*"
                 value={priceDollars}
                 onChange={(e) => setPriceDollars(e.target.value)}
                 className="pl-7 tabular-nums"
@@ -408,9 +408,9 @@ export function NewListingForm({
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-[14px]">$</span>
                 <Input
                   id="budget"
-                  type="number"
-                  min="0"
-                  step="0.01"
+                  type="text"
+                  inputMode="decimal"
+                  pattern="[0-9]*\.?[0-9]*"
                   value={budgetDollars}
                   onChange={(e) => setBudgetDollars(e.target.value)}
                   className="pl-7 tabular-nums"
@@ -447,9 +447,9 @@ export function NewListingForm({
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-[14px]">$</span>
                 <Input
                   id="auction-start"
-                  type="number"
-                  min="0"
-                  step="0.01"
+                  type="text"
+                  inputMode="decimal"
+                  pattern="[0-9]*\.?[0-9]*"
                   value={auctionStart}
                   onChange={(e) => setAuctionStart(e.target.value)}
                   className="pl-7 tabular-nums"
@@ -463,9 +463,9 @@ export function NewListingForm({
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-[14px]">$</span>
                 <Input
                   id="auction-reserve"
-                  type="number"
-                  min="0"
-                  step="0.01"
+                  type="text"
+                  inputMode="decimal"
+                  pattern="[0-9]*\.?[0-9]*"
                   value={auctionReserve}
                   onChange={(e) => setAuctionReserve(e.target.value)}
                   className="pl-7 tabular-nums"
@@ -480,9 +480,9 @@ export function NewListingForm({
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-[14px]">$</span>
                 <Input
                   id="auction-increment"
-                  type="number"
-                  min="1"
-                  step="1"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={auctionIncrement}
                   onChange={(e) => setAuctionIncrement(e.target.value)}
                   className="pl-7 tabular-nums"
@@ -919,9 +919,9 @@ function SchemaFieldInput({
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-[14px]">$</span>
             <Input
               id={id}
-              type="number"
-              min="0"
-              step="0.01"
+              type="text"
+              inputMode="decimal"
+              pattern="[0-9]*\.?[0-9]*"
               value={(value as string | number | undefined) ?? ""}
               onChange={(e) => onChange(e.target.value === "" ? "" : Number(e.target.value))}
               className="pl-7 tabular-nums"

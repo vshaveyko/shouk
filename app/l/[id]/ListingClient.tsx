@@ -773,9 +773,9 @@ function PlaceBidDialog({
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted text-[14px]">$</span>
               <Input
                 id="bid-input"
-                type="number"
-                min={(minNextCents / 100).toString()}
-                step="1"
+                type="text"
+                inputMode="decimal"
+                pattern="[0-9]*\.?[0-9]*"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 className="pl-7 tabular-nums"

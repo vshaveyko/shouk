@@ -1,0 +1,30 @@
+import { expect, test } from "@playwright/test";
+import { signIn } from "../fixtures/helpers";
+
+// Batch of small fixes pulled from the May 2026 sprint of SHK-060+
+// items. Each test is labeled with its tracker ID.
+
+test.describe("May 2026 batch", () => {
+  test.beforeAll(async ({ request }) => {
+    await request.post("/api/e2e-reset");
+  });
+
+  // SHK-066 — drop the up/down spinner on price fields so a stray scroll
+  // wheel can't bump the listed price. The real fix is to give the input
+  // a non-`number` type with inputMode="decimal" so the numeric keyboard
+  // still appears on mobile.
+  test("SHK-066: price input on the new-listing form has no native number spinner", async ({
+    page,
+  }) => {
+    await signIn(page, "member@shouks.test", "Test123!@#");
+    await page.goto("/m/ferrari-frenzy/new");
+
+    const price = page.getByTestId("price-input").first();
+    await expect(price).toBeVisible();
+
+    const type = await price.getAttribute("type");
+    expect(type).not.toBe("number");
+    const inputMode = await price.getAttribute("inputmode");
+    expect(inputMode).toBe("decimal");
+  });
+});
