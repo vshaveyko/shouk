@@ -27,4 +27,30 @@ test.describe("May 2026 batch", () => {
     const inputMode = await price.getAttribute("inputmode");
     expect(inputMode).toBe("decimal");
   });
+
+  // SHK-069 — Danger zone belongs at the bottom of the Identity tab.
+  // Previously it was rendered inside IdentityForm but the page also
+  // rendered RulesForm below IdentityForm, sandwiching the Danger zone
+  // in the middle.
+  test("SHK-069: Danger zone is the last card on the Identity settings tab", async ({
+    page,
+  }) => {
+    await signIn(page, "owner@shouks.test", "Test123!@#");
+    await page.goto("/owner/ferrari-frenzy/settings/identity");
+
+    const dangerHeading = page.getByText(/danger zone/i).first();
+    await expect(dangerHeading).toBeVisible();
+    const rulesHeading = page
+      .getByRole("heading", { name: /verification|application questions|rules/i })
+      .first();
+    await expect(rulesHeading).toBeVisible();
+
+    // Both have to be present; the danger heading must appear after the
+    // rules heading vertically.
+    const dangerBox = await dangerHeading.boundingBox();
+    const rulesBox = await rulesHeading.boundingBox();
+    expect(dangerBox).toBeTruthy();
+    expect(rulesBox).toBeTruthy();
+    expect(dangerBox!.y).toBeGreaterThan(rulesBox!.y);
+  });
 });

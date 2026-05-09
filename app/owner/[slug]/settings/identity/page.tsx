@@ -1,6 +1,7 @@
 import { requireOwnerOf } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 import { IdentityForm } from "./IdentityForm";
+import { DangerZone } from "./DangerZone";
 import { RulesForm } from "../rules/RulesForm";
 
 export default async function IdentitySettingsPage(props: { params: Promise<{ slug: string }> }) {
@@ -47,6 +48,7 @@ export default async function IdentitySettingsPage(props: { params: Promise<{ sl
           questions,
         }}
       />
+      <DangerZone slug={params.slug} status={mp.status} />
     </div>
   );
 }
