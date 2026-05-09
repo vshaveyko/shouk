@@ -25,3 +25,4 @@ export {
 export { Switch } from "./Switch";
 export { Tabs, TabsList, TabsTrigger, TabsContent } from "./Tabs";
 export { EmptyState } from "./EmptyState";
+export { Skel, SkelCircle, SkelText, SrLoading } from "./Skeleton";
