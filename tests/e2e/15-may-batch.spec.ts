@@ -9,6 +9,43 @@ test.describe("May 2026 batch", () => {
     await request.post("/api/e2e-reset");
   });
 
+  // SHK-073 — "New in your marketplaces" on /home was rendering prices
+  // with maximumFractionDigits: 0, so $100.25 showed as "$100" and a
+  // listing intentionally priced with cents (auction increments, parts
+  // listings) appeared mispriced. Surface cents whenever they're present.
+  test("SHK-073: New-in-your-marketplaces preserves cents in displayed prices", async ({
+    page,
+  }) => {
+    await signIn(page, "member@shouks.test", "Test123!@#");
+    const title = `Cent test ${Date.now()}`;
+    const create = await page.request.post(
+      "/api/marketplaces/ferrari-frenzy/listings",
+      {
+        data: {
+          title,
+          type: "FIXED",
+          priceCents: 10025,
+          schemaValues: {},
+          images: ["https://picsum.photos/seed/cents-test/400/300"],
+        },
+      },
+    );
+    expect(create.ok()).toBeTruthy();
+    const created = (await create.json()) as { id: string };
+
+    try {
+      await page.goto("/home");
+      const card = page
+        .getByTestId("feed-item")
+        .filter({ hasText: title })
+        .first();
+      await expect(card).toBeVisible();
+      await expect(card).toContainText("$100.25");
+    } finally {
+      await page.request.delete(`/api/listings/${created.id}`);
+    }
+  });
+
   // SHK-066 — drop the up/down spinner on price fields so a stray scroll
   // wheel can't bump the listed price. The real fix is to give the input
   // a non-`number` type with inputMode="decimal" so the numeric keyboard

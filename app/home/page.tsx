@@ -652,9 +652,15 @@ export default async function HomeDashboard(
   );
 }
 
+// SHK-073: keep cents whenever a listing is priced with them. Sellers
+// who intentionally set $100.25 expect to see the full price in "New
+// in your marketplaces", not "$100".
 function formatMoney(cents: number) {
-  const v = cents / 100;
-  return `$${v.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+  const hasCents = cents % 100 !== 0;
+  return `$${(cents / 100).toLocaleString(undefined, {
+    minimumFractionDigits: hasCents ? 2 : 0,
+    maximumFractionDigits: hasCents ? 2 : 0,
+  })}`;
 }
 
 function formatMoneyShort(cents: number) {

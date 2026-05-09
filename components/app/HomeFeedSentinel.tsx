@@ -17,8 +17,14 @@ type FeedItem = {
   marketplace: { name: string; slug: string; primaryColor: string | null };
 };
 
+// SHK-073: preserve cents when present so the infinite-scroll
+// continuation of /home matches the server-rendered first page.
 function formatMoney(cents: number) {
-  return `$${(cents / 100).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+  const hasCents = cents % 100 !== 0;
+  return `$${(cents / 100).toLocaleString(undefined, {
+    minimumFractionDigits: hasCents ? 2 : 0,
+    maximumFractionDigits: hasCents ? 2 : 0,
+  })}`;
 }
 
 function timeUntilShort(toIso: string) {
