@@ -8,6 +8,9 @@ import { prisma } from "@/lib/prisma";
 //   weren't part of the seed (we identify the seeded ones by their titles)
 //   so dashboard count assertions match the seed even if 02-create-marketplace
 //   etc. ran first.
+// - { refreshAuctions: true }: pushes auctionEndsAt forward on every active
+//   auction so suites that rely on bid endpoints don't go stale a few days
+//   after seeding.
 // Gated to non-production.
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,9 +28,12 @@ export async function POST(req: Request) {
   if (process.env.NODE_ENV === "production") {
     return NextResponse.json({ error: "Not available" }, { status: 404 });
   }
-  let body: { resetListings?: boolean } = {};
+  let body: { resetListings?: boolean; refreshAuctions?: boolean } = {};
   try {
-    body = (await req.json()) as { resetListings?: boolean };
+    body = (await req.json()) as {
+      resetListings?: boolean;
+      refreshAuctions?: boolean;
+    };
   } catch {
     body = {};
   }
@@ -42,6 +48,14 @@ export async function POST(req: Request) {
   if (body.resetListings) {
     await prisma.listing.deleteMany({
       where: { title: { notIn: SEEDED_LISTING_TITLES } },
+    });
+  }
+
+  if (body.refreshAuctions) {
+    const inTwoDays = new Date(Date.now() + 1000 * 60 * 60 * 24 * 2);
+    await prisma.listing.updateMany({
+      where: { type: "AUCTION", status: "ACTIVE" },
+      data: { auctionEndsAt: inTwoDays },
     });
   }
 

@@ -68,20 +68,51 @@ export async function POST(req: Request, props: { params: Promise<{ slug: string
 
   switch (parsed.data.action) {
     case "SUSPEND":
-      await prisma.membership.update({
-        where: { id: target.id },
-        data: { status: "SUSPENDED", suspensionReason: parsed.data.reason ?? null, suspendedUntil: parsed.data.until ? new Date(parsed.data.until) : null },
-      });
+      // WA-009: pull the suspended user out of any active auctions in
+      // this marketplace. Their open bids are deleted so the leaderboard
+      // reflects only members currently allowed to engage; otherwise a
+      // suspended user could still "win" an auction that closes during
+      // their suspension. Their own listings stay live — suspension is
+      // temporary, and BAN is the path that takes inventory down.
+      await prisma.$transaction([
+        prisma.membership.update({
+          where: { id: target.id },
+          data: {
+            status: "SUSPENDED",
+            suspensionReason: parsed.data.reason ?? null,
+            suspendedUntil: parsed.data.until ? new Date(parsed.data.until) : null,
+          },
+        }),
+        prisma.bid.deleteMany({
+          where: {
+            userId: parsed.data.userId,
+            listing: { marketplaceId: mp.id, status: "ACTIVE" },
+          },
+        }),
+      ]);
       break;
     case "BAN":
-      await prisma.membership.update({
-        where: { id: target.id },
-        data: { status: "BANNED", banReason: parsed.data.reason ?? null },
-      });
-      await prisma.listing.updateMany({
-        where: { marketplaceId: mp.id, sellerId: parsed.data.userId },
-        data: { status: "REMOVED" },
-      });
+      // WA-009: BAN cancels the user's open bids in this marketplace in
+      // addition to closing their own listings (existing behavior). The
+      // listing.updateMany REMOVES their inventory, but bids they placed
+      // on other members' auctions live on Bid not Listing — they need
+      // their own deleteMany.
+      await prisma.$transaction([
+        prisma.membership.update({
+          where: { id: target.id },
+          data: { status: "BANNED", banReason: parsed.data.reason ?? null },
+        }),
+        prisma.listing.updateMany({
+          where: { marketplaceId: mp.id, sellerId: parsed.data.userId },
+          data: { status: "REMOVED" },
+        }),
+        prisma.bid.deleteMany({
+          where: {
+            userId: parsed.data.userId,
+            listing: { marketplaceId: mp.id, status: "ACTIVE" },
+          },
+        }),
+      ]);
       break;
     case "REINSTATE":
       await prisma.membership.update({
