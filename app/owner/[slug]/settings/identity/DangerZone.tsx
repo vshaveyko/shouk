@@ -46,7 +46,9 @@ export function DangerZone({ slug, status }: { slug: string; status: Status }) {
       }
       toast.success(i18n.t("...identity.identityForm.marketplaceDeactivated"));
       setOpen(false);
-      router.refresh();
+      // SHK-070: drop the owner back to /home rather than leaving them
+      // sitting in the (now-INACTIVE) admin shell.
+      router.push("/home");
     } catch {
       toast.error(i18n.t("common.networkErrorPleaseTryAgain"));
     } finally {

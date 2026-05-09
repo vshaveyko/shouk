@@ -28,6 +28,44 @@ test.describe("May 2026 batch", () => {
     expect(inputMode).toBe("decimal");
   });
 
+  // SHK-070 — after the owner confirms the destructive action in the
+  // Danger zone, they should land on /home instead of staying inside the
+  // (now-inactive) admin shell.
+  test("SHK-070: deactivating a marketplace navigates the owner to /home", async ({
+    page,
+    request,
+  }) => {
+    // Use a throwaway marketplace so we don't take down a seeded one for
+    // the rest of the suite. Sign in as the seeded owner and create one
+    // via the API.
+    await signIn(page, "owner@shouks.test", "Test123!@#");
+    const slug = `delete-test-${Date.now()}`;
+    const create = await page.request.post("/api/marketplaces", {
+      data: {
+        slug,
+        name: "Delete Test",
+        category: "Cars",
+        entryMethod: "PUBLIC",
+        requiredVerifications: ["GOOGLE"],
+        schemaFields: [
+          {
+            name: "title",
+            label: "Title",
+            type: "SHORT_TEXT",
+            required: true,
+          },
+        ],
+      },
+    });
+    expect(create.ok()).toBeTruthy();
+
+    await page.goto(`/owner/${slug}/settings/identity`);
+    await page.getByTestId("identity-deactivate").click();
+    await page.getByTestId("identity-deactivate-confirm").click();
+
+    await expect(page).toHaveURL(/\/home(\?|$)/);
+  });
+
   // SHK-069 — Danger zone belongs at the bottom of the Identity tab.
   // Previously it was rendered inside IdentityForm but the page also
   // rendered RulesForm below IdentityForm, sandwiching the Danger zone
