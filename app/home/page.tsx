@@ -213,6 +213,12 @@ export default async function HomeDashboard(
           unreadMessagesCount={unreadMessages}
         />
         <SectionedDashboard data={dashboardData} />
+        {/* SHK-072: keep the Recently viewed rail visible under the
+            sectioned_dashboard flag — the new layout returned before
+            reaching the legacy render path that still hosted it. */}
+        <div className="px-6 pb-10 max-w-[1440px] mx-auto">
+          <RecentlyViewedSection />
+        </div>
       </div>
     );
   }

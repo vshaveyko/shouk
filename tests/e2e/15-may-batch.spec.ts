@@ -9,6 +9,26 @@ test.describe("May 2026 batch", () => {
     await request.post("/api/e2e-reset");
   });
 
+  // SHK-072 / SHK-078 — Recently viewed disappeared from /home for users
+  // on the sectioned_dashboard flag. The legacy dashboard branch still
+  // rendered <RecentlyViewedSection />, but the new branch returned
+  // before reaching that block.
+  test("SHK-072: Recently viewed renders on /home under the sectioned dashboard flag", async ({
+    page,
+  }) => {
+    await signIn(page, "member@shouks.test", "Test123!@#");
+    // Visit a listing first so there's something to surface in the rail.
+    const listingsRes = await page.request.get(
+      "/api/marketplaces/ferrari-frenzy/listings",
+    );
+    const listings = (await listingsRes.json()) as Array<{ id: string }>;
+    expect(listings.length).toBeGreaterThan(0);
+    await page.goto(`/l/${listings[0].id}`);
+
+    await page.goto("/home?se_ks_sectioned_dashboard=true");
+    await expect(page.getByTestId("recently-viewed")).toBeVisible();
+  });
+
   // SHK-073 — "New in your marketplaces" on /home was rendering prices
   // with maximumFractionDigits: 0, so $100.25 showed as "$100" and a
   // listing intentionally priced with cents (auction increments, parts
