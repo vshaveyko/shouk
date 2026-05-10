@@ -62,15 +62,19 @@ export async function PATCH(req: Request, props: { params: Promise<{ id: string 
   const parsed = editSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "Invalid input" }, { status: 400 });
 
-  const moderated = listing.marketplace.moderationRequired && parsed.data.status !== "SOLD" && parsed.data.status !== "CLOSED";
-
+  // SHK-068: V1 already disabled auto-PENDING_REVIEW on create (see the
+  // listings POST handler); the edit path was still demoting listings on
+  // every save in moderated marketplaces, so a seller's small text tweak
+  // made the listing vanish from the feed. Match the create-path policy:
+  // edits don't change status. Moderators can still surface edited
+  // listings via the moderation queue or `editedAt` filters.
   const updated = await prisma.listing.update({
     where: { id: listing.id },
     data: {
       ...parsed.data,
       schemaValues: parsed.data.schemaValues ? (parsed.data.schemaValues as object) : undefined,
       editedAt: new Date(),
-      status: parsed.data.status ?? (moderated ? "PENDING_REVIEW" : listing.status),
+      status: parsed.data.status ?? listing.status,
       soldAt: parsed.data.status === "SOLD" ? new Date() : listing.soldAt,
       closedAt: parsed.data.status === "CLOSED" ? new Date() : listing.closedAt,
     },

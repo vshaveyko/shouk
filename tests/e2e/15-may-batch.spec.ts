@@ -9,6 +9,63 @@ test.describe("May 2026 batch", () => {
     await request.post("/api/e2e-reset");
   });
 
+  // SHK-068 — editing a listing in a marketplace that has moderation
+  // enabled used to flip the listing to PENDING_REVIEW, which made it
+  // vanish from the feed mid-edit. V1 already removed moderation on
+  // create; the edit path needs the same treatment.
+  test("SHK-068: editing a listing in a moderated marketplace keeps it ACTIVE", async ({
+    page,
+    request,
+  }) => {
+    await signIn(page, "owner@shouks.test", "Test123!@#");
+    // Turn moderation on for ferrari-frenzy.
+    const turnOn = await page.request.patch(
+      "/api/marketplaces/ferrari-frenzy",
+      { data: { moderationRequired: true } },
+    );
+    expect(turnOn.ok()).toBeTruthy();
+
+    try {
+      // Member creates a fresh ACTIVE listing (no moderation on create).
+      await page.context().clearCookies();
+      await signIn(page, "member@shouks.test", "Test123!@#");
+      const create = await page.request.post(
+        "/api/marketplaces/ferrari-frenzy/listings",
+        {
+          data: {
+            title: `SHK-068 ${Date.now()}`,
+            type: "FIXED",
+            priceCents: 5000,
+            schemaValues: {},
+            images: ["https://picsum.photos/seed/shk068/400/300"],
+          },
+        },
+      );
+      expect(create.ok()).toBeTruthy();
+      const created = (await create.json()) as { id: string; status: string };
+      expect(created.status).toBe("ACTIVE");
+
+      // Edit the title — this previously demoted the listing to
+      // PENDING_REVIEW. The fix keeps it ACTIVE; moderators have other
+      // ways to surface edited listings.
+      const edit = await page.request.patch(`/api/listings/${created.id}`, {
+        data: { title: `SHK-068 edited ${Date.now()}` },
+      });
+      expect(edit.ok()).toBeTruthy();
+      const edited = (await edit.json()) as { status: string };
+      expect(edited.status).toBe("ACTIVE");
+
+      await page.request.delete(`/api/listings/${created.id}`);
+    } finally {
+      // Reset moderationRequired so other suites aren't affected.
+      await page.context().clearCookies();
+      await signIn(page, "owner@shouks.test", "Test123!@#");
+      await page.request.patch("/api/marketplaces/ferrari-frenzy", {
+        data: { moderationRequired: false },
+      });
+    }
+  });
+
   // SHK-062 + SHK-071 — when a member fills extra schema-driven fields
   // (year, model, condition, mileage) on the new-listing form, those
   // values must be captured and shown in the Details section on the
