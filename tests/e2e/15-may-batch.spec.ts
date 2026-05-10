@@ -9,6 +9,56 @@ test.describe("May 2026 batch", () => {
     await request.post("/api/e2e-reset");
   });
 
+  // SHK-074 — clicking "Message seller" creates a thread row but the
+  // recipient should not see the thread in their inbox until at least
+  // one message is actually sent. Sender stays on their compose pane.
+  test("SHK-074: empty thread does not surface in the recipient's inbox", async ({
+    page,
+  }) => {
+    // Sender (member) creates a brand-new owner-listed Fixed listing so
+    // there's no chance of finding a pre-existing thread (the seed has
+    // F355 with thread history, so re-using it would mask the bug).
+    await signIn(page, "owner@shouks.test", "Test123!@#");
+    const create = await page.request.post(
+      "/api/marketplaces/ferrari-frenzy/listings",
+      {
+        data: {
+          title: `SHK-074 ${Date.now()}`,
+          type: "FIXED",
+          priceCents: 1234,
+          schemaValues: {},
+          images: ["https://picsum.photos/seed/shk074/400/300"],
+        },
+      },
+    );
+    expect(create.ok()).toBeTruthy();
+    const created = (await create.json()) as { id: string };
+
+    await page.context().clearCookies();
+    await signIn(page, "member@shouks.test", "Test123!@#");
+    await page.goto(`/l/${created.id}`);
+    await page.getByTestId("message-seller").first().click();
+    await expect(page).toHaveURL(/\/messages\?t=/);
+
+    // Recipient (owner) opens their inbox — they must NOT see this empty
+    // thread because the sender hasn't actually messaged anything yet.
+    await page.context().clearCookies();
+    await signIn(page, "owner@shouks.test", "Test123!@#");
+    await page.goto("/m/ferrari-frenzy/messages");
+    // No thread row should display the empty placeholder copy ("No
+    // messages yet") — the only way that text would render is if an
+    // empty draft thread leaked into the inbox.
+    const draftRow = page
+      .getByTestId("thread-row")
+      .filter({ hasText: /no messages yet/i });
+    await expect(draftRow).toHaveCount(0);
+
+    // Cleanup the throwaway listing.
+    await page.context().clearCookies();
+    await signIn(page, "owner@shouks.test", "Test123!@#");
+    await page.request.delete(`/api/listings/${created.id}`);
+  });
+
   // SHK-068 — editing a listing in a marketplace that has moderation
   // enabled used to flip the listing to PENDING_REVIEW, which made it
   // vanish from the feed mid-edit. V1 already removed moderation on

@@ -71,10 +71,20 @@ export default async function MarketplaceMessagesPage(
     }
   }
 
+  // SHK-074: only surface threads that have at least one message — clicking
+  // "Message seller" shouldn't drop a draft into the recipient's inbox.
+  // The sender keeps access via the explicit `?t=<id>` redirect that
+  // follows findOrCreateThread, even when the empty thread is filtered
+  // out of their list view (the selectThread / selectedMessages path
+  // below resolves it directly by id).
   const threadsRaw = await prisma.messageThread.findMany({
     where: {
       marketplaceId: mp.id,
       participants: { some: { userId: ctx.user.id } },
+      OR: [
+        { messages: { some: {} } },
+        ...(searchParams?.t ? [{ id: searchParams.t }] : []),
+      ],
     },
     orderBy: { lastMessageAt: "desc" },
     include: {
