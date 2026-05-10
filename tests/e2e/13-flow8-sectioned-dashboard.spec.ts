@@ -115,6 +115,46 @@ test.describe("Flow 8 · Sectioned dashboard — flag-gated", () => {
     ).not.toHaveClass(/active/);
   });
 
+  test("flag on — sidebar sections expand independently of each other", async ({ page }) => {
+    await signIn(page, "member@shouks.test", "Test123!@#");
+    await page.goto("/home?se_ks_sectioned_dashboard=true");
+
+    const listings = page.locator(".sb-section[data-section='listings']");
+    const iso = page.locator(".sb-section[data-section='iso']");
+    const alerts = page.locator(".sb-section[data-section='alerts']");
+
+    // Default state: only listings starts expanded — its sb-subs are visible
+    // and the others are collapsed.
+    await expect(listings).toHaveClass(/expanded/);
+    await expect(iso).not.toHaveClass(/expanded/);
+    await expect(alerts).not.toHaveClass(/expanded/);
+    await expect(listings.locator(".sb-subs")).toBeVisible();
+    await expect(iso.locator(".sb-subs")).toBeHidden();
+
+    // Opening ISO does NOT auto-close Listings.
+    await iso.locator(".sb-head").click();
+    await expect(iso).toHaveClass(/expanded/);
+    await expect(listings).toHaveClass(/expanded/);
+
+    // Opening Alerts on top — all three open simultaneously.
+    await alerts.locator(".sb-head").click();
+    await expect(listings).toHaveClass(/expanded/);
+    await expect(iso).toHaveClass(/expanded/);
+    await expect(alerts).toHaveClass(/expanded/);
+    await expect(listings.locator(".sb-subs")).toBeVisible();
+    await expect(iso.locator(".sb-subs")).toBeVisible();
+    await expect(alerts.locator(".sb-subs")).toBeVisible();
+
+    // Clicking the caret on a section closes only that one — the others
+    // stay in whatever state they were in.
+    await listings.locator(".sb-head .caret-btn").click();
+    await expect(listings).not.toHaveClass(/expanded/);
+    await expect(iso).toHaveClass(/expanded/);
+    await expect(alerts).toHaveClass(/expanded/);
+    await expect(listings.locator(".sb-subs")).toBeHidden();
+    await expect(iso.locator(".sb-subs")).toBeVisible();
+  });
+
   test("flag on — full-bleed layout with list-only scroll", async ({ page }) => {
     await signIn(page, "member@shouks.test", "Test123!@#");
     await page.goto("/home?se_ks_sectioned_dashboard=true");

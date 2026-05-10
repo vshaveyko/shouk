@@ -43,11 +43,13 @@ const css = `
 .sd-wrap .sb-head .new-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); margin-left: 4px; animation: sd-pulse 2.4s ease-in-out infinite; }
 .sd-wrap .sb-head .r { display: inline-flex; align-items: center; gap: 6px; }
 .sd-wrap .sb-head .caret { width: 12px; height: 12px; opacity: 0.55; transition: transform 160ms ease, opacity 160ms ease; transform: rotate(-90deg); }
-.sd-wrap .sb-section.active .sb-head .caret { transform: rotate(0deg); opacity: 0.85; }
+.sd-wrap .sb-section.expanded .sb-head .caret { transform: rotate(0deg); opacity: 0.85; }
 .sd-wrap .sb-head:hover .caret { opacity: 0.85; }
+.sd-wrap .sb-head .caret-btn { display: inline-flex; align-items: center; justify-content: center; padding: 4px; margin: -4px; border-radius: 4px; cursor: pointer; }
+.sd-wrap .sb-head .caret-btn:hover { background: oklch(0.92 0.005 60); }
 @media (prefers-reduced-motion: reduce) { .sd-wrap .sb-head .caret { transition: none; } }
 .sd-wrap .sb-subs { padding: 2px 0 6px 22px; display: flex; flex-direction: column; gap: 1px; }
-.sd-wrap .sb-section:not(.active) .sb-subs { display: none; }
+.sd-wrap .sb-section:not(.expanded) .sb-subs { display: none; }
 .sd-wrap .sb-sub { display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12.5px; font-weight: 500; color: var(--muted); }
 .sd-wrap .sb-sub:hover { color: var(--ink); }
 .sd-wrap .sb-sub.active { color: var(--ink); background: #fff; }
@@ -450,6 +452,9 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
       });
       root.querySelectorAll<HTMLElement>(".section-panel").forEach((p) => p.classList.toggle("active", p.dataset.sectionPanel === name));
       const sec = root.querySelector<HTMLElement>(`.sb-section[data-section="${name}"]`);
+      // Activating a section also expands it, but never collapses sibling
+      // sections — the sidebar accordion is multi-open.
+      sec?.classList.add("expanded");
       const firstSub = sec?.querySelector<HTMLElement>(".sb-sub.active") || sec?.querySelector<HTMLElement>(".sb-sub");
       if (firstSub?.dataset.sub) {
         showSub(firstSub.dataset.sub);
@@ -468,6 +473,19 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
       const h = () => showSection(name);
       head.addEventListener("click", h);
       cleanups.push(() => head.removeEventListener("click", h));
+    });
+    // Caret = a dedicated close/open affordance independent of section
+    // selection: clicking it only toggles this section's expansion, leaving
+    // active section + sibling expansion untouched.
+    root.querySelectorAll<HTMLElement>(".sb-head .caret-btn").forEach((btn) => {
+      const sec = btn.closest<HTMLElement>(".sb-section");
+      if (!sec) return;
+      const h = (e: Event) => {
+        e.stopPropagation();
+        sec.classList.toggle("expanded");
+      };
+      btn.addEventListener("click", h);
+      cleanups.push(() => btn.removeEventListener("click", h));
     });
     root.querySelectorAll<HTMLElement>(".sb-sub").forEach((b) => {
       const name = b.dataset.sub;
@@ -508,12 +526,12 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
         <div className="body">
           {/* ───── Sidebar ───── */}
           <nav className="sb">
-            <div className="sb-section active" data-section="listings">
+            <div className="sb-section active expanded" data-section="listings">
               <div className="sb-head active">
                 <span className="l">{ICON_LIST}{i18n.t('common.listings')}</span>
                 <span className="r">
                   <span className="ct">{listings.counts.total}</span>
-                  {ICON_CARET}
+                  <span className="caret-btn" role="button" aria-label="Toggle section" tabIndex={0}>{ICON_CARET}</span>
                 </span>
               </div>
               <div className="sb-subs">
@@ -529,7 +547,7 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
                 <span className="r">
                   <span className="ct">{iso.counts.total}</span>
                   {iso.counts.newMatches > 0 && <span className="new-dot" />}
-                  {ICON_CARET}
+                  <span className="caret-btn" role="button" aria-label="Toggle section" tabIndex={0}>{ICON_CARET}</span>
                 </span>
               </div>
               <div className="sb-subs">
@@ -545,7 +563,7 @@ export function SectionedDashboard({ data }: { data: DashboardData }) {
                 <span className="r">
                   <span className="ct">{alerts.counts.total}</span>
                   {alerts.counts.newMatches > 0 && <span className="new-dot" />}
-                  {ICON_CARET}
+                  <span className="caret-btn" role="button" aria-label="Toggle section" tabIndex={0}>{ICON_CARET}</span>
                 </span>
               </div>
               <div className="sb-subs">
