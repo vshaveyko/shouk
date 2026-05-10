@@ -181,19 +181,18 @@ test.describe("V1 cleanup — hidden features from bugs_pending.md", () => {
     await ctx.close();
   });
 
-  test("SHK-020: New listing form shows hardcoded watch fields", async ({
+  test("SHK-020 (superseded by SHK-071): New listing form renders the marketplace's schema fields", async ({
     page,
   }) => {
     await page.goto("/m/ferrari-frenzy/new");
-    // The V1 watches form has fixed fields regardless of the marketplace schema.
+    // The form used to ship a single hardcoded watches UI (brand,
+    // case_size, dial_color…) regardless of the marketplace. SHK-071
+    // replaced it with dynamic fields driven by SchemaField rows.
     await expect(page.getByTestId("watch-details-section")).toBeVisible();
-    await expect(page.getByTestId("watch-field-brand")).toBeVisible();
-    await expect(page.getByTestId("watch-field-model")).toBeVisible();
-    await expect(page.getByTestId("watch-field-case-size")).toBeVisible();
-    await expect(page.getByTestId("watch-field-dial-color")).toBeVisible();
-    await expect(page.getByTestId("watch-field-case-material")).toBeVisible();
-    await expect(page.getByTestId("watch-field-box")).toBeVisible();
-    await expect(page.getByTestId("watch-field-papers")).toBeVisible();
+    await expect(page.getByTestId("listing-field-year")).toBeVisible();
+    await expect(page.getByTestId("listing-field-model")).toBeVisible();
+    await expect(page.getByTestId("listing-field-condition")).toBeVisible();
+    await expect(page.getByTestId("listing-field-mileage")).toBeVisible();
   });
 
   test("SHK-037: owner with multiple marketplaces lands on /home, not auto-redirected", async ({
@@ -254,8 +253,11 @@ test.describe("Listing detail seller actions", () => {
     await page.getByTestId("listing-type-fixed").click();
     await page.getByTestId("listing-field-title").fill(`Edit-menu test ${Date.now()}`);
     await page.getByTestId("price-input").fill("100");
-    await page.getByTestId("watch-field-brand").fill("Rolex");
-    await page.getByTestId("watch-field-model").fill("EditTest");
+    // SHK-071: ferrari-frenzy schema requires year, model, condition.
+    await page.getByTestId("listing-field-year").fill("2020");
+    await page.getByTestId("listing-field-model").fill("EditTest");
+    await page.getByTestId("listing-field-condition").click();
+    await page.getByRole("option").first().click();
     await page.getByTestId("images-input-0").fill("https://picsum.photos/seed/edit-menu/800/600");
     await page.getByTestId("submit-listing").click();
     await page.waitForURL(/\/l\/[^/]+$/, { timeout: 15_000 });
@@ -274,7 +276,7 @@ test.describe("Listing detail seller actions", () => {
     await expect(page.getByTestId("watch-details-section")).toBeVisible();
     await expect(page.getByTestId("listing-field-title")).toHaveValue(/Edit-menu test/);
     await expect(page.getByTestId("price-input")).toHaveValue("100");
-    await expect(page.getByTestId("watch-field-model")).toHaveValue("EditTest");
+    await expect(page.getByTestId("listing-field-model")).toHaveValue("EditTest");
 
     // Edit a field, save, and confirm the value persists on the detail page.
     await page.getByTestId("listing-field-title").fill("Edited title");

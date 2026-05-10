@@ -9,6 +9,28 @@ test.describe("May 2026 batch", () => {
     await request.post("/api/e2e-reset");
   });
 
+  // SHK-062 + SHK-071 — when a member fills extra schema-driven fields
+  // (year, model, condition, mileage) on the new-listing form, those
+  // values must be captured and shown in the Details section on the
+  // listing detail page. Previously the form's UI was hardcoded to watch
+  // fields (brand, case_size, dial_color, ...) so non-watch marketplaces
+  // lost everything except title/price/image/description.
+  test("SHK-062/SHK-071: dynamic schema fields render on form and listing page", async ({
+    page,
+  }) => {
+    await signIn(page, "member@shouks.test", "Test123!@#");
+    await page.goto("/m/ferrari-frenzy/new");
+
+    // The dynamic fields for ferrari-frenzy: year (NUMBER required),
+    // model (SHORT_TEXT required), condition (SELECT required), mileage
+    // (NUMBER optional), description (LONG_TEXT optional). The form
+    // should now expose inputs for them.
+    await expect(page.getByTestId("listing-field-year")).toBeVisible();
+    await expect(page.getByTestId("listing-field-model")).toBeVisible();
+    await expect(page.getByTestId("listing-field-condition")).toBeVisible();
+    await expect(page.getByTestId("listing-field-mileage")).toBeVisible();
+  });
+
   // SHK-076 — favorited marketplaces should be visually marked. Show a
   // star indicator on the home Your-Marketplaces chip and on the navbar
   // switcher row.
@@ -70,6 +92,16 @@ test.describe("May 2026 batch", () => {
     const listings = (await listingsRes.json()) as Array<{ id: string }>;
     expect(listings.length).toBeGreaterThan(0);
     await page.goto(`/l/${listings[0].id}`);
+    // TrackListingView writes to localStorage from a useEffect; give the
+    // hydration cycle a moment so the entry is persisted before we leave.
+    await page.waitForFunction(() => {
+      const raw = window.localStorage.getItem("shouks_recently_viewed");
+      try {
+        return Array.isArray(JSON.parse(raw ?? "[]")) && JSON.parse(raw ?? "[]").length > 0;
+      } catch {
+        return false;
+      }
+    });
 
     await page.goto("/home?se_ks_sectioned_dashboard=true");
     await expect(page.getByTestId("recently-viewed")).toBeVisible();

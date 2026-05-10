@@ -145,12 +145,18 @@ export function NewListingForm({
 
     const images = imageUrls.map((s) => s.trim()).filter(Boolean);
 
-    // V1: the form is a single watches form (SHK-020); legacy dynamic
-    // schema fields aren't rendered and therefore can't be filled in by
-    // the seller. Don't enforce `required` on fields the UI never
-    // surfaced — that would make listings un-submittable on any
-    // marketplace with required non-watch fields.
-    void nonImageFields;
+    // SHK-071: previously the form rendered a hardcoded watch UI and
+    // skipped validating required fields (the seller couldn't fill them).
+    // The dynamic schema-field section now renders the marketplace's
+    // actual fields, so enforce required-ness for them too.
+    for (const f of nonImageFields) {
+      if (!f.required) continue;
+      const v = schemaValues[f.name];
+      if (v == null || v === "" || (Array.isArray(v) && v.length === 0)) {
+        setError(`Please fill in "${f.label}".`);
+        return;
+      }
+    }
     if (imageField?.required) {
       const min = imageField.minImages ?? 1;
       if (images.length < min) {
@@ -615,114 +621,21 @@ export function NewListingForm({
         </section>
       )}
 
-      {/* V1 watch details (SHK-020). The per-marketplace dynamic schema
-          stays in the data model and on the form's data path (schemaValues
-          maps straight through), but the UI is a single hardcoded watches
-          form. All fields here are optional — mandatory stuff (Title,
-          Price, Images) lives in the Basics / Pricing / Images sections
-          above. */}
-      <section
-        className="bg-surface border border-line rounded-[14px] p-5 space-y-4"
-        data-testid="watch-details-section"
-      >
-        <h2 className="text-[14px] font-semibold">{i18n.t('common.details')}</h2>
-        <p className="text-[12.5px] text-muted -mt-3">
-          {i18n.t('...new.newListingForm.allOptionalFillInWhat')}
-        </p>
-
-        <div className="grid sm:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="watch-brand">{i18n.t('...new.newListingForm.brand')}</Label>
-            <Input
-              id="watch-brand"
-              value={(schemaValues.brand as string) ?? ""}
-              onChange={(e) => setField("brand", e.target.value)}
-              placeholder={i18n.t('...new.newListingForm.rolexPlaceholder')}
-              data-testid="watch-field-brand"
-            />
-          </div>
-          <div>
-            <Label htmlFor="watch-model">{i18n.t('...new.newListingForm.model')}</Label>
-            <Input
-              id="watch-model"
-              value={(schemaValues.model as string) ?? ""}
-              onChange={(e) => setField("model", e.target.value)}
-              placeholder={i18n.t('...new.newListingForm.submariner124060Placeholder')}
-              data-testid="watch-field-model"
-            />
-          </div>
-          <div>
-            <Label htmlFor="watch-case-size">{i18n.t('...new.newListingForm.caseSize')}</Label>
-            <Input
-              id="watch-case-size"
-              value={(schemaValues.case_size as string) ?? ""}
-              onChange={(e) => setField("case_size", e.target.value)}
-              placeholder={i18n.t('...new.newListingForm.41mmPlaceholder')}
-              data-testid="watch-field-case-size"
-            />
-          </div>
-          <div>
-            <Label htmlFor="watch-dial-color">{i18n.t('...new.newListingForm.dialColor')}</Label>
-            <Input
-              id="watch-dial-color"
-              value={(schemaValues.dial_color as string) ?? ""}
-              onChange={(e) => setField("dial_color", e.target.value)}
-              placeholder={i18n.t('...new.newListingForm.blackPlaceholder')}
-              data-testid="watch-field-dial-color"
-            />
-          </div>
-          <div className="sm:col-span-2">
-            <Label htmlFor="watch-case-material">{i18n.t('...new.newListingForm.caseMaterial')}</Label>
-            <Select
-              value={(schemaValues.case_material as string) ?? ""}
-              onValueChange={(v) => setField("case_material", v)}
-            >
-              <SelectTrigger id="watch-case-material" data-testid="watch-field-case-material">
-                <SelectValue placeholder={i18n.t('...new.newListingForm.selectAMaterialPlaceholder')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Stainless Steel">{i18n.t('...new.newListingForm.stainlessSteel')}</SelectItem>
-                <SelectItem value="Yellow Gold">{i18n.t('...new.newListingForm.yellowGold')}</SelectItem>
-                <SelectItem value="White Gold">{i18n.t('...new.newListingForm.whiteGold')}</SelectItem>
-                <SelectItem value="Rose Gold">{i18n.t('...new.newListingForm.roseGold')}</SelectItem>
-                <SelectItem value="Titanium">{i18n.t('...new.newListingForm.titanium')}</SelectItem>
-                <SelectItem value="Platinum">{i18n.t('...new.newListingForm.platinum')}</SelectItem>
-                <SelectItem value="Two-tone">{i18n.t('...new.newListingForm.twotone')}</SelectItem>
-                <SelectItem value="Other">{i18n.t('...new.newListingForm.other')}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap gap-4 pt-1">
-          <label className="flex items-center gap-2 text-[13px]">
-            <input
-              type="checkbox"
-              checked={Boolean(schemaValues.box)}
-              onChange={(e) => setField("box", e.target.checked)}
-              data-testid="watch-field-box"
-            />
-            {i18n.t('...new.newListingForm.originalBox')}
-          </label>
-          <label className="flex items-center gap-2 text-[13px]">
-            <input
-              type="checkbox"
-              checked={Boolean(schemaValues.papers)}
-              onChange={(e) => setField("papers", e.target.checked)}
-              data-testid="watch-field-papers"
-            />
-            {i18n.t('...new.newListingForm.originalPapers')}
-          </label>
-        </div>
-      </section>
-
-      {/* Fallback: if this marketplace has legacy non-watch fields that
-          aren't already covered above, render them so we don't silently
-          drop data. The V1 design is a single watch form, but this keeps
-          data-entry parity with the existing schema mechanism.*/}
-      {false && nonImageFields.length > 0 && (
-        <section className="bg-surface border border-line rounded-[14px] p-5 space-y-5">
+      {/* SHK-062 / SHK-071: render the marketplace's actual schema fields
+          (year, model, condition, era, etc.) instead of the V1 hardcoded
+          watch UI. The watch form silently dropped data on every non-
+          watches marketplace because the keys it wrote (brand, case_size,
+          ...) didn't match the seller's schema; year/condition/etc. then
+          showed as "—" on the listing detail page. */}
+      {nonImageFields.length > 0 && (
+        <section
+          className="bg-surface border border-line rounded-[14px] p-5 space-y-5"
+          data-testid="watch-details-section"
+        >
           <h2 className="text-[14px] font-semibold">{i18n.t('common.details')}</h2>
+          <p className="text-[12.5px] text-muted -mt-3">
+            {i18n.t('...new.newListingForm.allOptionalFillInWhat')}
+          </p>
           {nonImageFields.map((f) => (
             <SchemaFieldInput
               key={f.id}
