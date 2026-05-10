@@ -88,6 +88,10 @@ type FormState = {
   unlisted: boolean;
   requiredVerifications: VerifyProviderId[];
   autoApprove: boolean;
+  // SHK-065: when false (and entryMethod=APPLICATION), the wizard hides
+  // the application-questions card and submits an empty list — owner
+  // still gets a Request to join entry but doesn't ask anything.
+  requiresApplication: boolean;
   applicationQuestions: ApplicationQuestion[];
   isPaid: boolean;
   monthlyPriceDollars: string;
@@ -176,6 +180,7 @@ const INITIAL_STATE: FormState = {
   unlisted: false,
   requiredVerifications: ["GOOGLE"],
   autoApprove: false,
+  requiresApplication: true,
   applicationQuestions: [
     {
       uid: uid(),
@@ -241,7 +246,7 @@ export function CreateMarketplaceWizard() {
     }
     if (current === 3) {
       if (state.requiredVerifications.length < 1) e.requiredVerifications = "Select at least one verification.";
-      if (state.entryMethod === "APPLICATION") {
+      if (state.entryMethod === "APPLICATION" && state.requiresApplication) {
         state.applicationQuestions.forEach((q, i) => {
           if (!q.label.trim()) e[`q-${i}-label`] = "Question is required.";
           if ((q.type === "SELECT" || q.type === "MULTI_SELECT") && (!q.options || q.options.length < 1))
@@ -343,7 +348,7 @@ export function CreateMarketplaceWizard() {
         maxImages: f.type === "IMAGE" ? f.maxImages ?? 10 : null,
       })),
       applicationQuestions:
-        state.entryMethod === "APPLICATION"
+        state.entryMethod === "APPLICATION" && state.requiresApplication
           ? state.applicationQuestions.map((q) => ({
               label: q.label.trim(),
               helpText: q.helpText?.trim() || null,
@@ -1418,6 +1423,27 @@ function MembershipStep({
                   </span>
                 </label>
               )}
+
+              {/* SHK-065: when APPLICATION is the join method, let the
+                  creator opt out of asking questions. Off = "anyone can
+                  request to join, owner approves manually, no form". */}
+              {state.entryMethod === "APPLICATION" && (
+                <label className="mt-3 flex items-center gap-3 rounded-[10px] border border-line-soft bg-bg-panel px-3 py-2.5">
+                  <Switch
+                    checked={state.requiresApplication}
+                    onCheckedChange={(v) =>
+                      setState((s) => ({ ...s, requiresApplication: !!v }))
+                    }
+                    data-testid="requires-application-toggle"
+                  />
+                  <span className="text-[13px]">
+                    <span className="font-medium">Require an application form</span>
+                    <span className="block text-muted text-[12px]">
+                      Off: applicants tap "Request to join" and you approve them manually — no questions asked.
+                    </span>
+                  </span>
+                </label>
+              )}
             </div>
           )}
         </CardContent>
@@ -1464,7 +1490,7 @@ function MembershipStep({
         </CardContent>
       </Card>
 
-      {state.entryMethod === "APPLICATION" && (
+      {state.entryMethod === "APPLICATION" && state.requiresApplication && (
         <Card>
           <CardHeader>
             <div className="flex items-start justify-between gap-3">

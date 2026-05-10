@@ -9,6 +9,40 @@ test.describe("May 2026 batch", () => {
     await request.post("/api/e2e-reset");
   });
 
+  // SHK-065 — when an owner picks CLOSED/PRIVATE + APPLICATION, the
+  // wizard should let them opt out of an application form (manual
+  // approval without questions). Tracker also asked for a "who can
+  // refer" toggle on REFERRAL — that's deferred (schema change), see
+  // tracker note.
+  test("SHK-065: application questions can be turned off in the create wizard", async ({
+    page,
+  }) => {
+    await signIn(page, "owner@shouks.test", "Test123!@#");
+    await page.goto("/owner/create");
+    await page.waitForLoadState("networkidle");
+    // Walk to step 3 (Membership rules) — fill the basics step.
+    await page.getByTestId("field-name").fill(`SHK-065 ${Date.now()}`);
+    // category is a Select trigger — open and pick first option.
+    await page.getByTestId("field-category").click();
+    await page.getByRole("option").first().click();
+    await page.getByTestId("wizard-next").click();
+    // Listing schema step — keep defaults.
+    await page.getByTestId("wizard-next").click();
+    // Membership rules step.
+    await page.getByTestId("entry-method-closed").click();
+    await page.getByTestId("join-method-application").click();
+
+    // The toggle should default to ON (questions required) for back-compat.
+    const toggle = page.getByTestId("requires-application-toggle");
+    await expect(toggle).toBeVisible();
+
+    // Turn it OFF and confirm the questions section disappears.
+    await toggle.click();
+    await expect(
+      page.getByRole("heading", { name: /application questions/i }),
+    ).toHaveCount(0);
+  });
+
   // SHK-074 — clicking "Message seller" creates a thread row but the
   // recipient should not see the thread in their inbox until at least
   // one message is actually sent. Sender stays on their compose pane.
